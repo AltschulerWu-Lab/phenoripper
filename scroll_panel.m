@@ -63,6 +63,7 @@ handles.delete_marker=uicontrol('Style', 'pushbutton',...
         'position', [handles.left_edge_of_panel+0.2,handles.bottom_of_panel-0.15,0.1,0.05],...
         'Callback', {@deletemarker_callback,handles},'parent',handles.fig,...
         'BackgroundColor',handles.background_color,'ForegroundColor',handles.foreground_color); %Delete Channel
+myhandles.regular_expressions{1}='';
 
 %table to display matched files
 handles.file_table=uitable('Units','normalized','position',...
@@ -331,6 +332,12 @@ myhandles=getappdata(0,'myhandles');
 handles=getappdata(0,'handles');
 myhandles.file_table=contruct_filetable();
 set(handles.file_table,'Data',myhandles.file_table);
+%myhandles.regular_expressions{channel_number}=get(hObject,'String');
+[myhandles.metadata,~]=extract_regexp_metadata(myhandles.file_table,myhandles.regular_expressions);
+temp=fieldnames(myhandles.metadata{1});
+handles=getappdata(0,'handles');
+set(handles.groupby_listbox,'String',temp(2:end));
+
 setappdata(0,'handles',handles);   
 setappdata(0,'myhandles',myhandles);   
 
@@ -474,7 +481,7 @@ for i=1:number_of_files
    end
 end
 
-files_with_matches=false(number_of_files,files_per_image);
+files_with_matches=true(number_of_files,files_per_image);
 
 for channel=1:files_per_image
     
@@ -491,7 +498,7 @@ for channel=1:files_per_image
                 if(~isempty(matched))
                     fnames=fieldnames(nam{matched(1)});
                 else
-                    error('No matches');
+                    errordlg('No matches');
                 end
                 
                 
