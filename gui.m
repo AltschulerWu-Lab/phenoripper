@@ -22,7 +22,7 @@ function varargout = gui(varargin)
  
 % Edit the above text to modify the response to help gui
 
-% Last Modified by GUIDE v2.5 31-Jan-2011 15:56:32
+% Last Modified by GUIDE v2.5 17-Feb-2011 13:36:01
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -59,7 +59,7 @@ myhandles.number_of_blocks_per_training_image=1000;
 myhandles.rgb_samples_per_training_image=3000;
 myhandles.number_of_block_representatives=3;
 myhandles.number_of_superblocks=20;
-myhandles.number_of_channels=3;
+%myhandles.files_per_image=3;
 myhandles.imageDirectory='/home/z/My Paper Stuff/Images/Test';
 myhandles.is_directory_usable=false;
 
@@ -299,25 +299,38 @@ function SelectDirectory_Callback(hObject, eventdata, handles)
 % hObject    handle to SelectDirectory (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-SetButtonState(hObject,handles,false);
-myhandles=getappdata(0,'myhandles');
-%files = uipickfiles('num',1,'out','ch','FilterSpec','/home/z/My Paper Stuff/Images/Test');
-files = uipickfiles('num',1,'out','ch','FilterSpec',myhandles.imageDirectory);
-%files = uipickfiles('num',1,'out','ch','FilterSpec','TestImages/');
-if(files~=0)
-set(handles.ImageRootDirectory','String',files);
-myhandles.imageDirectory=files;
-setappdata(0,'myhandles',myhandles);
-end
-if(~Test_Directory(files))
-    warndlg('Directory Unusable');
-else
-    myhandles=getappdata(0,'myhandles');
-    myhandles.is_directory_usable=true;
-    setappdata(0,'myhandles',myhandles);
-end
+%SetButtonState(hObject,handles,false);
+% myhandles=getappdata(0,'myhandles');
+% %files = uipickfiles('num',1,'out','ch','FilterSpec','/home/z/My Paper Stuff/Images/Test');
+% files = uipickfiles('num',1,'out','ch','FilterSpec',myhandles.imageDirectory);
+% %files = uipickfiles('num',1,'out','ch','FilterSpec','TestImages/');
+% if(files~=0)
+% set(handles.ImageRootDirectory','String',files);
+% myhandles.imageDirectory=files;
+% setappdata(0,'myhandles',myhandles);
+% end
+% if(~Test_Directory(files))
+%     warndlg('Directory Unusable');
+% else
+%     myhandles=getappdata(0,'myhandles');
+%     myhandles.is_directory_usable=true;
+%     setappdata(0,'myhandles',myhandles);
+% end
 
-SetButtonState(hObject,handles,true);
+scroll_panel;
+uiwait;
+myhandles=getappdata(0,'myhandles');
+
+myhandles.number_of_conditions=length(myhandles.grouped_metadata);
+myhandles.number_of_files=0;
+for i=1:myhandles.number_of_conditions
+    myhandles.number_of_files=myhandles.number_of_files+...
+        size(myhandles.grouped_metadata{i}.files_in_group,1);
+end
+set(handles.PointColor_popupmenu,'String',myhandles.grouping_fields);
+set(handles.PointLabel_popupmenu,'String',myhandles.grouping_fields);
+setappdata(0,'myhandles',myhandles);
+%SetButtonState(hObject,handles,true);
 guidata(hObject, handles);
 
 
@@ -329,12 +342,12 @@ function RunBtn_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 myhandles=getappdata(0,'myhandles');
-if(~myhandles.is_directory_usable)
-    warndlg('Change Root Directory');
-    return;
-end
+% if(~myhandles.is_directory_usable)
+%     warndlg('Change Root Directory');
+%     return;
+% end
 
-SetButtonState(hObject,handles,false);
+%SetButtonState(hObject,handles,false);
 
 block_size = str2double(get(handles.blockSize,'String'));
 cutoff_intensity=str2double(get(handles.ThreshodIntensity,'String'));
@@ -344,60 +357,25 @@ number_of_blocks_per_training_image=1000;
 rgb_samples_per_training_image=3000;
 number_of_block_representatives=3;
 number_of_superblocks=str2double(get(handles.SuperBlockNr,'String'));
-number_of_channels=str2double(get(handles.ChannelNr,'String'));
+files_per_image=myhandles.files_per_image;%str2double(get(handles.ChannelNr,'String'));
 imageDirectory=get(handles.ImageRootDirectory,'String');
 
-if (get(handles.displayByColumn,'Value') == get(handles.displayByColumn,'Max'))
-    outputDisplay=1;
-elseif (get(handles.displayByRow,'Value') == get(handles.displayByRow,'Max'))
-    outputDisplay=2;
+if(myhandles.number_of_conditions>100)
+   chosen_conditions=randsample(myhandles.number_of_conditions,100); 
 else
-    outputDisplay=3;
-end
-if (get(handles.OutputMDS,'Value') == get(handles.displayByColumn,'Max'))
-    outputType=1;
-elseif (get(handles.OutputHeatMap,'Value') == get(handles.displayByRow,'Max'))
-    outputType=2;
-else
-    outputType=3;
+    chosen_conditions=1:myhandles.number_of_conditions;
 end
 
-if(strcmp(imageDirectory(length(imageDirectory):end),filesep))
-    imageDirectory=imageDirectory(1:length(imageDirectory)-1);
-end
-dir_list=dir(imageDirectory);
-subdirs={dir_list([(dir_list(:).isdir)]).name};
-subdirs=subdirs(3:end);
-global_filenames=cell(length(subdirs),number_of_channels);
-
-for subdir_num=1:length(subdirs)
-    dir_name=[imageDirectory filesep subdirs{subdir_num} filesep];
-    
-    dir_list=dir(dir_name);
-    file_list={dir_list(~[(dir_list(:).isdir)]).name};
-    imagenames=cell(0);
-    
-    for i=1:length(file_list)
-        tokens=regexp(cell2mat(file_list(i)),'-','split');
-        imagenames(i)=tokens(1);
-    end
-    imagenames=unique(imagenames);
-    
-    filenames=cell(length(imagenames),number_of_channels);
-    for image_number=1:length(imagenames)
-        for channel=1:number_of_channels
-            filenames{image_number,channel}=...
-                [dir_name imagenames{image_number} '-' num2str(channel) '.png'];
-        end
-    end
-    
+global_filenames=cell(length(chosen_conditions),files_per_image);
+for condition=1:length(chosen_conditions)
+    filenames=myhandles.grouped_metadata{chosen_conditions(condition)}.files_in_group;
     file_num=randi(size(filenames,1));%Pick Random File
-    for channel=1:number_of_channels
-        global_filenames{subdir_num,channel}=filenames{file_num,channel}; %Change this to a randomly selected file
+    for channel=1:files_per_image
+        global_filenames{condition,channel}=filenames{file_num,channel}; 
     end
   
-    
 end
+
 
 set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
 %set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximum',myhandles.number_of_files, 'Value',0);
@@ -421,139 +399,118 @@ myhandles.global_data=global_data;
 %   disp(exception); 
 %end
 
-
-if(strcmp(imageDirectory(length(imageDirectory):end),filesep))
-    imageDirectory=imageDirectory(1:length(imageDirectory)-1);
-end
-    
-dir_list=dir(imageDirectory);
-subdirs={dir_list([(dir_list(:).isdir)]).name};
-subdirs=subdirs(3:end);
+% 
+% if(strcmp(imageDirectory(length(imageDirectory):end),filesep))
+%     imageDirectory=imageDirectory(1:length(imageDirectory)-1);
+% end
+%     
+% dir_list=dir(imageDirectory);
+% subdirs={dir_list([(dir_list(:).isdir)]).name};
+% subdirs=subdirs(3:end);
 Ripped_Data=struct;
-block_profiles=zeros(length(subdirs),number_of_block_clusters);
-superblock_profiles=zeros(length(subdirs),number_of_superblocks);
-well_names=cell(length(subdirs),1);
+block_profiles=zeros(myhandles.number_of_conditions,number_of_block_clusters);
+superblock_profiles=zeros(myhandles.number_of_conditions,number_of_superblocks);
+well_names=cell(myhandles.number_of_conditions,1);
 set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','off');
 set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximum',myhandles.number_of_files, 'Value',0);
 myhandles.statusbarHandles=statusbar(hObject,'Calculating Block Profiles per Image...');
 
 tStart=tic; 
  myhandles.files_analyzed=0;
-for subdir_num=1:length(subdirs)
-    %if getappdata(h,'canceling')
-    %    break
-    %end
-    
+ 
+for condition=1:myhandles.number_of_conditions
     myhandles.tElapsed=toc(tStart); 
-    
     setappdata(0,'myhandles',myhandles);
-    dir_name=[imageDirectory filesep subdirs{subdir_num} filesep];
-    
-    dir_list=dir(dir_name);
-    file_list={dir_list(~[(dir_list(:).isdir)]).name};
-    imagenames=cell(0);
-    
-    for i=1:length(file_list)
-        tokens=regexp(cell2mat(file_list(i)),'-','split');
-        imagenames(i)=tokens(1);
-    end
-    imagenames=unique(imagenames);
-    
-    filenames=cell(length(imagenames),number_of_channels);
-    for image_number=1:length(imagenames)
-        for channel=1:number_of_channels
-            filenames{image_number,channel}=...
-                [dir_name imagenames{image_number} '-' num2str(channel) '.png'];
-        end
-    end
-    
+    filenames=myhandles.grouped_metadata{condition}.files_in_group;
+       
     results=SecondOrder(filenames,global_data);
-    Ripped_Data(subdir_num).block_profile=results.block_profile;
-    block_profiles(subdir_num,:)=results.block_profile;
-    superblock_profiles(subdir_num,:)=results.superblock_profile;
-    Ripped_Data(subdir_num).superblock_profile=results.superblock_profile;
-    dir_name=subdirs{subdir_num};
-    Ripped_Data(subdir_num).row_name=dir_name(1);
-    Ripped_Data(subdir_num).column_number=dir_name(2:end);
-    Ripped_Data(subdir_num).well=dir_name;
-    well_names{subdir_num}=dir_name;
+    Ripped_Data(condition).block_profile=results.block_profile;
+    block_profiles(condition,:)=results.block_profile;
+    superblock_profiles(condition,:)=results.superblock_profile;
+    Ripped_Data(condition).superblock_profile=results.superblock_profile;
+%     dir_name=subdirs{condition};
+%     Ripped_Data(condition).row_name=dir_name(1);
+%     Ripped_Data(condition).column_number=dir_name(2:end);
+%     Ripped_Data(condition).well=dir_name;
+%     well_names{condition}=dir_name;
     
 %    waitbar(subdir_num/length(subdirs),h,sprintf('%3f minutes
 %    left',(length(subdirs)-subdir_num)*tElapsed/(60*subdir_num)));
    %set(myhandles.statusbarHandles.ProgressBar, 'Value',subdir_num);
-    myhandles.files_analyzed=myhandles.files_analyzed+length(imagenames);
+    myhandles.files_analyzed=myhandles.files_analyzed+length(filenames);
     setappdata(0,'myhandles',myhandles);
     drawnow;
-   %myhandles.statusbarHandles=statusbar(hObject,'Calculating Block Profiles per Image...%3f minutes left',(length(subdirs)-subdir_num)*tElapsed/(60*subdir_num));
+    
 end
+ 
 set(myhandles.statusbarHandles.ProgressBar, 'Visible','off','StringPainted','off');
 myhandles.Ripped_Data=Ripped_Data;
 myhandles.superblock_profiles=superblock_profiles;
 myhandles.block_profiles=block_profiles;
 setappdata(0,'myhandles',myhandles);
-
-row_names=cell(0);
-col_names=cell(0);
-for subdir_num=1:length(subdirs)
-   row_names{subdir_num}= Ripped_Data(subdir_num).row_name;
-   col_names{subdir_num}= Ripped_Data(subdir_num).column_number;
-end
-
-
-        
-[r,rn]=grp2idx(row_names);
-[c,cn]=grp2idx(col_names);
-
-switch(outputDisplay)
-    case 1
-        colorsGroup=c;
-    case 2
-        colorsGroup=r;
-    case 3
-        colorsGroup=(1:length(subdirs));
-end
-
-myhandles.mds_text=cell(size(block_profiles,1),1);
-myhandles.mds_colors=zeros(size(block_profiles,1),3);
-switch(outputType)
-    case 1
-        
-        
-        dists=pdist(superblock_profiles);
-        profile_mds=mdscale(dists,3);
-        colors=colormap(jet(max(colorsGroup)));
-        figure;
-        scatter3(profile_mds(:,1),profile_mds(:,2),profile_mds(:,3),10);
-        for i=1:size(block_profiles,1)
-            text(profile_mds(i,1),profile_mds(i,2),profile_mds(i,3),Ripped_Data(i).well,...
-                'BackgroundColor',colors(colorsGroup(i),:));%not always cn
-            myhandles.mds_text{i}=Ripped_Data(i).well;
-            myhandles.mds_colors(i,:)=colors(colorsGroup(i),:);
-        end
-    case 2
-        clustergram(superblock_profiles,'RowLabels',well_names);
-        
-    case 3
-        
-        clustergram(superblock_profiles,'RowLabels',well_names);
-        
-        dists=pdist(superblock_profiles);
-        profile_mds=mdscale(dists,3);
-        colors=colormap(jet(max(colorsGroup)));
-        figure;
-        scatter3(profile_mds(:,1),profile_mds(:,2),profile_mds(:,3),10);
-        for i=1:size(block_profiles,1)
-            text(profile_mds(i,1),profile_mds(i,2),profile_mds(i,3),Ripped_Data(i).well,...
-                'BackgroundColor',colors(colorsGroup(i),:));%not always cn
-            myhandles.mds_text{i}=Ripped_Data(i).well;
-            myhandles.mds_colors(i,:)=colors(colorsGroup(i),:);
-        end
-end
-
+% 
+% row_names=cell(0);
+% col_names=cell(0);
+% for subdir_num=1:length(subdirs)
+%    row_names{subdir_num}= Ripped_Data(subdir_num).row_name;
+%    col_names{subdir_num}= Ripped_Data(subdir_num).column_number;
+% end
+% 
+% 
+%         
+% [r,rn]=grp2idx(row_names);
+% [c,cn]=grp2idx(col_names);
+% 
+% switch(outputDisplay)
+%     case 1
+%         colorsGroup=c;
+%     case 2
+%         colorsGroup=r;
+%     case 3
+%         colorsGroup=(1:length(subdirs));
+% end
+% 
+% myhandles.mds_text=cell(size(block_profiles,1),1);
+% myhandles.mds_colors=zeros(size(block_profiles,1),3);
+% switch(outputType)
+%     case 1
+%         
+%         
+%         dists=pdist(superblock_profiles);
+%         profile_mds=mdscale(dists,3);
+%         colors=colormap(jet(max(colorsGroup)));
+%         figure;
+%         scatter3(profile_mds(:,1),profile_mds(:,2),profile_mds(:,3),10);
+%         for i=1:size(block_profiles,1)
+%             text(profile_mds(i,1),profile_mds(i,2),profile_mds(i,3),Ripped_Data(i).well,...
+%                 'BackgroundColor',colors(colorsGroup(i),:));%not always cn
+%             myhandles.mds_text{i}=Ripped_Data(i).well;
+%             myhandles.mds_colors(i,:)=colors(colorsGroup(i),:);
+%         end
+%     case 2
+%         clustergram(superblock_profiles,'RowLabels',well_names);
+%         
+%     case 3
+%         
+%         clustergram(superblock_profiles,'RowLabels',well_names);
+%         
+%         dists=pdist(superblock_profiles);
+%         profile_mds=mdscale(dists,3);
+%         colors=colormap(jet(max(colorsGroup)));
+%         figure;
+%         scatter3(profile_mds(:,1),profile_mds(:,2),profile_mds(:,3),10);
+%         for i=1:size(block_profiles,1)
+%             text(profile_mds(i,1),profile_mds(i,2),profile_mds(i,3),Ripped_Data(i).well,...
+%                 'BackgroundColor',colors(colorsGroup(i),:));%not always cn
+%             myhandles.mds_text{i}=Ripped_Data(i).well;
+%             myhandles.mds_colors(i,:)=colors(colorsGroup(i),:);
+%         end
+% end
+% 
 dists=pdist(superblock_profiles);
 myhandles.mds_data=mdscale(dists,3);
 setappdata(0,'myhandles',myhandles);
-SetButtonState(hObject,handles,true);
+%SetButtonState(hObject,handles,true);
 set(handles.ExplorerButton,'Visible','on');
 set(handles.SaveOutputButton,'Visible','on');
 set(handles.ExplorerButton,'Enable','on');
@@ -569,50 +526,41 @@ function TestThreshold_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 myhandles=getappdata(0,'myhandles');
-if(~myhandles.is_directory_usable)
-    warndlg('Change Root Directory');
-    return;
-end
-SetButtonState(hObject,handles,false);
+% if(~myhandles.is_directory_usable)
+%     warndlg('Change Root Directory');
+%     return;
+% end
+%SetButtonState(hObject,handles,false);
 
 
 cutoff_intensity=str2double(get(handles.ThreshodIntensity,'String'));
-number_of_channels=str2double(get(handles.ChannelNr,'String'));
-imageDirectory=get(handles.ImageRootDirectory,'String');
+files_per_image=myhandles.files_per_image;%str2double(get(handles.ChannelNr,'String'));
+number_of_channels=myhandles.number_of_channels;
+%imageDirectory=get(handles.ImageRootDirectory,'String');
    
 number_of_test_files=10;
 
-selected_files=cell(number_of_test_files,number_of_channels);
+selected_files=cell(number_of_test_files,files_per_image);
 
-if(strcmp(imageDirectory(length(imageDirectory):end),filesep))
-    imageDirectory=imageDirectory(1:length(imageDirectory)-1);
-end
-dir_list=dir(imageDirectory);
-subdirs={dir_list([(dir_list(:).isdir)]).name};
-subdirs=subdirs(3:end);
+% if(strcmp(imageDirectory(length(imageDirectory):end),filesep))
+%     imageDirectory=imageDirectory(1:length(imageDirectory)-1);
+% end
+% dir_list=dir(imageDirectory);
+% subdirs={dir_list([(dir_list(:).isdir)]).name};
 
 
 for test_num=1:number_of_test_files
-  subdir_num=randi(length(subdirs));
-dir_name=[imageDirectory filesep subdirs{subdir_num} filesep];
+    condition=randi(myhandles.number_of_conditions);
+    imagenames=myhandles.grouped_metadata{condition}.files_in_group;
     
-    dir_list=dir(dir_name);
-    file_list={dir_list(~[(dir_list(:).isdir)]).name};
-    imagenames=cell(0);
-    
-    for i=1:length(file_list)
-        tokens=regexp(cell2mat(file_list(i)),'-','split');
-        imagenames(i)=tokens(1);
-    end
-    imagenames=unique(imagenames);
     file_num=randi(length(imagenames));
     
-    for channel=1:number_of_channels
-        selected_files{test_num,channel}=...
-            [dir_name imagenames{file_num} '-' num2str(channel) '.png'];
-         
+    for channel=1:files_per_image
+        selected_files{test_num,channel}=imagenames{file_num,channel};
+          
+        
     end
-
+    
     
 end
 
@@ -626,8 +574,12 @@ img=zeros(xres,yres,number_of_channels);
 amplitudes=zeros(size(selected_files,1),1);
 max_val=0;
 for file_num=1:size(selected_files,1)
-    for channel=1:number_of_channels
-        img(:,:,channel)=imread(selected_files{file_num,channel});
+    if(number_of_channels~=files_per_image)
+        img=selected_files{file_num,1};
+    else
+        for channel=1:number_of_channels
+                img(:,:,channel)=imread(selected_files{file_num,channel});
+        end
     end
     max_val=max(max(img(:)),max_val);
     amp=sum(double(img).^2,3);
@@ -672,54 +624,54 @@ function AutoThreshold_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 myhandles=getappdata(0,'myhandles');
-if(~myhandles.is_directory_usable)
-    warndlg('Change Root Directory');
-    return;
-end
-SetButtonState(hObject,handles,false);
+% if(~myhandles.is_directory_usable)
+%     warndlg('Change Root Directory');
+%     return;
+% end
+%SetButtonState(hObject,handles,false);
 cutoff_intensity=str2double(get(handles.ThreshodIntensity,'String'));
-number_of_channels=str2double(get(handles.ChannelNr,'String'));
-imageDirectory=get(handles.ImageRootDirectory,'String');
+files_per_image=myhandles.files_per_image;
+number_of_channels=myhandles.number_of_channels;
+%imageDirectory=get(handles.ImageRootDirectory,'String');
 number_of_test_files=10;
 
 
-if(strcmp(imageDirectory(length(imageDirectory):end),filesep))
-    imageDirectory=imageDirectory(1:length(imageDirectory)-1);
-end
-dir_list=dir(imageDirectory);
-subdirs={dir_list([(dir_list(:).isdir)]).name};
-subdirs=subdirs(3:end);
+% if(strcmp(imageDirectory(length(imageDirectory):end),filesep))
+%     imageDirectory=imageDirectory(1:length(imageDirectory)-1);
+% end
+% dir_list=dir(imageDirectory);
+% subdirs={dir_list([(dir_list(:).isdir)]).name};
+% subdirs=subdirs(3:end);
 
 thresholds=zeros(number_of_test_files,1);
 set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximum',number_of_test_files, 'Value',0);
 myhandles.statusbarHandles=statusbar(hObject,'Calculating Best Threshold ...');
 for test_num=1:number_of_test_files
-  subdir_num=randi(length(subdirs));
-dir_name=[imageDirectory filesep subdirs{subdir_num} filesep];
+ 
+    condition=randi(myhandles.number_of_conditions);
+    imagenames=myhandles.grouped_metadata{condition}.files_in_group;
     
-    dir_list=dir(dir_name);
-    file_list={dir_list(~[(dir_list(:).isdir)]).name};
-    imagenames=cell(0);
-    
-    for i=1:length(file_list)
-        tokens=regexp(cell2mat(file_list(i)),'-','split');
-        imagenames(i)=tokens(1);
-    end
-    imagenames=unique(imagenames);
     file_num=randi(length(imagenames));
     
-    filename=[dir_name imagenames{file_num} '-' num2str(1) '.png'];
+    filename=imagenames{1};
     test=imfinfo(filename);
     xres=test.Height;
     yres=test.Width;
     img=zeros(xres,yres,number_of_channels);
     
-   
+    
     channel_thresholds=zeros(number_of_channels,1);
+    if(number_of_channels==files_per_image)
+        for channel=1:number_of_channels
+            filename=imagenames{file_num,channel};
+            img(:,:,channel)=imread(filename);
+        end
+    else
+        filename=imagenames{file_num,1};
+        img=imread(filename);
+    end
+
     for channel=1:number_of_channels
-        filename=...
-            [dir_name imagenames{file_num} '-' num2str(channel) '.png'];
-         img(:,:,channel)=imread(filename);
          intensity= img(:,:,channel);
          max_intensity=max(intensity(:));
          min_intensity=min(intensity(:));
@@ -772,7 +724,7 @@ guidata(hObject, handles);
 
 function dir_ok=Test_Directory(imageDirectory)
 myhandles=getappdata(0,'myhandles');
-number_of_channels=myhandles.number_of_channels;
+files_per_image=myhandles.files_per_image;
 number_of_files=0;
 if(strcmp(imageDirectory(length(imageDirectory):end),filesep))
     imageDirectory=imageDirectory(1:length(imageDirectory)-1);
@@ -805,9 +757,9 @@ for subdir_num=1:length(subdirs)
     end
     imagenames=unique(imagenames);
     
-    filenames=cell(length(imagenames),number_of_channels);
+    filenames=cell(length(imagenames),files_per_image);
     for image_number=1:length(imagenames)
-        for channel=1:number_of_channels
+        for channel=1:files_per_image
             filename=...
                 [dir_name imagenames{image_number} '-' num2str(channel) '.png'];
             filenames{image_number,channel}=filename;
@@ -852,10 +804,11 @@ function ExplorerButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 myhandles=getappdata(0,'myhandles');
-%MakePlots(hObject,eventdata,handles);
+MakePlots(hObject,eventdata,handles);
+myhandles=getappdata(0,'myhandles');
 CoolClustergram(myhandles.superblock_profiles,...
-    myhandles.global_data.superblock_representatives,myhandles.mds_text);
-Explorer;
+     myhandles.global_data.superblock_representatives,myhandles.mds_text);
+ Explorer;
 
 
 
@@ -903,83 +856,126 @@ setappdata(0,'myhandles',myhandles);
 
 function MakePlots(hObject,eventdata,handles)
 myhandles=getappdata(0,'myhandles');
-if (get(handles.displayByColumn,'Value') == get(handles.displayByColumn,'Max'))
-    outputDisplay=1;
-elseif (get(handles.displayByRow,'Value') == get(handles.displayByRow,'Max'))
-    outputDisplay=2;
-else
-    outputDisplay=3;
-end
-if (get(handles.OutputMDS,'Value') == get(handles.displayByColumn,'Max'))
-    outputType=1;
-elseif (get(handles.OutputHeatMap,'Value') == get(handles.displayByRow,'Max'))
-    outputType=2;
-else
-    outputType=3;
-end
 
-Ripped_Data=myhandles.Ripped_Data;
-row_names=cell(0);
-col_names=cell(0);
-for subdir_num=1:length(Ripped_Data)
-   row_names{subdir_num}= Ripped_Data(subdir_num).row_name;
-   col_names{subdir_num}= Ripped_Data(subdir_num).column_number;
-end
+label_field=myhandles.grouping_fields{get(handles.PointLabel_popupmenu,'Value')};
+color_field=myhandles.grouping_fields{get(handles.PointColor_popupmenu,'Value')};
 
 
-        
-[r,rn]=grp2idx(row_names);
-[c,cn]=grp2idx(col_names);
+% if (get(handles.OutputMDS,'Value') == get(handles.displayByColumn,'Max'))
+%     outputType=1;
+% elseif (get(handles.OutputHeatMap,'Value') == get(handles.displayByRow,'Max'))
+%     outputType=2;
+% else
+%     outputType=3;
+% end
 
-switch(outputDisplay)
-    case 1
-        colorsGroup=c;
-    case 2
-        colorsGroup=r;
-    case 3
-        colorsGroup=(1:length(Ripped_Data));
+group_vals=cell(1,myhandles.number_of_conditions);
+for condition=1:myhandles.number_of_conditions
+   group_vals{condition}=cell2mat(myhandles.grouped_metadata{condition}.(color_field)); 
 end
 
 myhandles.mds_text=cell(size(myhandles.superblock_profiles,1),1);
-myhandles.mds_colors=zeros(size(myhandles.superblock_profiles,1),3);
-well_names={Ripped_Data(:).well};
-switch(outputType)
-    case 1
-        
-        
-        dists=pdist(myhandles.superblock_profiles);
-        profile_mds=mdscale(dists,3);
-        colors=colormap(jet(max(colorsGroup)));
-        figure;
-        scatter3(profile_mds(:,1),profile_mds(:,2),profile_mds(:,3),10);
-        for i=1:length(Ripped_Data)
-            text(profile_mds(i,1),profile_mds(i,2),profile_mds(i,3),Ripped_Data(i).well,...
-                'BackgroundColor',colors(colorsGroup(i),:));%not always cn
-            myhandles.mds_text{i}=Ripped_Data(i).well;
-            myhandles.mds_colors(i,:)=colors(colorsGroup(i),:);
-        end
-    case 2
-        clustergram(myhandles.superblock_profiles,'RowLabels',well_names);
-        
-    case 3
-        
-        
-        
-        dists=pdist(myhandles.superblock_profiles);
-        profile_mds=mdscale(dists,3);
-        colors=colormap(jet(max(colorsGroup)));
-        figure;
-        scatter3(profile_mds(:,1),profile_mds(:,2),profile_mds(:,3),10);
-        for i=1:length(Ripped_Data)
-            text(profile_mds(i,1),profile_mds(i,2),profile_mds(i,3),Ripped_Data(i).well,...
-                'BackgroundColor',colors(colorsGroup(i),:));%not always cn
-           
-        end
-        %clustergram(myhandles.superblock_profiles,'RowLabels',well_names);
+myhandles.mds_colors=zeros(size(myhandles.superblock_profiles,1),3);       
+[colorsGroup,GN]=grp2idx(group_vals);
+colors=colormap(jet(max(colorsGroup)));
+dists=pdist(myhandles.superblock_profiles);
+profile_mds=mdscale(dists,3);
+figure;
+scatter3(profile_mds(:,1),profile_mds(:,2),profile_mds(:,3),10);
+for i=1:myhandles.number_of_conditions
+    text(profile_mds(i,1),profile_mds(i,2),profile_mds(i,3),...
+        myhandles.grouped_metadata{i}.(label_field),...
+        'BackgroundColor',colors(colorsGroup(i),:));%not always cn
+    myhandles.mds_text{i}=myhandles.grouped_metadata{i}.(label_field);
+    myhandles.mds_colors(i,:)=colors(colorsGroup(i),:);
 end
+setappdata(0,'myhandles',myhandles);
+% 
+% 
+% well_names={Ripped_Data(:).well};
+% switch(outputType)
+%     case 1
+%         
+%         
+%         dists=pdist(myhandles.superblock_profiles);
+%         profile_mds=mdscale(dists,3);
+%         colors=colormap(jet(max(colorsGroup)));
+%         figure;
+%         scatter3(profile_mds(:,1),profile_mds(:,2),profile_mds(:,3),10);
+%         for i=1:length(Ripped_Data)
+%             text(profile_mds(i,1),profile_mds(i,2),profile_mds(i,3),Ripped_Data(i).well,...
+%                 'BackgroundColor',colors(colorsGroup(i),:));%not always cn
+%             myhandles.mds_text{i}=Ripped_Data(i).well;
+%             myhandles.mds_colors(i,:)=colors(colorsGroup(i),:);
+%         end
+%     case 2
+%         clustergram(myhandles.superblock_profiles,'RowLabels',well_names);
+%         
+%     case 3
+%         
+%         
+%         
+%         dists=pdist(myhandles.superblock_profiles);
+%         profile_mds=mdscale(dists,3);
+%         colors=colormap(jet(max(colorsGroup)));
+%         figure;
+%         scatter3(profile_mds(:,1),profile_mds(:,2),profile_mds(:,3),10);
+%         for i=1:length(Ripped_Data)
+%             text(profile_mds(i,1),profile_mds(i,2),profile_mds(i,3),Ripped_Data(i).well,...
+%                 'BackgroundColor',colors(colorsGroup(i),:));%not always cn
+%            
+%         end
+%         %clustergram(myhandles.superblock_profiles,'RowLabels',well_names);
+% end
 
 
 
 function LoadParameters(loaded_handles,handles,hObject)
 set(handles.SelectDirectory,'String',get(loaded_handles.SelectDirectory,'String'));
 guidata(hObject, handles);
+
+
+% --- Executes on selection change in PointColor_popupmenu.
+function PointColor_popupmenu_Callback(hObject, eventdata, handles)
+% hObject    handle to PointColor_popupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns PointColor_popupmenu contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from PointColor_popupmenu
+
+
+% --- Executes during object creation, after setting all properties.
+function PointColor_popupmenu_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to PointColor_popupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in PointLabel_popupmenu.
+function PointLabel_popupmenu_Callback(hObject, eventdata, handles)
+% hObject    handle to PointLabel_popupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns PointLabel_popupmenu contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from PointLabel_popupmenu
+
+
+% --- Executes during object creation, after setting all properties.
+function PointLabel_popupmenu_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to PointLabel_popupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

@@ -60,6 +60,7 @@ handles.output = hObject;
 %myhandles.all_files=files_in_dir('./');
 myhandles=getappdata(0','myhandles');
 set(handles.FileTable,'Data',myhandles.wizard_files);
+set(handles.DefineRegExp,'String',myhandles.regexp_text);
 % Update handles structure
 setappdata(0,'myhandles',myhandles);
 guidata(hObject, handles);
@@ -76,7 +77,8 @@ function varargout = RegExp_Wizard_OutputFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Get default command line output from handles structure
-varargout{1} = handles.output;
+
+varargout{1} = get(handles.DefineRegExp,'String');
 
 
 % --- Executes on selection change in listbox1.
@@ -192,6 +194,9 @@ pattern=get(hObject,'String');
            
         end
         set(handles.FileTable,'Data',file_data,'ColumnName',cnames);
+        myhandles=getappdata(0,'myhandles');
+myhandles.regexp_text=get(handles.DefineRegExp,'String');
+setappdata(0,'myhandles',myhandles);
         %set(handles.FileTable,'Data',matched_data,'ColumnName',cnames);
         %set(handles.Nonmatched_Table,'Data',non_matched_data,'ColumnName','Non-Matched Files');
         

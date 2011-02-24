@@ -1,0 +1,452 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+1	GUILayout_1p3/GUILayout-1p3/layoutHelp/Function reference.html	/^                    &nbsp;<A href="index.html"><img src="Images\/uparrow.png" border="0" align="top" alt="Go back up one level"\/><\/A><\/h1><!-- ****************************************************************** --><!-- ****************************************************************** --><table border="0"><tr><td colspan="2"><a name="1"><h2>1: Panels<\/h2><\/a><a href="uiextras.Panel.html"><img src="Images\/bigicon_Panel.png" border="1"\/><\/a><a href="uiextras.CardPanel.html"><img src="Images\/bigicon_CardPanel.png" border="1"\/><\/a><a href="uiextras.BoxPanel.html"><img src="Images\/bigicon_BoxPanel.png" border="1"\/><\/a><a href="uiextras.TabPanel.html"><img src="Images\/bigicon_TabPanel.png" border="1"\/><\/a><\/td><\/tr><tr><td valign="top"><a href="Function reference1_1.html">1.1&nbsp;uiextras.Panel<\/a><\/td><td valign="top">Arrange a single element inside a standard panel<\/td><\/tr><tr><td valign="top"><a href="Function reference1_2.html">1.2&nbsp;uiextras.CardPanel<\/a><\/td><td valign="top">Show one element (card) from a list<\/td><\/tr><tr><td valign="top"><a href="Function reference1_3.html">1.3&nbsp;uiextras.BoxPanel<\/a><\/td><td valign="top">Arrange a single element in a panel with boxed title<\/td><\/tr><tr><td valign="top"><a href="Function reference1_4.html">1.4&nbsp;uiextras.TabPanel<\/a><\/td><td valign="top">Arrange elements in a panel with tabs for selecting which is visible<\/td><\/tr><tr><td colspan="2"><a name="2"><h2>2: Boxes<\/h2><\/a><a href="uiextras.HBox.html"><img src="Images\/bigicon_HBox.png" border="1"\/><\/a><a href="uiextras.VBox.html"><img src="Images\/bigicon_VBox.png" border="1"\/><\/a><a href="uiextras.HBoxFlex.html"><img src="Images\/bigicon_HBoxFlex.png" border="1"\/><\/a><a href="uiextras.VBoxFlex.html"><img src="Images\/bigicon_VBoxFlex.png" border="1"\/><\/a><a href="uiextras.HButtonBox.html"><img src="Images\/bigicon_HButtonBox.png" border="1"\/><\/a><a href="uiextras.VButtonBox.html"><img src="Images\/bigicon_VButtonBox.png" border="1"\/><\/a><\/td><\/tr><tr><td valign="top"><a href="Function reference2_1.html">2.1&nbsp;uiextras.HBox<\/a><\/td><td valign="top">Arrange elements horizontally in a single row<\/td><\/tr><tr><td valign="top"><a href="Function reference2_2.html">2.2&nbsp;uiextras.VBox<\/a><\/td><td valign="top">Arrange elements vertically in a single column<\/td><\/tr><tr><td valign="top"><a href="Function reference2_3.html">2.3&nbsp;uiextras.HBoxFlex<\/a><\/td><td valign="top">Arrange elements horizontally with draggable dividers<\/td><\/tr><tr><td valign="top"><a href="Function reference2_4.html">2.4&nbsp;uiextras.VBoxFlex<\/a><\/td><td valign="top">Arrange elements vertically with draggable dividers<\/td><\/tr><tr><td valign="top"><a href="Function reference2_5.html">2.5&nbsp;uiextras.HButtonBox<\/a><\/td><td valign="top">Arrange buttons horizontally in a single row<\/td><\/tr><tr><td valign="top"><a href="Function reference2_6.html">2.6&nbsp;uiextras.VButtonBox<\/a><\/td><td valign="top">Arrange buttons vertically in a single column<\/td><\/tr><tr><td colspan="2"><a name="3"><h2>3: Grids<\/h2><\/a><a href="uiextras.Grid.html"><img src="Images\/bigicon_Grid.png" border="1"\/><\/a><a href="uiextras.GridFlex.html"><img src="Images\/bigicon_GridFlex.png" border="1"\/><\/a><\/td><\/tr><tr><td valign="top"><a href="Function reference3_1.html">3.1&nbsp;uiextras.Grid<\/a><\/td><td valign="top">Arrange elements in a two dimensional grid<\/td><\/tr><tr><td valign="top"><a href="Function reference3_2.html">3.2&nbsp;uiextras.GridFlex<\/a><\/td><td valign="top">Arrange elements in a two dimensional grid with draggable dividers<\/td><\/tr><tr><td colspan="2"><a name="4"><h2>4: Other functions<\/h2><\/a><\/td><\/tr><tr><td valign="top"><a href="Function reference4_1.html">4.1&nbsp;uiextras.Empty<\/a><\/td><td valign="top">Create an empty space<\/td><\/tr><tr><td valign="top"><a href="Function reference4_2.html">4.2&nbsp;layoutVersion<\/a><\/td><td valign="top">Get the toolbox version number and date<\/td><\/tr><tr><td valign="top"><a href="Function reference4_3.html">4.3&nbsp;layoutRoot<\/a><\/td><td valign="top">Return the folder containing the GUI layout toolbox<\/td><\/tr><\/table><BR CLEAR="ALL"\/><BR CLEAR="ALL"\/><TABLE WIDTH="100%" BORDER="0" CELLSPACING="0" CELLPADDING="0"><TR><TD WIDTH="18" HEIGHT="15" BGCOLOR="#e4f0f8" ALIGN="left"><A HREF="index.html"><IMG SRC="Images\/leftarrow.png" BORDER="0" ALT="previous page"\/><\/A><\/TD><TD WIDTH="40%" HEIGHT="15" BGCOLOR="#e4f0f8" ALIGN="left"><A HREF="index.html"><font face="Arial" bgcolor="#e4f0f8" size="normal" underline="0" color="#000000">Front page<\/font><\/A><\/TD><TD WIDTH="20%" HEIGHT="15" BGCOLOR="#e4f0f8" ALIGN="center"><a href="index.html"><font face="Arial" bgcolor="#e4f0f8" size="normal" underline="0" color="#000000">$/;"	a
+1	GUIs_FEX/contents.html	/^         <h2>GUI_1  Explore simple string manipulation.<a name="1"><\/a><\/h2>$/;"	a
+10	GUIs_FEX/contents.html	/^         <h2>GUI_10  Explore making an image visible and invisible.<a name="10"><\/a><\/h2>$/;"	a
+11	GUIs_FEX/contents.html	/^         <h2>GUI_11  Explore GUI use to stop a FOR loop.<a name="11"><\/a><\/h2>$/;"	a
+12	GUIs_FEX/contents.html	/^         <h2>GUI_12  Explore mouse pointer manipulation.<a name="12"><\/a><\/h2>$/;"	a
+13	GUIs_FEX/contents.html	/^         <h2>GUI_13  Explore slider and editbox interaction.<a name="13"><\/a><\/h2>$/;"	a
+14	GUIs_FEX/contents.html	/^         <h2>GUI_14  Explore string color control.<a name="14"><\/a><\/h2>$/;"	a
+15	GUIs_FEX/contents.html	/^         <h2>GUI_15  Explore simple string manipulation.<a name="15"><\/a><\/h2>$/;"	a
+16	GUIs_FEX/contents.html	/^         <h2>GUI_16  Explore slider and editbox interaction.<a name="16"><\/a><\/h2>$/;"	a
+17	GUIs_FEX/contents.html	/^         <h2>GUI_17  Explore clock and timer use in a GUI.<a name="17"><\/a><\/h2>$/;"	a
+18	GUIs_FEX/contents.html	/^         <h2>GUI_18  Explore the buttondownfcn for an axes.<a name="18"><\/a><\/h2>$/;"	a
+19	GUIs_FEX/contents.html	/^         <h2>GUI_19  Explore counting and argument detection.<a name="19"><\/a><\/h2>$/;"	a
+2	GUIs_FEX/contents.html	/^         <h2>GUI_2  Explore simple string manipulation.<a name="2"><\/a><\/h2>$/;"	a
+20	GUIs_FEX/contents.html	/^         <h2>GUI_20  Explore popup selection determination.<a name="20"><\/a><\/h2>$/;"	a
+21	GUIs_FEX/contents.html	/^         <h2>GUI_21  Explore popup selection determination and manipulation.<a name="21"><\/a><\/h2>$/;"	a
+22	GUIs_FEX/contents.html	/^         <h2>GUI_22  Explore popup selection determination and manipulation.<a name="22"><\/a><\/h2>$/;"	a
+23	GUIs_FEX/contents.html	/^         <h2>GUI_23  Explore multiple-figure data-passing, and the stacking order.<a name="23"><\/a><\/h2>$/;"	a
+24	GUIs_FEX/contents.html	/^         <h2>GUI_24  Explore multiple-figure data-passing.<a name="24"><\/a><\/h2>$/;"	a
+25	GUIs_FEX/contents.html	/^         <h2>GUI_25  Explore file selection\/manipulation.<a name="25"><\/a><\/h2>$/;"	a
+26	GUIs_FEX/contents.html	/^         <h2>GUI_26  Explore listbox choice restriction.<a name="26"><\/a><\/h2>$/;"	a
+27	GUIs_FEX/contents.html	/^         <h2>GUI_27  Explore pointer location detection and display.<a name="27"><\/a><\/h2>$/;"	a
+28	GUIs_FEX/contents.html	/^         <h2>GUI_28  Explore contextmenues and buttondownfcn.<a name="28"><\/a><\/h2>$/;"	a
+29	GUIs_FEX/contents.html	/^         <h2>GUI_29  Explore multiple figure interaction.<a name="29"><\/a><\/h2>$/;"	a
+3	GUIs_FEX/contents.html	/^         <h2>GUI_3  Explore visibility properties.<a name="3"><\/a><\/h2>$/;"	a
+30	GUIs_FEX/contents.html	/^         <h2>GUI_30  Explore callback strings.<a name="30"><\/a><\/h2>$/;"	a
+31	GUIs_FEX/contents.html	/^         <h2>GUI_31  Explore multiple interactions among uicontrols.<a name="31"><\/a><\/h2>$/;"	a
+32	GUIs_FEX/contents.html	/^         <h2>GUI_32  Explore exporting data to the base workspace.<a name="32"><\/a><\/h2>$/;"	a
+33	GUIs_FEX/contents.html	/^         <h2>GUI_33  Explore exporting data to the base workspace.<a name="33"><\/a><\/h2>$/;"	a
+34	GUIs_FEX/contents.html	/^         <h2>GUI_34  Explore image capturing with a printscreen GUI.<a name="34"><\/a><\/h2>$/;"	a
+35	GUIs_FEX/contents.html	/^         <h2>GUI_35  Explore fake tabbed panels.<a name="35"><\/a><\/h2>$/;"	a
+36	GUIs_FEX/contents.html	/^         <h2>GUI_36  Explore a custom dialog box.  GUI returns data to caller.<a name="36"><\/a><\/h2>$/;"	a
+37	GUIs_FEX/contents.html	/^         <h2>GUI_37  Explore string manipulation and nested functions.<a name="37"><\/a><\/h2>$/;"	a
+38	GUIs_FEX/contents.html	/^         <h2>GUI_38  Explore the user of JAVA and focussing issues.<a name="38"><\/a><\/h2>$/;"	a
+39	GUIs_FEX/contents.html	/^         <h2>GUI_39  Explore a simple drawing program and image saving.<a name="39"><\/a><\/h2>$/;"	a
+4	GUIs_FEX/contents.html	/^         <h2>GUI_4  Explore simple string manipulation.<a name="4"><\/a><\/h2>$/;"	a
+40	GUIs_FEX/contents.html	/^         <h2>GUI_40  Explore setting the background of pushbuttons to match an image.<a name="40"><\/a><\/h2>$/;"	a
+41	GUIs_FEX/contents.html	/^         <h2>GUI_41  Explore saving the state of a GUI system.<a name="41"><\/a><\/h2>$/;"	a
+5	GUIs_FEX/contents.html	/^         <h2>GUI_5  Explore simple string manipulation and user notification.<a name="5"><\/a><\/h2>$/;"	a
+6	GUIs_FEX/contents.html	/^         <h2>GUI_6  Explore selection determination.<a name="6"><\/a><\/h2>$/;"	a
+7	GUIs_FEX/contents.html	/^         <h2>GUI_7  Explore selection determination and counting.<a name="7"><\/a><\/h2>$/;"	a
+8	GUIs_FEX/contents.html	/^         <h2>GUI_8  Explore selection determination for a buttongroup.<a name="8"><\/a><\/h2>$/;"	a
+9	GUIs_FEX/contents.html	/^         <h2>GUI_9  Explore user notification.<a name="9"><\/a><\/h2>$/;"	a
+A	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><HR><A NAME="A"><H2>A<\/H2><\/A><\/TD><\/TR>$/;"	a
+AcceptButton_Callback	ThresholdImage.m	/^function AcceptButton_Callback(hObject, eventdata, handles)$/;"	f
+AutoThreshold_Callback	gui.m	/^function AutoThreshold_Callback(hObject, eventdata, handles)$/;"	f
+AutoThreshold_Callback	gui_backup.m	/^function AutoThreshold_Callback(hObject, eventdata, handles)$/;"	f
+B	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><HR><A NAME="B"><H2>B<\/H2><\/A><\/TD><\/TR>$/;"	a
+BlockTypeNr_Callback	gui.m	/^function BlockTypeNr_Callback(hObject, eventdata, handles)$/;"	f
+BlockTypeNr_Callback	gui_backup.m	/^function BlockTypeNr_Callback(hObject, eventdata, handles)$/;"	f
+BlockTypeNr_CreateFcn	gui.m	/^function BlockTypeNr_CreateFcn(hObject, eventdata, handles)$/;"	f
+BlockTypeNr_CreateFcn	gui_backup.m	/^function BlockTypeNr_CreateFcn(hObject, eventdata, handles)$/;"	f
+C	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><HR><A NAME="C"><H2>C<\/H2><\/A><\/TD><\/TR>$/;"	a
+ChannelNr_Callback	gui.m	/^function ChannelNr_Callback(hObject, eventdata, handles)$/;"	f
+ChannelNr_Callback	gui_backup.m	/^function ChannelNr_Callback(hObject, eventdata, handles)$/;"	f
+ChannelNr_CreateFcn	gui.m	/^function ChannelNr_CreateFcn(hObject, eventdata, handles)$/;"	f
+ChannelNr_CreateFcn	gui_backup.m	/^function ChannelNr_CreateFcn(hObject, eventdata, handles)$/;"	f
+CoolClustergram	CoolClustergram.m	/^function positions=CoolClustergram(data,representatives,row_labels)$/;"	f
+D	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><HR><A NAME="D"><H2>D<\/H2><\/A><\/TD><\/TR>$/;"	a
+E	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><HR><A NAME="E"><H2>E<\/H2><\/A><\/TD><\/TR>$/;"	a
+E_call	GUIs_FEX/GUI_24.m	/^function [] = E_call(varargin)$/;"	f
+Explorer	Explorer.m	/^function varargout = Explorer(varargin)$/;"	f
+ExplorerButton_Callback	gui.m	/^function ExplorerButton_Callback(hObject, eventdata, handles)$/;"	f
+Explorer_OpeningFcn	Explorer.m	/^function Explorer_OpeningFcn(hObject, eventdata, handles, varargin)$/;"	f
+Explorer_OutputFcn	Explorer.m	/^function varargout = Explorer_OutputFcn(hObject, eventdata, handles) $/;"	f
+F	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><HR><A NAME="F"><H2>F<\/H2><\/A><\/TD><\/TR>$/;"	a
+FindSPzero	maxkmex.c	/^void FindSPzero(const mxArray* S, mwIndex nz, double* I, double *J) {$/;"	f
+FindSPzero	minkmex.c	/^void FindSPzero(const mxArray* S, mwIndex nz, double* I, double *J) {$/;"	f
+FormatTime	FormatTime.m	/^function td=FormatTime(seconds)$/;"	f
+G	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><HR><A NAME="G"><H2>G<\/H2><\/A><\/TD><\/TR>$/;"	a
+GUI_1	GUIs_FEX/GUI_1.m	/^function [] = GUI_1()$/;"	f
+GUI_10	GUIs_FEX/GUI_10.m	/^function [] = GUI_10()$/;"	f
+GUI_11	GUIs_FEX/GUI_11.m	/^function [] = GUI_11()$/;"	f
+GUI_12	GUIs_FEX/GUI_12.m	/^function [] = GUI_12()$/;"	f
+GUI_13	GUIs_FEX/GUI_13.m	/^function [] = GUI_13()$/;"	f
+GUI_14	GUIs_FEX/GUI_14.m	/^function [] = GUI_14()$/;"	f
+GUI_15	GUIs_FEX/GUI_15.m	/^function [] = GUI_15()$/;"	f
+GUI_16	GUIs_FEX/GUI_16.m	/^function [] = GUI_16()$/;"	f
+GUI_17	GUIs_FEX/GUI_17.m	/^function [] = GUI_17()$/;"	f
+GUI_18	GUIs_FEX/GUI_18.m	/^function [] = GUI_18()$/;"	f
+GUI_19	GUIs_FEX/GUI_19.m	/^function [] = GUI_19()$/;"	f
+GUI_2	GUIs_FEX/GUI_2.m	/^function [] = GUI_2()$/;"	f
+GUI_20	GUIs_FEX/GUI_20.m	/^function [] = GUI_20()$/;"	f
+GUI_21	GUIs_FEX/GUI_21.m	/^function [] = GUI_21()$/;"	f
+GUI_22	GUIs_FEX/GUI_22.m	/^function [] = GUI_22()$/;"	f
+GUI_23	GUIs_FEX/GUI_23.m	/^function [] = GUI_23()$/;"	f
+GUI_24	GUIs_FEX/GUI_24.m	/^function [] = GUI_24()$/;"	f
+GUI_25	GUIs_FEX/GUI_25.m	/^function [] = GUI_25()$/;"	f
+GUI_26	GUIs_FEX/GUI_26.m	/^function [] = GUI_26()$/;"	f
+GUI_27	GUIs_FEX/GUI_27.m	/^function [] = GUI_27()$/;"	f
+GUI_28	GUIs_FEX/GUI_28.m	/^function [] = GUI_28()$/;"	f
+GUI_29	GUIs_FEX/GUI_29.m	/^function [] = GUI_29()$/;"	f
+GUI_3	GUIs_FEX/GUI_3.m	/^function [] = GUI_3()$/;"	f
+GUI_30	GUIs_FEX/GUI_30.m	/^function [] = GUI_30()$/;"	f
+GUI_31	GUIs_FEX/GUI_31.m	/^function [] = GUI_31()$/;"	f
+GUI_32	GUIs_FEX/GUI_32.m	/^function [] = GUI_32(str)$/;"	f
+GUI_33	GUIs_FEX/GUI_33.m	/^function [] = GUI_33()$/;"	f
+GUI_34	GUIs_FEX/GUI_34.m	/^function C = GUI_34()$/;"	f
+GUI_35	GUIs_FEX/GUI_35.m	/^function [] = GUI_35()$/;"	f
+GUI_36	GUIs_FEX/GUI_36.m	/^function [R] = GUI_36()$/;"	f
+GUI_37	GUIs_FEX/GUI_37.m	/^function [tf] = GUI_37(str,time_out)$/;"	f
+GUI_38	GUIs_FEX/GUI_38.m	/^function [] = GUI_38()$/;"	f
+GUI_39	GUIs_FEX/GUI_39.m	/^function [] = GUI_39()$/;"	f
+GUI_4	GUIs_FEX/GUI_4.m	/^function [] = GUI_4()$/;"	f
+GUI_40	GUIs_FEX/GUI_40.m	/^function [] = GUI_40()$/;"	f
+GUI_41	GUIs_FEX/GUI_41.m	/^function [] = GUI_41()$/;"	f
+GUI_5	GUIs_FEX/GUI_5.m	/^function [] = GUI_5()$/;"	f
+GUI_6	GUIs_FEX/GUI_6.m	/^function [] = GUI_6()$/;"	f
+GUI_7	GUIs_FEX/GUI_7.m	/^function [] = GUI_7()$/;"	f
+GUI_8	GUIs_FEX/GUI_8.m	/^function [] = GUI_8()$/;"	f
+GUI_9	GUIs_FEX/GUI_9.m	/^function [] = GUI_9()$/;"	f
+H	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><HR><A NAME="H"><H2>H<\/H2><\/A><\/TD><\/TR>$/;"	a
+HeirarchyExample	GUILayout_1p3/GUILayout-1p3/layoutHelp/User guide1_4.html	/^                axes grow to fill the remaining space.<\/p><br clear="all"\/><hr\/><h3 class="hbg"><a name="HeirarchyExample">&nbsp;<\/a><a name="1.4.1">$/;"	a
+I	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><HR><A NAME="I"><H2>I<\/H2><\/A><\/TD><\/TR>$/;"	a
+ISNAN	maxkmex.c	148;"	d	file:
+ISNAN	minkmex.c	148;"	d	file:
+ImageRootDirectory_Callback	gui.m	/^function ImageRootDirectory_Callback(hObject, eventdata, handles)$/;"	f
+ImageRootDirectory_Callback	gui_backup.m	/^function ImageRootDirectory_Callback(hObject, eventdata, handles)$/;"	f
+ImageRootDirectory_CreateFcn	gui.m	/^function ImageRootDirectory_CreateFcn(hObject, eventdata, handles)$/;"	f
+ImageRootDirectory_CreateFcn	gui_backup.m	/^function ImageRootDirectory_CreateFcn(hObject, eventdata, handles)$/;"	f
+Internal_mxArray	Internal_mxArray.h	/^} Internal_mxArray;$/;"	t	typeref:struct:__anon1
+J	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><A NAME="J"><\/A><\/TD><\/TR>$/;"	a
+K	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><A NAME="K"><\/A><\/TD><\/TR>$/;"	a
+L	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><HR><A NAME="L"><H2>L<\/H2><\/A><\/TD><\/TR>$/;"	a
+LoadParameters	gui.m	/^function LoadParameters(loaded_handles,handles,hObject)$/;"	f
+LoadResultsButton_Callback	gui.m	/^function LoadResultsButton_Callback(hObject, eventdata, handles)$/;"	f
+LocResult	maxkmex.c	/^mxArray* LocResult(mwIndex k, mwIndex p0, mwIndex nz,$/;"	f
+LocResult	minkmex.c	/^mxArray* LocResult(mwIndex k, mwIndex p0, mwIndex nz,$/;"	f
+M	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><HR><A NAME="M"><H2>M<\/H2><\/A><\/TD><\/TR>$/;"	a
+MDSPlot_ButtonDownFcn	Explorer.m	/^function MDSPlot_ButtonDownFcn(hObject, eventdata, handles)$/;"	f
+MDS_Rotatable_Callback	Explorer.m	/^function MDS_Rotatable_Callback(hObject, eventdata, handles)$/;"	f
+MEDIAN3	maxkmex.c	45;"	d	file:
+MEDIAN3	minkmex.c	45;"	d	file:
+MEDIANMEDIANS	maxkmex.c	46;"	d	file:
+MEDIANMEDIANS	minkmex.c	46;"	d	file:
+MIDPOINT	maxkmex.c	44;"	d	file:
+MIDPOINT	minkmex.c	44;"	d	file:
+MINF	maxkmex.c	149;"	d	file:
+MINF	minkmex.c	149;"	d	file:
+MakePlots	gui.m	/^function MakePlots(hObject,eventdata,handles)$/;"	f
+MinMaxResult	maxkmex.c	/^mxArray* MinMaxResult(mwIndex k, mwIndex p0, mwIndex nz,$/;"	f
+MinMaxResult	minkmex.c	/^mxArray* MinMaxResult(mwIndex k, mwIndex p0, mwIndex nz,$/;"	f
+N	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><A NAME="N"><\/A><\/TD><\/TR>$/;"	a
+NANmask	maxkmex.c	147;"	d	file:
+NANmask	minkmex.c	147;"	d	file:
+NextButton_Callback	ThresholdImage.m	/^function NextButton_Callback(hObject, eventdata, handles)$/;"	f
+O	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><HR><A NAME="O"><H2>O<\/H2><\/A><\/TD><\/TR>$/;"	a
+P	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><HR><A NAME="P"><H2>P<\/H2><\/A><\/TD><\/TR>$/;"	a
+PIVOT	maxkmex.c	49;"	d	file:
+PIVOT	minkmex.c	49;"	d	file:
+PointSelected1_Callback	Explorer.m	/^function PointSelected1_Callback(hObject, eventdata, handles)$/;"	f
+PointSelected2_Callback	Explorer.m	/^function PointSelected2_Callback(hObject, eventdata, handles)$/;"	f
+PreviousButton_Callback	ThresholdImage.m	/^function PreviousButton_Callback(hObject, eventdata, handles)$/;"	f
+Q	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><A NAME="Q"><\/A><\/TD><\/TR>$/;"	a
+R	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><HR><A NAME="R"><H2>R<\/H2><\/A><\/TD><\/TR>$/;"	a
+ReduceColorNr_Callback	gui.m	/^function ReduceColorNr_Callback(hObject, eventdata, handles)$/;"	f
+ReduceColorNr_Callback	gui_backup.m	/^function ReduceColorNr_Callback(hObject, eventdata, handles)$/;"	f
+ReduceColorNr_CreateFcn	gui.m	/^function ReduceColorNr_CreateFcn(hObject, eventdata, handles)$/;"	f
+ReduceColorNr_CreateFcn	gui_backup.m	/^function ReduceColorNr_CreateFcn(hObject, eventdata, handles)$/;"	f
+RunBtn_Callback	gui.m	/^function RunBtn_Callback(hObject, eventdata, handles)$/;"	f
+RunBtn_Callback	gui_backup.m	/^function RunBtn_Callback(hObject, eventdata, handles)$/;"	f
+S	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><HR><A NAME="S"><H2>S<\/H2><\/A><\/TD><\/TR>$/;"	a
+SaveOutputButton_Callback	gui.m	/^function SaveOutputButton_Callback(hObject, eventdata, handles)$/;"	f
+SecondOrder	SecondOrder.m	/^function data=SecondOrder(filenames,global_data)$/;"	f
+SecondOrder	SecondOrder_std.m	/^function data=SecondOrder(filenames,global_data)$/;"	f
+SelectDirectory_Callback	gui.m	/^function SelectDirectory_Callback(hObject, eventdata, handles)$/;"	f
+SelectDirectory_Callback	gui_backup.m	/^function SelectDirectory_Callback(hObject, eventdata, handles)$/;"	f
+SetButtonState	gui.m	/^function SetButtonState(hObject,handles,state)$/;"	f
+SetFileLabel	ThresholdImage.m	/^function SetFileLabel(filename,handles)$/;"	f
+ShowAdvanced_Callback	gui.m	/^function ShowAdvanced_Callback(hObject, eventdata, handles)$/;"	f
+ShowImages	Explorer.m	/^function ShowImages(filenames,axis_handle)$/;"	f
+SpLocResult	maxkmex.c	/^void SpLocResult(mwIndex k, mwIndex p0, mwIndex nz, mwIndex kout, $/;"	f
+SpLocResult	minkmex.c	/^void SpLocResult(mwIndex k, mwIndex p0, mwIndex nz, mwIndex kout, $/;"	f
+SuperBlockNr_Callback	gui.m	/^function SuperBlockNr_Callback(hObject, eventdata, handles)$/;"	f
+SuperBlockNr_Callback	gui_backup.m	/^function SuperBlockNr_Callback(hObject, eventdata, handles)$/;"	f
+SuperBlockNr_CreateFcn	gui.m	/^function SuperBlockNr_CreateFcn(hObject, eventdata, handles)$/;"	f
+SuperBlockNr_CreateFcn	gui_backup.m	/^function SuperBlockNr_CreateFcn(hObject, eventdata, handles)$/;"	f
+T	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><HR><A NAME="T"><H2>T<\/H2><\/A><\/TD><\/TR>$/;"	a
+TestThreshold_Callback	gui.m	/^function TestThreshold_Callback(hObject, eventdata, handles)$/;"	f
+TestThreshold_Callback	gui_backup.m	/^function TestThreshold_Callback(hObject, eventdata, handles)$/;"	f
+Test_Directory	gui.m	/^function dir_ok=Test_Directory(imageDirectory)$/;"	f
+ThirdOrder_Basis	ThirdOrder_Basis.m	/^function data=ThirdOrder_Basis(filenames,global_data,number_of_superblocks)$/;"	f
+ThreshodIntensity_Callback	gui.m	/^function ThreshodIntensity_Callback(hObject, eventdata, handles)$/;"	f
+ThreshodIntensity_Callback	gui_backup.m	/^function ThreshodIntensity_Callback(hObject, eventdata, handles)$/;"	f
+ThreshodIntensity_CreateFcn	gui.m	/^function ThreshodIntensity_CreateFcn(hObject, eventdata, handles)$/;"	f
+ThreshodIntensity_CreateFcn	gui_backup.m	/^function ThreshodIntensity_CreateFcn(hObject, eventdata, handles)$/;"	f
+ThresholdImage	ThresholdImage.m	/^function varargout = ThresholdImage(varargin)$/;"	f
+ThresholdImage_OpeningFcn	ThresholdImage.m	/^function ThresholdImage_OpeningFcn(hObject, eventdata, handles, varargin)$/;"	f
+ThresholdImage_OutputFcn	ThresholdImage.m	/^function varargout = ThresholdImage_OutputFcn(hObject, eventdata, handles) $/;"	f
+U	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><HR><A NAME="U"><H2>U<\/H2><\/A><\/TD><\/TR>$/;"	a
+V	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><HR><A NAME="V"><H2>V<\/H2><\/A><\/TD><\/TR>$/;"	a
+W	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><HR><A NAME="W"><H2>W<\/H2><\/A><\/TD><\/TR>$/;"	a
+WebsiteScreenScrapeFigure	regexpHelper.m	/^function h = WebsiteScreenScrapeFigure(hParent)$/;"	f
+X	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><A NAME="X"><\/A><\/TD><\/TR>$/;"	a
+Y	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><A NAME="Y"><\/A><\/TD><\/TR>$/;"	a
+Z	GUILayout_1p3/GUILayout-1p3/layoutHelp/atoz.html	/^      <TR><TD COLSPAN="2"><A NAME="Z"><\/A><\/TD><\/TR>$/;"	a
+addLabeledSpinner	ThresholdImage.m	/^function jhSpinner = addLabeledSpinner(label,model,pos,callbackFunc,hFig)$/;"	f
+addOrUpdateProp	statusbar.m	/^function addOrUpdateProp(handle,propName,propValue)$/;"	f
+add_marker	scroll_panel.m	/^function marker_handles=add_marker(height,parent_handle,handles)$/;"	f
+addmarker_callback	scroll_panel.m	/^function addmarker_callback(hObject,eventdata,handles)$/;"	f
+annotate_file_names	uipickfiles.m	/^function filenames = annotate_file_names(filenames,dir_listing,fsdata)$/;"	f
+annotate_file_names	uipickfiles/uipickfiles.m	/^function filenames = annotate_file_names(filenames,dir_listing,fsdata)$/;"	f
+ax_bdfcn	GUIs_FEX/GUI_18.m	/^function [] = ax_bdfcn(varargin)$/;"	f
+ax_bdfcn	GUIs_FEX/GUI_28.m	/^function [] = ax_bdfcn(varargin)$/;"	f
+axes1_DeleteFcn	uiremember_uirestore/demo.m	/^function axes1_DeleteFcn(hObject, eventdata, handles)$/;"	f
+bit_depth	bit_depth.m	/^function bd= bit_depth(max_value,standard_levels)$/;"	f
+blockSizeChangedCallback	ThresholdImage.m	/^function blockSizeChangedCallback(jSpinner,jEventData)$/;"	f
+blockSize_Callback	gui.m	/^function blockSize_Callback(hObject, eventdata, handles)$/;"	f
+blockSize_Callback	gui_backup.m	/^function blockSize_Callback(hObject, eventdata, handles)$/;"	f
+blockSize_CreateFcn	gui.m	/^function blockSize_CreateFcn(hObject, eventdata, handles)$/;"	f
+blockSize_CreateFcn	gui_backup.m	/^function blockSize_CreateFcn(hObject, eventdata, handles)$/;"	f
+block_weights2	block_weights2.m	/^function [weights block_ids] =block_weights2(block,centroids,intensity_cutoff)$/;"	f
+buildInternal_mxArrayDef	buildInternal_mxArrayDef.m	/^function content = buildInternal_mxArrayDef(mxArraydefFilename)$/;"	f
+callCallback	GUILayout_1p3/GUILayout-1p3/+uiextras/callCallback.m	/^function varargout = callCallback( callback, varargin )$/;"	f
+callbackClickA3DPoint	clickA3DPoint/callbackClickA3DPoint.m	/^function callbackClickA3DPoint(src, eventData, pointCloud)$/;"	f
+callbackexample	GUILayout_1p3/GUILayout-1p3/layoutHelp/Examples/callbackexample.m	/^function callbackexample()$/;"	f
+cell2path	uipickfiles.m	/^function p = cell2path(c)$/;"	f
+cell2path	uipickfiles/uipickfiles.m	/^function p = cell2path(c)$/;"	f
+ch_call	GUIs_FEX/GUI_3.m	/^function [] = ch_call(varargin)$/;"	f
+checkbox1_Callback	ThresholdImage.m	/^function checkbox1_Callback(hObject, eventdata, handles)$/;"	f
+clickA3DPoint	clickA3DPoint/clickA3DPoint.m	/^function h = clickA3DPoint(pointCloud)$/;"	f
+contruct_filetable	scroll_panel.m	/^function file_matrix=contruct_filetable()$/;"	f
+convertToDouble	GUILayout_1p3/GUILayout-1p3/+uiextras/loadLayoutIcon.m	/^function cdata = convertToDouble( cdata )$/;"	f
+data	Internal_mxArray.h	/^    }   data;$/;"	m	struct:__anon1	typeref:union:__anon1::__anon3
+deletemarker_callback	scroll_panel.m	/^function deletemarker_callback(hObject,eventdata,handles)$/;"	f
+demo	uiremember_uirestore/demo.m	/^function varargout = demo(varargin)$/;"	f
+demoBrowser	GUILayout_1p3/GUILayout-1p3/layoutHelp/Examples/demoBrowser.m	/^function demoBrowser()$/;"	f
+demo_OpeningFcn	uiremember_uirestore/demo.m	/^function demo_OpeningFcn(hObject, eventdata, handles, varargin)$/;"	f
+demo_OutputFcn	uiremember_uirestore/demo.m	/^function varargout = demo_OutputFcn(hObject, eventdata, handles) $/;"	f
+dequote	GUILayout_1p3/GUILayout-1p3/+uiextras/interpretColor.m	/^function str = dequote(str)$/;"	f
+displayEndOfDemoMessage	GUILayout_1p3/GUILayout-1p3/layoutHelp/Examples/displayEndOfDemoMessage.m	/^function displayEndOfDemoMessage(filename)$/;"	f
+display_image	ThresholdImage.m	/^function display_image(handles)$/;"	f
+doc	GUILayout_1p3/GUILayout-1p3/layoutHelp/doc.m	/^function doc( funcname )$/;"	f
+dockexample	GUILayout_1p3/GUILayout-1p3/layoutHelp/Examples/dockexample.m	/^function dockexample()$/;"	f
+dragzoom	dragzoom/dragzoom.m	/^function dragzoom(varargin)$/;"	f
+dsxy2figxy	dsxy2figxy.m	/^function varargout = dsxy2figxy(varargin)$/;"	f
+ed_call	GUIs_FEX/GUI_13.m	/^function [] = ed_call(varargin)$/;"	f
+ed_call	GUIs_FEX/GUI_15.m	/^function [] = ed_call(varargin)$/;"	f
+ed_call	GUIs_FEX/GUI_2.m	/^function [] = ed_call(varargin)$/;"	f
+ed_call	GUIs_FEX/GUI_21.m	/^function [] = ed_call(varargin)$/;"	f
+ed_call	GUIs_FEX/GUI_22.m	/^function [] = ed_call(varargin)$/;"	f
+ed_kpfcn	GUIs_FEX/GUI_15.m	/^function [] = ed_kpfcn(varargin)$/;"	f
+fh_bdfcn	GUIs_FEX/GUI_38.m	/^function [] = fh_bdfcn(varargin)$/;"	f
+fh_kpfcn	GUIs_FEX/GUI_38.m	/^function [] = fh_kpfcn(varargin)$/;"	f
+fh_wbmf	GUIs_FEX/GUI_12.m	/^function [] = fh_wbmf(varargin)$/;"	f
+fh_wbmfcn	GUIs_FEX/GUI_27.m	/^function [] = fh_wbmfcn(varargin)$/;"	f
+fig_del	GUIs_FEX/GUI_32.m	/^function [] = fig_del(varargin)$/;"	f
+fig_delet	GUIs_FEX/GUI_24.m	/^function [] = fig_delet(varargin)$/;"	f
+files_in_dir	files_in_dir.m	/^function fileList = files_in_dir(dirName)$/;"	f
+filtered_dir	uipickfiles.m	/^function d = filtered_dir(full_filter,re_filter,filter_both)$/;"	f
+filtered_dir	uipickfiles/uipickfiles.m	/^function d = filtered_dir(full_filter,re_filter,filter_both)$/;"	f
+findArg	GUILayout_1p3/GUILayout-1p3/+uiextras/findArg.m	/^function value = findArg( argname, varargin )$/;"	f
+findFirstK	maxkmex.c	/^void findFirstK(mwIndex left, mwIndex right) {$/;"	f
+findFirstK	minkmex.c	/^void findFirstK(mwIndex left, mwIndex right) {$/;"	f
+findMedianIndex	maxkmex.c	/^mwIndex findMedianIndex(mwIndex left, mwIndex right, mwIndex shift)$/;"	f
+findMedianIndex	minkmex.c	/^mwSize findMedianIndex(mwSize left, mwSize right, mwSize shift)$/;"	f
+findMedianOfMedians	maxkmex.c	/^mwIndex findMedianOfMedians(mwIndex left, mwIndex right)$/;"	f
+findMedianOfMedians	minkmex.c	/^mwSize findMedianOfMedians(mwSize left, mwSize right)$/;"	f
+findMedianThree	maxkmex.c	/^mwIndex findMedianThree(mwIndex left, mwIndex right)$/;"	f
+findMedianThree	minkmex.c	/^mwIndex findMedianThree(mwIndex left, mwIndex right)$/;"	f
+flag0	Internal_mxArray.h	/^        unsigned int    flag0 : 1;$/;"	m	struct:__anon1::__anon2
+flag1	Internal_mxArray.h	/^        unsigned int    flag1 : 1; $/;"	m	struct:__anon1::__anon2
+flag10	Internal_mxArray.h	/^        unsigned int    flag10 : 1;$/;"	m	struct:__anon1::__anon2
+flag11	Internal_mxArray.h	/^        unsigned int    flag11 : 4;$/;"	m	struct:__anon1::__anon2
+flag12	Internal_mxArray.h	/^        unsigned int    flag12 : 8;$/;"	m	struct:__anon1::__anon2
+flag13	Internal_mxArray.h	/^        unsigned int    flag13 : 8;$/;"	m	struct:__anon1::__anon2
+flag2	Internal_mxArray.h	/^        unsigned int    flag2 : 1;$/;"	m	struct:__anon1::__anon2
+flag3	Internal_mxArray.h	/^        unsigned int    flag3 : 1;$/;"	m	struct:__anon1::__anon2
+flag4	Internal_mxArray.h	/^        unsigned int    flag4 : 1;$/;"	m	struct:__anon1::__anon2
+flag5	Internal_mxArray.h	/^        unsigned int    flag5 : 1;$/;"	m	struct:__anon1::__anon2
+flag6	Internal_mxArray.h	/^        unsigned int    flag6 : 1;$/;"	m	struct:__anon1::__anon2
+flag7	Internal_mxArray.h	/^        unsigned int    flag7 : 1;$/;"	m	struct:__anon1::__anon2
+flag7a	Internal_mxArray.h	/^        unsigned int    flag7a: 1;$/;"	m	struct:__anon1::__anon2
+flag8	Internal_mxArray.h	/^        unsigned int    flag8 : 1;$/;"	m	struct:__anon1::__anon2
+flag9	Internal_mxArray.h	/^        unsigned int    flag9 : 1;$/;"	m	struct:__anon1::__anon2
+flags	Internal_mxArray.h	/^    }   flags;$/;"	m	struct:__anon1	typeref:struct:__anon1::__anon2
+generate_folder_icon	uipickfiles.m	/^function success = generate_folder_icon(icon_path)$/;"	f
+generate_folder_icon	uipickfiles/uipickfiles.m	/^function success = generate_folder_icon(icon_path)$/;"	f
+getdrives	uipickfiles.m	/^function drives = getdrives(other_drives)$/;"	f
+getdrives	uipickfiles/uipickfiles.m	/^function drives = getdrives(other_drives)$/;"	f
+getmexopts	getmexopts.m	/^function res = getmexopts(Tag)$/;"	f
+getoptionpair	minmaxk.m	/^function val = getoptionpair(name, defaultval, vargin)$/;"	f
+gui	gui.m	/^function varargout = gui(varargin)$/;"	f
+gui	gui_backup.m	/^function varargout = gui(varargin)$/;"	f
+gui_OpeningFcn	gui.m	/^function gui_OpeningFcn(hObject, eventdata, handles, varargin)$/;"	f
+gui_OpeningFcn	gui_backup.m	/^function gui_OpeningFcn(hObject, eventdata, handles, varargin)$/;"	f
+gui_OutputFcn	gui.m	/^function varargout = gui_OutputFcn(hObject, eventdata, handles) $/;"	f
+gui_OutputFcn	gui_backup.m	/^function varargout = gui_OutputFcn(hObject, eventdata, handles) $/;"	f
+helpDeleteChild	GUILayout_1p3/GUILayout-1p3/+uiextras/Container.m	/^function helpDeleteChild( src, evt, obj )$/;"	f
+helpReparentChild	GUILayout_1p3/GUILayout-1p3/+uiextras/Container.m	/^function helpReparentChild( src, evt, obj )$/;"	f
+iLoadIcon	GUILayout_1p3/GUILayout-1p3/+uiextras/TabPanel.m	/^function im = iLoadIcon(imagefilename, backgroundcolor, highlightcolor, shadowcolor )$/;"	f
+iResolveSimulinkBlockType	GUILayout_1p3/GUILayout-1p3/layoutHelp/doc.m	/^function type = iResolveSimulinkBlockType( block )$/;"	f
+iTabClicked	GUILayout_1p3/GUILayout-1p3/+uiextras/TabPanel.m	/^function iTabClicked( src, evt, obj, idx ) %#ok<INUSL>$/;"	f
+install	GUILayout_1p3/GUILayout-1p3/install.m	/^function install()$/;"	f
+interpretColor	GUILayout_1p3/GUILayout-1p3/+uiextras/interpretColor.m	/^function col = interpretColor(str)$/;"	f
+k	maxkmex.c	/^mwIndex k;$/;"	v
+k	minkmex.c	/^mwIndex k;$/;"	v
+layoutRoot	GUILayout_1p3/GUILayout-1p3/layoutRoot.m	/^function folder = layoutRoot()$/;"	f
+layoutVersion	GUILayout_1p3/GUILayout-1p3/layoutVersion.m	/^function [version, versionDate] = layoutVersion()$/;"	f
+list	maxkmex.c	/^double *list;$/;"	v
+list	minkmex.c	/^double *list;$/;"	v
+listbox1_Callback	uiremember_uirestore/demo.m	/^function listbox1_Callback(hObject, eventdata, handles)$/;"	f
+listbox1_CreateFcn	uiremember_uirestore/demo.m	/^function listbox1_CreateFcn(hObject, eventdata, handles)$/;"	f
+listbox1_DeleteFcn	uiremember_uirestore/demo.m	/^function listbox1_DeleteFcn(hObject, eventdata, handles)$/;"	f
+loadLayoutIcon	GUILayout_1p3/GUILayout-1p3/+uiextras/loadLayoutIcon.m	/^function cdata = loadLayoutIcon(imagefilename,bgcol)$/;"	f
+long64	maxkmex.c	/^typedef long long long64;$/;"	t	file:
+long64	minkmex.c	/^typedef long long long64;$/;"	t	file:
+makeFlexDivider	GUILayout_1p3/GUILayout-1p3/+uiextras/makeFlexDivider.m	/^function uic = makeFlexDivider( parent, position, bgCol, orientation, showMarks )$/;"	f
+marker_ending_edit_callback	scroll_panel.m	/^function marker_ending_edit_callback(hObject,eventdata,handles)$/;"	f
+marker_metadata_checkbox_callback	scroll_panel.m	/^function marker_metadata_checkbox_callback(hObject,eventdata,marker_handles)$/;"	f
+marker_name_edit_callback	scroll_panel.m	/^function marker_name_edit_callback(hObject,eventdata,marker_handles)$/;"	f
+match_property	uipickfiles.m	/^function prop_index = match_property(arg,properties)$/;"	f
+match_property	uipickfiles/uipickfiles.m	/^function prop_index = match_property(arg,properties)$/;"	f
+maxk	maxk.m	/^function varargout = maxk(varargin)$/;"	f
+mexFunction	inplacecolumnmex.c	/^void mexFunction(int nlhs, mxArray *plhs[],$/;"	f
+mexFunction	maxkmex.c	/^void mexFunction(int nlhs, mxArray *plhs[],$/;"	f
+mexFunction	minkmex.c	/^void mexFunction(int nlhs, mxArray *plhs[],$/;"	f
+mexFunction	releaseinplace.c	/^void mexFunction(int nlhs, mxArray *plhs[],$/;"	f
+minimizeexample	GUILayout_1p3/GUILayout-1p3/layoutHelp/Examples/minimizeexample.m	/^function minimizeexample()$/;"	f
+mink	mink.m	/^function mink_vals = mink(x,N)$/;"	f
+minmax_install	minmax_install.m	/^function minmax_install$/;"	f
+minmaxk	minmaxk.m	/^function [res loc] = minmaxk(mexfun, list, k, dim, varargin)$/;"	f
+number_array	Internal_mxArray.h	/^        }   number_array;$/;"	m	union:__anon1::__anon3	typeref:struct:__anon1::__anon3::__anon4
+number_of_dims	Internal_mxArray.h	/^    size_t  number_of_dims;$/;"	m	struct:__anon1
+parse_inputs	splash.m	/^function [filename, format, time, handle, msg] = parse_inputs(varargin)$/;"	f
+parsepropval	uipickfiles.m	/^function prop = parsepropval(prop,varargin)$/;"	f
+parsepropval	uipickfiles/uipickfiles.m	/^function prop = parsepropval(prop,varargin)$/;"	f
+part0	maxkmex.c	/^mwIndex part0(mwIndex left, mwIndex right) {$/;"	f
+part0	minkmex.c	/^mwIndex part0(mwIndex left, mwIndex right) {$/;"	f
+partNaN	maxkmex.c	/^mwIndex partNaN(mwIndex left, mwIndex right) {$/;"	f
+partNaN	minkmex.c	/^mwIndex partNaN(mwIndex left, mwIndex right) {$/;"	f
+partial_sort_index	partial_sort_index/partial_sort_index.m	/^function max_N_index = partial_sort_index(x,N)$/;"	f
+partition	maxkmex.c	/^mwIndex partition(mwIndex left, mwIndex right, mwIndex pivotIndex) {$/;"	f
+partition	minkmex.c	/^mwSize partition(mwSize left, mwSize right, mwSize pivotIndex) {$/;"	f
+path2cell	uipickfiles.m	/^function [c,network_vol] = path2cell(p)$/;"	f
+path2cell	uipickfiles/uipickfiles.m	/^function [c,network_vol] = path2cell(p)$/;"	f
+pb1_call	GUIs_FEX/GUI_19.m	/^function [] = pb1_call(varargin)$/;"	f
+pb2_call	GUIs_FEX/GUI_19.m	/^function [] = pb2_call(varargin)$/;"	f
+pb_call	GUIs_FEX/GUI_1.m	/^function [] = pb_call(varargin)$/;"	f
+pb_call	GUIs_FEX/GUI_10.m	/^function [] = pb_call(varargin)$/;"	f
+pb_call	GUIs_FEX/GUI_14.m	/^function [] = pb_call(varargin)$/;"	f
+pb_call	GUIs_FEX/GUI_15.m	/^function [] = pb_call(varargin)$/;"	f
+pb_call	GUIs_FEX/GUI_23.m	/^function [] = pb_call(varargin)$/;"	f
+pb_call	GUIs_FEX/GUI_24.m	/^function [] = pb_call(varargin)$/;"	f
+pb_call	GUIs_FEX/GUI_25.m	/^function [] = pb_call(varargin)$/;"	f
+pb_call	GUIs_FEX/GUI_26.m	/^function [] = pb_call(varargin)$/;"	f
+pb_call	GUIs_FEX/GUI_31.m	/^function [] = pb_call(varargin)$/;"	f
+pb_call	GUIs_FEX/GUI_32.m	/^function [] = pb_call(varargin)$/;"	f
+pb_call	GUIs_FEX/GUI_33.m	/^function [] = pb_call(varargin)$/;"	f
+pb_call	GUIs_FEX/GUI_35.m	/^function [] = pb_call(varargin)$/;"	f
+pb_call	GUIs_FEX/GUI_38.m	/^function [] = pb_call(varargin)$/;"	f
+pb_call	GUIs_FEX/GUI_4.m	/^function [] = pb_call(varargin)$/;"	f
+pb_call	GUIs_FEX/GUI_5.m	/^function [] = pb_call(varargin)$/;"	f
+pb_call	GUIs_FEX/GUI_6.m	/^function [] = pb_call(varargin)$/;"	f
+pb_call	GUIs_FEX/GUI_8.m	/^function [] = pb_call(varargin)$/;"	f
+pb_call	GUIs_FEX/GUI_9.m	/^function [] = pb_call(varargin)$/;"	f
+pdata	Internal_mxArray.h	/^            void  *pdata;$/;"	m	struct:__anon1::__anon3::__anon4
+pimag_data	Internal_mxArray.h	/^            void  *pimag_data;$/;"	m	struct:__anon1::__anon3::__anon4
+pop_call	GUIs_FEX/GUI_21.m	/^function [] = pop_call(varargin)$/;"	f
+pos	maxkmex.c	/^mwIndex *pos;$/;"	v
+pos	minkmex.c	/^mwIndex *pos;$/;"	v
+pp_call	GUIs_FEX/GUI_20.m	/^function [] = pp_call(varargin)$/;"	f
+pp_call	GUIs_FEX/GUI_22.m	/^function [] = pp_call(varargin)$/;"	f
+pp_call	GUIs_FEX/GUI_26.m	/^function [] = pp_call(varargin)$/;"	f
+pp_call	GUIs_FEX/GUI_31.m	/^function [] = pp_call(varargin)$/;"	f
+pp_call	GUIs_FEX/GUI_7.m	/^function [] = pp_call(varargin)$/;"	f
+previewGUIs	GUIs_FEX/previewGUIs.m	/^function [] = previewGUIs()$/;"	f
+radiobutton1_Callback	uiremember_uirestore/demo.m	/^function radiobutton1_Callback(hObject, eventdata, handles)$/;"	f
+radiobutton2_Callback	uiremember_uirestore/demo.m	/^function radiobutton2_Callback(hObject, eventdata, handles)$/;"	f
+regexpHelper	regexpHelper.m	/^function regexpHelper()$/;"	f
+reserved	Internal_mxArray.h	/^    void    *reserved;$/;"	m	struct:__anon1
+reserved1	Internal_mxArray.h	/^    int      reserved1[2];$/;"	m	struct:__anon1
+reserved2	Internal_mxArray.h	/^    void    *reserved2;$/;"	m	struct:__anon1
+reserved3	Internal_mxArray.h	/^    unsigned int reserved3;$/;"	m	struct:__anon1
+reserved4	Internal_mxArray.h	/^    size_t reserved4[2];$/;"	m	struct:__anon1
+reserved5	Internal_mxArray.h	/^            void  *reserved5;$/;"	m	struct:__anon1::__anon3::__anon4
+reserved6	Internal_mxArray.h	/^            size_t reserved6[3];$/;"	m	struct:__anon1::__anon3::__anon4
+restack	GUILayout_1p3/GUILayout-1p3/+uiextras/restack.m	/^function restack( obj, position )$/;"	f
+rootdirectory_pushbutton_callback	scroll_panel.m	/^function rootdirectory_pushbutton_callback(hObject,eventdata,handles)$/;"	f
+rowNorm	clickA3DPoint/rowNorm.m	/^function v = rowNorm(A)$/;"	f
+scroll_callback	scroll_panel.m	/^function scroll_callback(hObject,eventdata,handles)$/;"	f
+scroll_panel	scroll_panel.m	/^function varargout = scroll_panel(varargin)$/;"	f
+setDesktopStatus	statusbar.m	/^function setDesktopStatus(statusText)$/;"	f
+setFigureStatus	statusbar.m	/^function statusbarObj = setFigureStatus(hFig, deleteFlag, updateFlag, statusText)$/;"	f
+setText	statusbar.m	/^function setText(varargin)$/;"	f
+set_folder_style	uipickfiles.m	/^function fsdata = set_folder_style(folder_style_pref)$/;"	f
+set_folder_style	uipickfiles/uipickfiles.m	/^function fsdata = set_folder_style(folder_style_pref)$/;"	f
+sl_call	GUIs_FEX/GUI_16.m	/^function [] = sl_call(varargin)$/;"	f
+sl_call	GUIs_FEX/GUI_29.m	/^function [] = sl_call(varargin) $/;"	f
+slider1_Callback	ThresholdImage.m	/^function slider1_Callback(hObject, eventdata, handles)$/;"	f
+slider1_CreateFcn	ThresholdImage.m	/^function slider1_CreateFcn(hObject, eventdata, handles)$/;"	f
+splash	splash.m	/^function varargout = splash(varargin)$/;"	f
+statusbar	statusbar.m	/^function statusbarHandles = statusbar(varargin)$/;"	f
+test_2D	dragzoom/test_2D.m	/^function test_2D$/;"	f
+test_3D	dragzoom/test_3D.m	/^function test_3D$/;"	f
+test_CB1_Callback	uiremember_uirestore/demo.m	/^function test_CB1_Callback(hObject, eventdata, handles)$/;"	f
+test_CB1_CreateFcn	uiremember_uirestore/demo.m	/^function test_CB1_CreateFcn(hObject, eventdata, handles)$/;"	f
+test_CB1_DeleteFcn	uiremember_uirestore/demo.m	/^function test_CB1_DeleteFcn(hObject, eventdata, handles)$/;"	f
+test_CB2_Callback	uiremember_uirestore/demo.m	/^function test_CB2_Callback(hObject, eventdata, handles)$/;"	f
+test_CB2_CreateFcn	uiremember_uirestore/demo.m	/^function test_CB2_CreateFcn(hObject, eventdata, handles)$/;"	f
+test_CB2_DeleteFcn	uiremember_uirestore/demo.m	/^function test_CB2_DeleteFcn(hObject, eventdata, handles)$/;"	f
+test_RB2_CreateFcn	uiremember_uirestore/demo.m	/^function test_RB2_CreateFcn(hObject, eventdata, handles)$/;"	f
+test_RB2_DeleteFcn	uiremember_uirestore/demo.m	/^function test_RB2_DeleteFcn(hObject, eventdata, handles)$/;"	f
+test_RB3_CreateFcn	uiremember_uirestore/demo.m	/^function test_RB3_CreateFcn(hObject, eventdata, handles)$/;"	f
+test_RB3_DeleteFcn	uiremember_uirestore/demo.m	/^function test_RB3_DeleteFcn(hObject, eventdata, handles)$/;"	f
+test_TB1_Callback	uiremember_uirestore/demo.m	/^function test_TB1_Callback(hObject, eventdata, handles)$/;"	f
+test_TB1_CreateFcn	uiremember_uirestore/demo.m	/^function test_TB1_CreateFcn(hObject, eventdata, handles)$/;"	f
+test_TB1_DeleteFcn	uiremember_uirestore/demo.m	/^function test_TB1_DeleteFcn(hObject, eventdata, handles)$/;"	f
+test_edit1_Callback	uiremember_uirestore/demo.m	/^function test_edit1_Callback(hObject, eventdata, handles)$/;"	f
+test_edit1_CreateFcn	uiremember_uirestore/demo.m	/^function test_edit1_CreateFcn(hObject, eventdata, handles)$/;"	f
+test_edit1_DeleteFcn	uiremember_uirestore/demo.m	/^function test_edit1_DeleteFcn(hObject, eventdata, handles)$/;"	f
+test_img	dragzoom/test_img.m	/^function test_img$/;"	f
+test_loglog	dragzoom/test_loglog.m	/^function test_loglog$/;"	f
+test_pop_Callback	uiremember_uirestore/demo.m	/^function test_pop_Callback(hObject, eventdata, handles)$/;"	f
+test_pop_CreateFcn	uiremember_uirestore/demo.m	/^function test_pop_CreateFcn(hObject, eventdata, handles)$/;"	f
+test_pop_DeleteFcn	uiremember_uirestore/demo.m	/^function test_pop_DeleteFcn(hObject, eventdata, handles)$/;"	f
+test_rect_hor_img	dragzoom/test_rect_hor_img.m	/^function test_rect_hor_img$/;"	f
+test_rect_ver_img	dragzoom/test_rect_ver_img.m	/^function test_rect_ver_img$/;"	f
+test_semilogx	dragzoom/test_semilogx.m	/^function test_semilogx$/;"	f
+test_semilogy	dragzoom/test_semilogy.m	/^function test_semilogy$/;"	f
+test_slider1_Callback	uiremember_uirestore/demo.m	/^function test_slider1_Callback(hObject, eventdata, handles)$/;"	f
+test_slider1_CreateFcn	uiremember_uirestore/demo.m	/^function test_slider1_CreateFcn(hObject, eventdata, handles)$/;"	f
+test_slider1_DeleteFcn	uiremember_uirestore/demo.m	/^function test_slider1_DeleteFcn(hObject, eventdata, handles)$/;"	f
+test_subplot_2D	dragzoom/test_subplot_2D.m	/^function test_subplot_2D$/;"	f
+test_subplot_2D_3D	dragzoom/test_subplot_2D_3D.m	/^function test_subplot_2D_3D$/;"	f
+test_subplot_3D	dragzoom/test_subplot_3D.m	/^function test_subplot_3D$/;"	f
+test_subplot_img	dragzoom/test_subplot_img.m	/^function test_subplot_img()$/;"	f
+testme_figure_CloseRequestFcn	uiremember_uirestore/demo.m	/^function testme_figure_CloseRequestFcn(hObject, eventdata, handles)$/;"	f
+testme_figure_CreateFcn	uiremember_uirestore/demo.m	/^function testme_figure_CreateFcn(hObject, eventdata, handles)$/;"	f
+tg_call	GUIs_FEX/GUI_35.m	/^function [] = tg_call(varargin)$/;"	f
+uipanel1_SelectionChangeFcn	Explorer.m	/^function uipanel1_SelectionChangeFcn(hObject, eventdata, handles)$/;"	f
+uipickfiles	uipickfiles.m	/^function out = uipickfiles(varargin)$/;"	f
+uipickfiles	uipickfiles/uipickfiles.m	/^function out = uipickfiles(varargin)$/;"	f
+uiremember	uiremember_uirestore/uiremember.m	/^function uiremember(varargin)$/;"	f
+uirestore	uiremember_uirestore/uirestore.m	/^function [status,status_str] = uirestore(varargin)$/;"	f
+ulong64	maxkmex.c	/^typedef unsigned __int64 ulong64;$/;"	t	file:
+ulong64	maxkmex.c	/^typedef unsigned long long ulong64;$/;"	t	file:
+ulong64	minkmex.c	/^typedef unsigned __int64 ulong64;$/;"	t	file:
+ulong64	minkmex.c	/^typedef unsigned long long ulong64;$/;"	t	file:
+um1_call	GUIs_FEX/GUI_28.m	/^function [] = um1_call(varargin)$/;"	f
+um2_call	GUIs_FEX/GUI_28.m	/^function [] = um2_call(varargin)$/;"	f
+um_call	GUIs_FEX/GUI_33.m	/^function [] = um_call(varargin)$/;"	f
+uninstall	GUILayout_1p3/GUILayout-1p3/uninstall.m	/^function uninstall()$/;"	f
+update_history	uipickfiles.m	/^function history = update_history(history,current_dir,time,history_size)$/;"	f
+update_history	uipickfiles/uipickfiles.m	/^function history = update_history(history,current_dir,time,history_size)$/;"	f
+update_threshold	ThresholdImage.m	/^function update_threshold(hObject, eventdata, handles)$/;"	f
+wmd_read_data_simple	wmd_read_data_simple.m	/^function data=wmd_read_data_simple(filenames,block_size,cutoff_intensity, number_of_RGB_clusters,number_of_block_clusters,...$/;"	f

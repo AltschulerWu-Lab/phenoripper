@@ -183,10 +183,22 @@ superblock_representatives=cell(number_of_superblocks,number_of_superblock_repre
 supr_counter=zeros(number_of_superblocks,1);
 for file_num=1:length(included_files)
     img=zeros(xres,yres,number_of_channels);
-    for channel=1:number_of_channels
-       img(:,:,channel)=imread(cell2mat(filenames(included_files(file_num),channel)));
-       
+    
+      
+    if(channels_per_file>1)
+        %img=double(imread(cell2mat(filenames(image_counter))));
+        img=imread(cell2mat(filenames(included_files(file_num),1)));
+    else
+        for channel=1:number_of_channels
+            %img(:,:,channel_counter)=imread(cell2mat(filenames(image_counter,channel_counter)));
+            img(:,:,channel)=imread(cell2mat(filenames(included_files(file_num),channel)));
+        end
     end
+    
+%     for channel=1:number_of_channels
+%        img(:,:,channel)=imread(cell2mat(filenames(included_files(file_num),channel)));
+%        
+%     end
     for i=1:number_of_superblocks
         number_of_matches=size(locations{included_files(file_num),i},1);
         if(number_of_matches>0)

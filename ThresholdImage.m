@@ -57,6 +57,7 @@ myhandles=getappdata(0,'myhandles');
 %myhandles.bit_depth=14;
 myhandles.show_blocks=false;
 number_of_channels=myhandles.number_of_channels;
+files_per_image=myhandles.files_per_image;
 filenames=myhandles.test_files;
 myhandles.image_number=1;
 test=imfinfo(filenames{myhandles.image_number,1});
@@ -76,14 +77,18 @@ jEditor = javaObject('javax.swing.JSpinner$NumberEditor',jhSpinner, '#');
 jhSpinner.setEditor(jEditor);
 
 
+if(number_of_channels~=files_per_image)
+img=imread(filenames{myhandles.image_number,1});
 
-for channel=1:myhandles.number_of_channels
-    img(:,:,channel)=imread(filenames{myhandles.image_number,channel});
+else
+      for channel=1:myhandles.number_of_channels
+          img(:,:,channel)=imread(filenames{myhandles.image_number,channel});
+      end
 end
 myhandles.intensity=sum(img.^2,3);
 myhandles.h=gca;
 myhandles.img=img;
-myhandles.img1=tanh(img/2^myhandles.bit_depth*10);
+myhandles.img1=tanh(double(img)/2^myhandles.bit_depth*10);
 
 setappdata(0,'myhandles',myhandles);
 
@@ -291,12 +296,17 @@ set(handles.NextButton,'Enable','on');
 SetFileLabel(filenames{myhandles.image_number,1},handles);
 guidata(hObject, handles);
 img=zeros(myhandles.xres,myhandles.yres,myhandles.number_of_channels);
-for channel=1:myhandles.number_of_channels
-    img(:,:,channel)=imread(filenames{myhandles.image_number,channel});
+if(myhandles.number_of_channels~=myhandles.files_per_image)
+img=imread(filenames{myhandles.image_number,1});
+
+else
+      for channel=1:myhandles.number_of_channels
+          img(:,:,channel)=imread(filenames{myhandles.image_number,channel});
+      end
 end
 myhandles.img=img;
 myhandles.intensity=sum(img.^2,3);
-myhandles.img1=tanh(img/2^myhandles.bit_depth*10);
+myhandles.img1=tanh(double(img)/2^myhandles.bit_depth*10);
 setappdata(0,'myhandles',myhandles);
 display_image(handles);
 %This could be displaying something different from the real thing
@@ -342,12 +352,17 @@ set(handles.PreviousButton,'Enable','on');
 SetFileLabel(filenames{myhandles.image_number,1},handles);
 guidata(hObject, handles);
 img=zeros(myhandles.xres,myhandles.yres,myhandles.number_of_channels);
-for channel=1:myhandles.number_of_channels
-    img(:,:,channel)=imread(filenames{myhandles.image_number,channel});
+if(myhandles.number_of_channels~=myhandles.files_per_image)
+img=imread(filenames{myhandles.image_number,1});
+
+else
+      for channel=1:myhandles.number_of_channels
+          img(:,:,channel)=imread(filenames{myhandles.image_number,channel});
+      end
 end
 myhandles.img=img;
 myhandles.intensity=sum(img.^2,3);
-myhandles.img1=tanh(img/2^myhandles.bit_depth*10);
+myhandles.img1=tanh(double(img)/2^myhandles.bit_depth*10);
 setappdata(0,'myhandles',myhandles);
 display_image(handles);
 % %This could be displaying something different from the real thing

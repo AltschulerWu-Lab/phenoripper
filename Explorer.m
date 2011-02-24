@@ -238,7 +238,7 @@ end
 myhandles.MDS_gca=gca;
 myhandles.MDS_gcf=gcf;
 myhandles.selected_point=point_number;
-ShowImages(myhandles.file_structure{point_number},myhandles.axes_chosen);
+ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,myhandles.axes_chosen);
 setappdata(0,'myhandles',myhandles);
 
 function ShowImages(filenames,axis_handle)
@@ -249,8 +249,12 @@ test=imfinfo(filenames{1,1});
 xres=test.Height;
 yres=test.Width;
 img=zeros(xres,yres,myhandles.number_of_channels);
-for channel=1:myhandles.number_of_channels
-    img(:,:,channel)=imread(filenames{file_number,channel});
+if(myhandles.files_per_image~=myhandles.number_of_channels)
+    img=imread(filenames{file_number,1});
+else
+    for channel=1:myhandles.number_of_channels
+        img(:,:,channel)=imread(filenames{file_number,channel});
+    end
 end
 image(img./max(img(:)),'parent',axis_handle);
 box on;
