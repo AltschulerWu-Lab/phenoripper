@@ -22,7 +22,7 @@ function varargout = wizard(varargin)
 
 % Edit the above text to modify the response to help wizard
 
-% Last Modified by GUIDE v2.5 08-Mar-2011 13:18:35
+% Last Modified by GUIDE v2.5 21-Mar-2011 14:20:02
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -56,7 +56,35 @@ function wizard_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 
 % Update handles structure
-guidata(hObject, handles);
+guidata(hObject, handles);  
+axis(handles.header);
+setappdata(0,'handles',handles);
+img=imread('wizard.png');
+image(img,'parent',handles.header);
+axis off;
+
+%set(handles.header,'axes','off');
+
+%Load the default template list
+wizardhandles=load('default-templates.mat','templates');
+setappdata(0,'wizardhandles',wizardhandles);
+populateTemplateSelectorList(handles);
+setappdata(0,'wizardhandles',wizardhandles);
+
+
+
+function populateTemplateSelectorList(handles)
+  fileExtension=get(handles.fileExtensionTF,'String');
+  channelSep=get(handles.channelSeparatorTF,'String');
+  %Populate the Template list
+  wizardhandles=getappdata(0,'wizardhandles');
+  templateList=cell(1,length(wizardhandles.templates));
+  for i=1:length(wizardhandles.templates)
+    templateList{i}=wizardhandles.templates{i}.getName(fileExtension,channelSep);
+  end
+  set(handles.templateSelector,'String',templateList);
+  setappdata(0,'wizardhandles',wizardhandles);
+
 
 % UIWAIT makes wizard wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
@@ -74,18 +102,18 @@ varargout{1} = handles.output;
 
 
 
-function edit1_Callback(hObject, eventdata, handles)
-% hObject    handle to edit1 (see GCBO)
+function rootdirTF_Callback(hObject, eventdata, handles)
+% hObject    handle to rootdirTF (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit1 as text
-%        str2double(get(hObject,'String')) returns contents of edit1 as a double
+% Hints: get(hObject,'String') returns contents of rootdirTF as text
+%        str2double(get(hObject,'String')) returns contents of rootdirTF as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function edit1_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit1 (see GCBO)
+function rootdirTF_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to rootdirTF (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -96,35 +124,100 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in pushbutton1.
-function pushbutton1_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton1 (see GCBO)
+% --- Executes on button press in rootDirSelectBT.
+function rootDirSelectBT_Callback(hObject, eventdata, handles)
+% hObject    handle to rootDirSelectBT (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+%handles=getappdata(0,'handles');
+lastPath=loadLastPath();
+dir_name=[];
+if(~exist(char(lastPath),'dir'))
+  dir_name=uigetdir();
+else
+  dir_name=uigetdir(lastPath);
+end
+myhandles=getappdata(0,'myhandles'); 
+if(~exist(char(dir_name),'dir'))
+        dir_name='';
+        warndlg('Invalid Root Directory');
+else
+        myhandles.all_files=files_in_dir(dir_name);
+        temp=regexp(myhandles.all_files,[dir_name filesep],'split');
+        saveLastPath(dir_name);
+        
+        %set(handles.file_table,'Data',cellfun(@(x) x(end),temp));
+end
+set(handles.rootdirTF,'String',dir_name);
+setappdata(0,'myhandles',myhandles);   
+setappdata(0,'handles',handles);
+
+function saveLastPath(path)
+fid = fopen('.lastPath.txt','w');
+fprintf(fid, '%s', path);
+fclose(fid);
+
+function path=loadLastPath()
+path=[];
+if(exist('.lastPath.txt','file'))
+  fid = fopen('.lastPath.txt', 'r');
+  path = fgetl(fid);
+end
+
+
+% --- Executes on button press in selectSingleChannelCB.
+function selectSingleChannelCB_Callback(hObject, eventdata, handles)
+% hObject    handle to selectSingleChannelCB (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Hint: get(hObject,'Value') returns toggle state of selectSingleChannelCB
+if(get(handles.selectSingleChannelCB,'Value')==0)
+  set(handles.nrChannelPerImageDB,'Visible','on');
+  set(handles.channelImageText,'Visible','on');
+  set(handles.detectChannelBT,'Visible','off');
+else
+  set(handles.nrChannelPerImageDB,'Visible','off');
+  set(handles.channelImageText,'Visible','off');
+  set(handles.detectChannelBT,'Visible','on');
+end
 
-% --- Executes on button press in checkbox1.
-function checkbox1_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox1 (see GCBO)
+% --- Executes on selection change in nrChannelPerImageDB.
+function nrChannelPerImageDB_Callback(hObject, eventdata, handles)
+% hObject    handle to nrChannelPerImageDB (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of checkbox1
+% Hints: contents = cellstr(get(hObject,'String')) returns nrChannelPerImageDB contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from nrChannelPerImageDB
+
+channelNr=get(handles.nrChannelPerImageDB,'Value');
+data=cell(channelNr,3);
+for i=1:channelNr
+  data{i,1}=true;
+end
+for i=1:channelNr
+  data{i,2}=num2str(i);
+end
+for i=1:channelNr
+  data{i,3}='';
+end
+for i=1:channelNr
+  data{i,4}='';
+end
+
+set(handles.markerTable,'Visible','on');
+set(handles.markerTable,'Data',data);
+set(handles.markerTable, 'ColumnWidth', {30 110 240, 90});
+msgbox('Marker have been detected, please enter the name of each marker and click on Done to use this configuration.');
 
 
-% --- Executes on selection change in popupmenu1.
-function popupmenu1_Callback(hObject, eventdata, handles)
-% hObject    handle to popupmenu1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu1 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from popupmenu1
 
 
 % --- Executes during object creation, after setting all properties.
-function popupmenu1_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to popupmenu1 (see GCBO)
+function nrChannelPerImageDB_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to nrChannelPerImageDB (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -135,19 +228,19 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on selection change in popupmenu3.
-function popupmenu3_Callback(hObject, eventdata, handles)
-% hObject    handle to popupmenu3 (see GCBO)
+% --- Executes on selection change in nrChannelDB.
+function nrChannelDB_Callback(hObject, eventdata, handles)
+% hObject    handle to nrChannelDB (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu3 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from popupmenu3
+% Hints: contents = cellstr(get(hObject,'String')) returns nrChannelDB contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from nrChannelDB
 
 
 % --- Executes during object creation, after setting all properties.
-function popupmenu3_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to popupmenu3 (see GCBO)
+function nrChannelDB_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to nrChannelDB (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -159,18 +252,19 @@ end
 
 
 
-function edit2_Callback(hObject, eventdata, handles)
-% hObject    handle to edit2 (see GCBO)
+function fileExtensionTF_Callback(hObject, eventdata, handles)
+% hObject    handle to fileExtensionTF (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit2 as text
-%        str2double(get(hObject,'String')) returns contents of edit2 as a double
+% Hints: get(hObject,'String') returns contents of fileExtensionTF as text
+%        str2double(get(hObject,'String')) returns contents of fileExtensionTF as a double
+populateTemplateSelectorList(handles);
 
 
 % --- Executes during object creation, after setting all properties.
-function edit2_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit2 (see GCBO)
+function fileExtensionTF_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fileExtensionTF (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -182,18 +276,18 @@ end
 
 
 
-function edit3_Callback(hObject, eventdata, handles)
-% hObject    handle to edit3 (see GCBO)
+function channelSeparatorTF_Callback(hObject, eventdata, handles)
+% hObject    handle to channelSeparatorTF (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit3 as text
-%        str2double(get(hObject,'String')) returns contents of edit3 as a double
-
+% Hints: get(hObject,'String') returns contents of channelSeparatorTF as text
+%        str2double(get(hObject,'String')) returns contents of channelSeparatorTF as a double
+populateTemplateSelectorList(handles);
 
 % --- Executes during object creation, after setting all properties.
-function edit3_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit3 (see GCBO)
+function channelSeparatorTF_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to channelSeparatorTF (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -204,19 +298,32 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on selection change in popupmenu5.
-function popupmenu5_Callback(hObject, eventdata, handles)
-% hObject    handle to popupmenu5 (see GCBO)
+% --- Executes on selection change in templateSelector.
+function templateSelector_Callback(hObject, eventdata, handles)
+% hObject    handle to templateSelector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu5 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from popupmenu5
+% Hints: contents = cellstr(get(hObject,'String')) returns templateSelector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from templateSelector
+groupbyList=getGroups(handles);
+set(handles.groupSelector,'String',groupbyList);
+set(handles.groupSelector,'Visible','on');
+set(handles.text8,'Visible','on');
+
+function groups=getGroups(handles)
+selectedTemplateNr = get(handles.templateSelector,'Value');
+if(selectedTemplateNr<1)
+  groups=[];
+  return;
+end
+wizardhandles=getappdata(0','wizardhandles');
+groups=wizardhandles.templates{selectedTemplateNr}.getGroupbyList();
 
 
 % --- Executes during object creation, after setting all properties.
-function popupmenu5_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to popupmenu5 (see GCBO)
+function templateSelector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to templateSelector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -227,26 +334,37 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in pushbutton2.
-function pushbutton2_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton2 (see GCBO)
+% --- Executes on button press in editTemplateBT.
+function editTemplateBT_Callback(hObject, eventdata, handles)
+
+wizardhandles=getappdata(0,'wizardhandles');
+wizardhandles.selectedTemplateID = get(handles.templateSelector,'Value');
+wizardhandles.fileExtension = get(handles.fileExtensionTF,'String');
+wizardhandles.channelSeparator = get(handles.channelSeparatorTF,'String');
+setappdata(0,'wizardhandles',wizardhandles);
+editTemplate;
+uiwait;
+wizardhandles=getappdata(0,'wizardhandles');
+populateTemplateSelectorList(handles);
+
+% hObject    handle to editTemplateBT (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% --- Executes on selection change in listbox2.
-function listbox2_Callback(hObject, eventdata, handles)
-% hObject    handle to listbox2 (see GCBO)
+% --- Executes on selection change in groupSelector.
+function groupSelector_Callback(hObject, eventdata, handles)
+% hObject    handle to groupSelector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns listbox2 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from listbox2
+% Hints: contents = cellstr(get(hObject,'String')) returns groupSelector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from groupSelector
 
 
 % --- Executes during object creation, after setting all properties.
-function listbox2_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to listbox2 (see GCBO)
+function groupSelector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to groupSelector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -257,22 +375,250 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in pushbutton4.
-function pushbutton4_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton4 (see GCBO)
+% --- Executes on button press in doneBT.
+function doneBT_Callback(hObject, eventdata, handles)
+% hObject    handle to doneBT (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+getWizardData(handles);
+
+
+function data=getWizardData(handles)
+selectedFolder=get(handles.rootdirTF,'String');
+if(~isdir(selectedFolder))
+  warndlg('The choosen folder is not a valid directory. Please select a valid directory!');
+  return;
+end
+%Get the root directory
+data.rootDir=selectedFolder;
+%For each marker, get the information
+markersData=get(handles.markerTable,'Data');
+%Test if at least 1 marker has been selected
+if(any(vertcat(markersData{:,1}))==0)
+  warndlg('At least 1 marker has to be selected!');
+  return;
+end  
+%Test is the selected marker data have all been filled
+selectedMarkerIndex=find([markersData{:,1}]);
+indx=~cellfun(@isempty,markersData(selectedMarkerIndex,:));
+[rx,cx]=find(indx<1);
+if(length(rx)>0 && length(cx))
+  warndlg('You must described all the markers (Name and Color)');
+  return;
+end
+%Warn if a color is used twice or more for markers
+if(length(unique(markersData(selectedMarkerIndex,4)))~=length(selectedMarkerIndex)) 
+  answer=questdlg(sprintf(['Color should be different for each marker.\n'...
+    'Are you sure you want to attribute the same color to more than 1 marker?']), ...
+ 'Yes', 'No');
+% Handle response
+  switch answer
+    case 'No'
+      return;
+  end
+end
+%Get the choosen Regular Expression
+regExp=getSelectedRegExp(handles);
+if(isempty(regExp))
+  warndlg('No Template have been selected, you must select a template!');
+  return;
+end
+%Remove the groups Separator and Extension from the regular expression
+regExp=regexprep(regExp,'?<Separator>','');
+regExp=regexprep(regExp,'?<Extension>','');
+
+%Return the markerData in Structure
+markers=cell(1,length(markersData));
+for i=1:length(markersData)
+  markers{i}.isUse=markersData{i,1};
+  markers{i}.marker=markersData{i,2};
+  markers{i}.name=markersData{i,3};
+  markers{i}.color=markersData{i,4};
+  markers{i}.regExp=regexprep(regExp,'\(\?<Channel>.\*\)',markersData{i,2});
+  %markers{i}.regexp=
+end
+data.markers=markers;
+data.nrChannelPerFile=1;
+if(get(handles.selectSingleChannelCB,'Value'))
+  data.nrChannelPerFile=get(handles.nrChannelPerImageDB,'Value');
+end
+data.pattern=getFullRegExp(handles);
+data.groups=getGroups(handles);
+disp(data);
+
+
+% --- Executes on button press in testTemplateBT.
+function testTemplateBT_Callback(hObject, eventdata, handles)
+% hObject    handle to testTemplateBT (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% --- Executes on button press in pushbutton5.
-function pushbutton5_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton5 (see GCBO)
+% --- Executes on button press in advancedEditBT.
+function advancedEditBT_Callback(hObject, eventdata, handles)
+% hObject    handle to advancedEditBT (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% --- Executes on button press in pushbutton6.
-function pushbutton6_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton6 (see GCBO)
+% --- Executes on button press in saveAllTemplatesBT.
+function saveAllTemplatesBT_Callback(hObject, eventdata, handles)
+% hObject    handle to saveAllTemplatesBT (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+wizardhandles=getappdata(0,'wizardhandles');
+answer=questdlg(sprintf('Save this pattern list as the default one?'), ...
+ 'Yes', 'No');
+% Handle response
+  switch answer
+    case 'Yes'
+      templates=wizardhandles.templates;
+      save('default-templates.mat','templates');
+      msgbox(['Default Templates have been saved'],'Saved Template with success');
+    case 'No'
+      templates=wizardhandles.templates;
+      [fileName, pathName]=uiputfile('*.mat','Save as',...
+          'template.mat');
+      if(fileName)
+        save([pathName fileName],'templates'); 
+        msgbox(['Template has been saved in ' pathName fileName],...
+          'Saved Template with success');
+      end
+  end
+
+
+
+% --- Executes on button press in removeSelectedTemplateBT.
+function removeSelectedTemplateBT_Callback(hObject, eventdata, handles)
+% hObject    handle to removeSelectedTemplateBT (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+answer=questdlg(sprintf(['Are you sure you want to delete this Pattern']), ...
+ 'Yes', 'No');
+% Handle response
+  switch answer
+    case 'No'
+      return;
+  end
+wizardhandles=getappdata(0,'wizardhandles');
+selected = get(handles.templateSelector,'Value');
+templates= cell(1,length(wizardhandles.templates)-1);
+index=1;
+for i=1:length(wizardhandles.templates)
+  if(i~=selected)
+  templates{index}=wizardhandles.templates{i};
+  end
+  index=index+1;
+end
+wizardhandles.templates=templates;
+setappdata(0,'wizardhandles',wizardhandles);
+populateTemplateSelectorList(handles);
+set(handles.templateSelector,'Value',selected-1);
+
+
+
+% --- Executes on button press in upTemplateBT.
+function upTemplateBT_Callback(hObject, eventdata, handles)
+% hObject    handle to upTemplateBT (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+wizardhandles=getappdata(0,'wizardhandles');
+selected = get(handles.templateSelector,'Value');
+if(selected==1)
+  return;
+end
+templates= wizardhandles.templates;
+templates{selected-1}=wizardhandles.templates{selected};
+templates{selected}=wizardhandles.templates{selected-1};
+wizardhandles.templates=templates;
+setappdata(0,'wizardhandles',wizardhandles);
+populateTemplateSelectorList(handles);
+set(handles.templateSelector,'Value',selected-1);
+
+
+
+% --- Executes on button press in downTemplateBT.
+function downTemplateBT_Callback(hObject, eventdata, handles)
+% hObject    handle to downTemplateBT (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+wizardhandles=getappdata(0,'wizardhandles');
+selected = get(handles.templateSelector,'Value');
+if(selected==length(wizardhandles.templates))
+  return;
+end
+templates= wizardhandles.templates;
+templates{selected+1}=wizardhandles.templates{selected};
+templates{selected}=wizardhandles.templates{selected+1};
+wizardhandles.templates=templates;
+setappdata(0,'wizardhandles',wizardhandles);
+populateTemplateSelectorList(handles);
+set(handles.templateSelector,'Value',selected+1);
+
+
+% --- Executes on button press in detectChannelBT.
+function detectChannelBT_Callback(hObject, eventdata, handles)
+% hObject    handle to detectChannelBT (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+selectedFolder=get(handles.rootdirTF,'String');
+if(~isdir(selectedFolder))
+  warndlg('The choosen folder is not a valid directory. Please select a valid directory!');
+  return;
+end
+regExp=getSelectedRegExp(handles);
+if(isempty(regExp))
+  warndlg('No Template have been selected, you must select a template!');
+  return;
+end
+channelList=getMarkersFromDir(selectedFolder,regExp,selectedFolder);
+if(isempty(channelList))
+  warndlg('Couldn detect the channel. Did you select the template corresponding to your data?');
+  set(handles.markerTable,'Data',cell(0,3));
+  set(handles.markerTable,'Visible','off');
+  return;
+end
+data=cell(length(channelList),3);
+for i=1:length(channelList)
+  data{i,1}=true;
+end
+for i=1:length(channelList)
+  data{i,2}=channelList{i};
+end
+for i=1:length(channelList)
+  data{i,3}='';
+end
+for i=1:length(channelList)
+  data{i,4}='';
+end
+
+set(handles.markerTable,'Visible','on');
+set(handles.markerTable,'Data',data);
+set(handles.markerTable, 'ColumnWidth', {30 110 220, 90});
+disp(channelList);
+msgbox(['Marker have been detected, please enter the name of each marker'...
+  'and click on Done to use this configuration.']);
+
+
+function regExp=getSelectedRegExp(handles)
+selectedTemplateNr = get(handles.templateSelector,'Value');
+if(selectedTemplateNr<1)
+  regExp=[];
+  return;
+end
+wizardhandles=getappdata(0,'wizardhandles');
+selectedTemplate=wizardhandles.templates{selectedTemplateNr};
+fileExtension=get(handles.fileExtensionTF,'String');
+channelSep=get(handles.channelSeparatorTF,'String');
+regExp=selectedTemplate.getRegularExpression(fileExtension,channelSep);
+
+function regExp=getFullRegExp(handles)
+selectedTemplateNr = get(handles.templateSelector,'Value');
+if(selectedTemplateNr<1)
+  regExp=[];
+  return;
+end
+wizardhandles=getappdata(0,'wizardhandles');
+selectedTemplate=wizardhandles.templates{selectedTemplateNr};
+regExp=selectedTemplate.Pattern;
