@@ -1,11 +1,11 @@
-function data=ThirdOrder_Basis(filenames,global_data,number_of_superblocks)
+function data=SecondOrder(filenames,global_data)
 %% Preprocessing
 block_size=global_data.block_size;
 cutoff_intensity=global_data.cutoff_intensity;
 number_of_RGB_clusters=global_data.number_of_RGB_clusters;
 number_of_block_clusters=global_data.number_of_block_clusters;
+number_of_superblocks=size(global_data.superblock_centroids,1);
 
-number_of_superblock_representatives=3;
 
 [number_of_repeats,number_of_channels]=size(filenames);
 %tic;
@@ -44,12 +44,15 @@ block_ids_temp=zeros(blocks_nx*blocks_ny*number_of_repeats,1);
 block_counter=0;
 foreground_blocks_per_image=zeros(number_of_repeats,1);
 foreground_blocks_temp=zeros(blocks_nx*blocks_ny*number_of_repeats,1);
-image_number_of_block_temp=zeros(blocks_nx*blocks_ny*number_of_repeats,1);
-position_of_block_temp=zeros(blocks_nx*blocks_ny*number_of_repeats,2);
 neighbor_profiles_temp=zeros(blocks_nx*blocks_ny*number_of_repeats,number_of_block_clusters+1);
 
+%if(exist('myhandles','var'));
+myhandles=getappdata(0,'myhandles');
+progress= get(myhandles.statusbarHandles.ProgressBar, 'Value');
+tStart1=tic; 
+%end
 for image_counter=1:number_of_repeats
-    %disp(['Reading Image ' num2str(image_counter) '....']);
+   % disp(['Reading Image ' num2str(image_counter) '....']);
     img=zeros(xres,yres,number_of_channels);
     
     if(channels_per_file>1)
@@ -103,8 +106,8 @@ for image_counter=1:number_of_repeats
     image_in_discrete_block_states=zeros(blocks_nx,blocks_ny);
     image_in_discrete_block_states(foreground_blocks)=block_ids_in_image;
     
-    %h=fspecial('gaussian',2,1);
-    h=[1 1 1;1 1 1; 1 1 1];
+    
+     h=[1 1 1;1 1 1; 1 1 1];
 %filtered=imfilter(double(img),h);
     neighbor_profiles_in_image=zeros(length(foreground_blocks),number_of_block_clusters+1);
     
@@ -113,6 +116,8 @@ for image_counter=1:number_of_repeats
         neighbor_profiles_in_image(:,i+1)=temp(foreground_blocks)/8;
        
     end
+    neighbor_profiles_temp(block_counter+1:block_counter+length(foreground_blocks),:)=neighbor_profiles_in_image;
+    
     
     
     data.image_in_discrete_block_states=image_in_discrete_block_states;
@@ -121,110 +126,61 @@ for image_counter=1:number_of_repeats
     foreground_blocks_per_image(image_counter)=length(foreground_blocks);
     block_ids_temp(block_counter+1:block_counter+length(foreground_blocks))=block_ids_in_image;
     foreground_blocks_temp(block_counter+1:block_counter+length(foreground_blocks))=foreground_blocks;
-    neighbor_profiles_temp(block_counter+1:block_counter+length(foreground_blocks),:)=neighbor_profiles_in_image;
-    image_number_of_block_temp(block_counter+1:block_counter+length(foreground_blocks))=image_counter;
-    [x_pos,y_pos]=find(avg_block_intensities>cutoff_intensity);%repeated operation,can be speeded up
-    position_of_block_temp(block_counter+1:block_counter+length(foreground_blocks),:)=...
-        [(x_pos'-1)*block_size+x_offset;(y_pos'-1)*block_size+y_offset]';
     
     block_counter=block_counter+length(foreground_blocks);
+  
+   
+ %   if(exist('myhandles','var'))  
+    progress=progress+1;
+    tElapsed1=toc(tStart1); 
+    tElapsed=myhandles.tElapsed+tElapsed1;
+    %disp([num2str(myhandles.tElapsed),' ',num2str(tElapsed1),' ',num2str(tElapsed)]);
+    
+    files_analyzed=myhandles.files_analyzed+image_counter;
+    %disp([num2str(myhandles.files_analyzed) ' ' num2str(image_counter),'
+    %',num2str(myhandles.number_of_files)]);
+    time_left=(myhandles.number_of_files-files_analyzed)*tElapsed/(files_analyzed);
+    set(myhandles.statusbarHandles.ProgressBar,...
+        'Value',progress,'StringPainted','on', 'string',FormatTime(time_left));
+    %setappdata(0,'myhandles',myhandles);
     %disp('done!');
+ %   end
 end
 
 
+
 block_ids=block_ids_temp(1:block_counter);
-image_number_of_block=image_number_of_block_temp(1:block_counter);
-position_of_block=position_of_block_temp(1:block_counter,:);
 
-%neighbor_profiles=zeros(block_counter,number_of_block_clusters+1);
+%neighbor_profiles=zeros(block_counter,2*number_of_block_clusters+1);
 neighbor_profiles=neighbor_profiles_temp(1:block_counter,:);
-mean_superblock_profile=mean(neighbor_profiles);
-data.mean_superblock_profile=mean_superblock_profile;
+
 %for i=1:block_counter
-%        neighbor_profiles(i,:)=log(neighbor_profiles(i,:)./mean_superblock_profile);
-%end
-%for i=1:block_counter
-%   neighbor_profiles(i,block_ids(i))=1000;
+%        neighbor_profiles(i,:)=log(neighbor_profiles(i,:)./global_data.mean_superblock_profile);
 %end
 
-[~,data.superblock_centroids,~,superblock_distances]=kmeans(neighbor_profiles,number_of_superblocks...
-    ,'emptyaction','singleton','start','cluster');
+%for i=1:block_counter
+%   neighbor_profiles(i,block_ids(i))=1;
+%end
+
+superblock_distmat=zeros(length(block_ids),number_of_superblocks);
+    for superblock_cluster=1:number_of_superblocks
+        temp=repmat(global_data.superblock_centroids(superblock_cluster,:),length(block_ids),1);
+        superblock_distmat(:,superblock_cluster) =sum((neighbor_profiles-temp).^2,2);
+    end
+[~,superblock_ids]=min(superblock_distmat,[],2);
+
+
 data.block_profile=zeros(number_of_block_clusters,1);
 for block_cluster=1:number_of_block_clusters
    data.block_profile(block_cluster)=sum(block_ids==block_cluster)/length(block_ids);
 end
 
-
-
-%Picking representatives
-% 1) For each block store filenumber and (x,y) location (remember cropping)
-% 
-
-% Optimal File Opening Steps:
-% 1) Identify blocks within acceptable range of top and determine image and location
-% 2) Create a FileVsBlockType matrix containing number of acceptable representatives for each superblock per file
-% 3) If i is the indicator function to include a file, then minimize sum(i) such that i.*f(:,j)>number_of_reps for each j
-% 4) Since all files will need to be opened, just go in order and load up all possible reps per file
-distance_cutoffs=zeros(number_of_superblocks,1);
-FvB=zeros(number_of_repeats,number_of_superblocks);
-locations=cell(number_of_repeats,number_of_superblocks);
-
-for i=1:number_of_superblocks
-  distance_cutoffs(i)=max(mink(superblock_distances(:,i),number_of_superblock_representatives));
-   
-   acceptable_blocks=find(superblock_distances(:,i)<=distance_cutoffs(i));
-   for j=1:length(acceptable_blocks)
-       block_num=acceptable_blocks(j);
-       FvB(image_number_of_block(block_num),i)=FvB(image_number_of_block(block_num),i)+1;
-       locations{image_number_of_block(block_num),i}=[locations{image_number_of_block(block_num),i};...
-           position_of_block(block_num,:)];
-   end
+data.superblock_profile=zeros(number_of_superblocks,1);
+for superblock_cluster=1:number_of_superblocks
+   data.superblock_profile(superblock_cluster)=sum(superblock_ids==superblock_cluster)/length(superblock_ids);
 end
 
-included_files=find(bintprog(ones(number_of_repeats,1),-FvB',-number_of_superblock_representatives*ones(number_of_superblocks,1))>0.5);
-%included_files=1:number_of_repeats;
-superblock_representatives=cell(number_of_superblocks,number_of_superblock_representatives);
 
-supr_counter=zeros(number_of_superblocks,1);
-for file_num=1:length(included_files)
-    img=zeros(xres,yres,number_of_channels);
-    
-      
-    if(channels_per_file>1)
-        %img=double(imread(cell2mat(filenames(image_counter))));
-        img=imread(cell2mat(filenames(included_files(file_num),1)));
-    else
-        for channel=1:number_of_channels
-            %img(:,:,channel_counter)=imread(cell2mat(filenames(image_counter,channel_counter)));
-            img(:,:,channel)=imread(cell2mat(filenames(included_files(file_num),channel)));
-        end
-    end
-    
-%     for channel=1:number_of_channels
-%        img(:,:,channel)=imread(cell2mat(filenames(included_files(file_num),channel)));
-%        
-%     end
-    for i=1:number_of_superblocks
-        number_of_matches=size(locations{included_files(file_num),i},1);
-        if(number_of_matches>0)
-            location_info=locations{included_files(file_num),i};
-            for j=1:min(number_of_matches,number_of_superblock_representatives-supr_counter(i))
-                %rep_img=zeros(3*block_size,3*block_size,number_of_channels);
-                x1=max(location_info(j,1)-block_size,1);
-                x2=min(location_info(j,1)+2*block_size-1,xres);
-                y1=max(location_info(j,2)-block_size,1);
-                y2=min(location_info(j,2)+2*block_size-1,yres);
-                supr_counter(i)=supr_counter(i)+1;
-                superblock_representatives{i,supr_counter(i)}=img(x1:x2,y1:y2,:);
-                
-            end
-        end
-     %disp('meow');       
-              
-    end
-end
-
-data.superblock_representatives=superblock_representatives;
 
 end
 

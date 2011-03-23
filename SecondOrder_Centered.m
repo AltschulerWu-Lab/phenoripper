@@ -48,9 +48,7 @@ neighbor_profiles_temp=zeros(blocks_nx*blocks_ny*number_of_repeats,number_of_blo
 
 %if(exist('myhandles','var'));
 myhandles=getappdata(0,'myhandles');
-if(~isempty(myhandles))
-        progress= get(myhandles.statusbarHandles.ProgressBar, 'Value');
-end
+progress= get(myhandles.statusbarHandles.ProgressBar, 'Value');
 tStart1=tic; 
 %end
 for image_counter=1:number_of_repeats
@@ -109,7 +107,7 @@ for image_counter=1:number_of_repeats
     image_in_discrete_block_states(foreground_blocks)=block_ids_in_image;
     
     
-     h=[1 1 1;1 1 1; 1 1 1];
+     h=[1 1 1;1 0 1; 1 1 1];
 %filtered=imfilter(double(img),h);
     neighbor_profiles_in_image=zeros(length(foreground_blocks),number_of_block_clusters+1);
     
@@ -132,7 +130,6 @@ for image_counter=1:number_of_repeats
     block_counter=block_counter+length(foreground_blocks);
   
    
-if(~isempty(myhandles))
  %   if(exist('myhandles','var'))  
     progress=progress+1;
     tElapsed1=toc(tStart1); 
@@ -148,23 +145,17 @@ if(~isempty(myhandles))
     %setappdata(0,'myhandles',myhandles);
     %disp('done!');
  %   end
-end   
 end
 
 
 
 block_ids=block_ids_temp(1:block_counter);
 
-%neighbor_profiles=zeros(block_counter,2*number_of_block_clusters+1);
-neighbor_profiles=neighbor_profiles_temp(1:block_counter,:);
-
-%for i=1:block_counter
-%        neighbor_profiles(i,:)=log(neighbor_profiles(i,:)./global_data.mean_superblock_profile);
-%end
-
-%for i=1:block_counter
-%   neighbor_profiles(i,block_ids(i))=1;
-%end
+neighbor_profiles=zeros(block_counter,2*number_of_block_clusters+1);
+neighbor_profiles(:,number_of_block_clusters+1:end)=neighbor_profiles_temp(1:block_counter,:);
+for i=1:block_counter
+   neighbor_profiles(i,block_ids(i))=1;
+end
 
 superblock_distmat=zeros(length(block_ids),number_of_superblocks);
     for superblock_cluster=1:number_of_superblocks

@@ -393,6 +393,7 @@ myhandles.statusbarHandles=statusbar(hObject,'Generating Neighborhood Statistics
 %try
 third_order=ThirdOrder_Basis(global_filenames,global_data,number_of_superblocks);
 global_data.superblock_centroids=third_order.superblock_centroids;
+global_data.mean_superblock_profile=third_order.mean_superblock_profile;
 global_data.superblock_representatives=third_order.superblock_representatives;
 myhandles.global_data=global_data;
 %catch exception
@@ -437,7 +438,7 @@ for condition=1:myhandles.number_of_conditions
 %    waitbar(subdir_num/length(subdirs),h,sprintf('%3f minutes
 %    left',(length(subdirs)-subdir_num)*tElapsed/(60*subdir_num)));
    %set(myhandles.statusbarHandles.ProgressBar, 'Value',subdir_num);
-    myhandles.files_analyzed=myhandles.files_analyzed+length(filenames);
+    myhandles.files_analyzed=myhandles.files_analyzed+size(filenames,1);
     setappdata(0,'myhandles',myhandles);
     drawnow;
     
@@ -507,8 +508,15 @@ setappdata(0,'myhandles',myhandles);
 %         end
 % end
 % 
-dists=pdist(superblock_profiles);
-myhandles.mds_data=mdscale(dists,3);
+mean_sb=mean(superblock_profiles);
+% for i=1:size(superblock_profiles,1)
+%     superblock_profiles(i,:)=log((superblock_profiles(i,:)+1E-7)./mean_sb);
+% end
+
+%dists=pdist(superblock_profiles);
+
+
+%myhandles.mds_data=mdscale(dists,3);
 setappdata(0,'myhandles',myhandles);
 %SetButtonState(hObject,handles,true);
 set(handles.ExplorerButton,'Visible','on');
@@ -553,7 +561,7 @@ for test_num=1:number_of_test_files
     condition=randi(myhandles.number_of_conditions);
     imagenames=myhandles.grouped_metadata{condition}.files_in_group;
     
-    file_num=randi(length(imagenames));
+    file_num=randi(size(imagenames,1));
     
     for channel=1:files_per_image
         selected_files{test_num,channel}=imagenames{file_num,channel};
@@ -651,7 +659,7 @@ for test_num=1:number_of_test_files
     condition=randi(myhandles.number_of_conditions);
     imagenames=myhandles.grouped_metadata{condition}.files_in_group;
     
-    file_num=randi(length(imagenames));
+    file_num=randi(size(imagenames,1));
     
     filename=imagenames{1};
     test=imfinfo(filename);
@@ -703,21 +711,21 @@ if(get(hObject,'Value'))
     set(handles.text4,'Visible','on');
     set(handles.text6,'Visible','on');
     set(handles.text7,'Visible','on');
-    set(handles.text8,'Visible','on');
+    %set(handles.text8,'Visible','on');
     set(handles.ReduceColorNr,'Visible','on');
     set(handles.BlockTypeNr,'Visible','on');
     set(handles.SuperBlockNr,'Visible','on');
-    set(handles.ChannelNr,'Visible','on');
+    %set(handles.ChannelNr,'Visible','on');
 else
     set(handles.AdvancedOptions,'Visible','off');
     set(handles.text4,'Visible','off');
     set(handles.text6,'Visible','off');
     set(handles.text7,'Visible','off');
-    set(handles.text8,'Visible','off');
+    %set(handles.text8,'Visible','off');
     set(handles.ReduceColorNr,'Visible','off');
     set(handles.BlockTypeNr,'Visible','off');
     set(handles.SuperBlockNr,'Visible','off');
-    set(handles.ChannelNr,'Visible','off');
+    %set(handles.ChannelNr,'Visible','off');
 end
 guidata(hObject, handles);
 
@@ -804,6 +812,7 @@ function ExplorerButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 myhandles=getappdata(0,'myhandles');
+Explainer;
 MakePlots(hObject,eventdata,handles);
 myhandles=getappdata(0,'myhandles');
 CoolClustergram(myhandles.superblock_profiles,...
@@ -834,10 +843,10 @@ function LoadResultsButton_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 %uirestore;
 %guidata(hObject, handles);
-filename=uigetfile;
+[filename,pathname]=uigetfile;
 h=gcf;
 delete(h);
-hgload(filename);
+hgload([pathname filesep filename]);
 myhandles = getappdata(gcf,'myhandles');
 % Lines below are added since loading the file does not initialize the
 % status bar (it is a java hack, not officially supported by matlab)

@@ -31,7 +31,7 @@ h=gca;
 f=gcf;
 positions=zeros(number_of_representatives,4);
 normed_size=number_of_data_points/number_of_representatives;
-perm2=fliplr(perm2);
+%perm2=fliplr(perm2);
 perm1=fliplr(perm1);
 for rep_num=1:number_of_representatives
    
@@ -48,7 +48,7 @@ for rep_num=1:number_of_representatives
   % set(gca,'Units','normalized');
    positions(rep_num,:)=dsxy2figxy(h,[x_positions(rep_num),y_positions(rep_num),scale_factor*1,scale_factor*number_of_data_points/number_of_representatives]);
    axes('position', positions(rep_num,:),'parent',f);
-   img=double(representatives{perm2(rep_num)}(:,:,1:3));
+   img=double(representatives{perm2(rep_num),1}(:,:,1:3));
    max_col=max(img(:));
    image(img/max_col);axis equal;axis off;
    %image(representatives{perm2(rep_num)}./max(max(max(representatives{perm2(rep_num)}))));axis equal;axis off;
