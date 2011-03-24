@@ -1,1 +1,1 @@
-/home/z/Data/CellMorph/HT01
+/home/lab_share/Temp/Satwik/PhenoRipper/TestData/HT01

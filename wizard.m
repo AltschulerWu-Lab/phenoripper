@@ -70,6 +70,9 @@ wizardhandles=load('default-templates.mat','templates');
 setappdata(0,'wizardhandles',wizardhandles);
 populateTemplateSelectorList(handles);
 setappdata(0,'wizardhandles',wizardhandles);
+set(handles.templateSelector,'value',1);
+templateSelector_Callback('','',handles);
+%set(handles.selectSingleChannelCB,'visible','off');
 
 
 
@@ -131,7 +134,6 @@ function rootDirSelectBT_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 %handles=getappdata(0,'handles');
 lastPath=loadLastPath();
-dir_name=[];
 if(~exist(char(lastPath),'dir'))
   dir_name=uigetdir();
 else
@@ -143,10 +145,8 @@ if(~exist(char(dir_name),'dir'))
         warndlg('Invalid Root Directory');
 else
         myhandles.all_files=files_in_dir(dir_name);
-        temp=regexp(myhandles.all_files,[dir_name filesep],'split');
+        %temp=regexp(myhandles.all_files,[dir_name filesep],'split');
         saveLastPath(dir_name);
-        
-        %set(handles.file_table,'Data',cellfun(@(x) x(end),temp));
 end
 set(handles.rootdirTF,'String',dir_name);
 setappdata(0,'myhandles',myhandles);   
@@ -306,12 +306,15 @@ function templateSelector_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns templateSelector contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from templateSelector
-groupbyList=getGroups(handles);
+[~, groupbyList]=getGroups(handles);
+%Display group and the corresponding matching with the example
 set(handles.groupSelector,'String',groupbyList);
 set(handles.groupSelector,'Visible','on');
 set(handles.text8,'Visible','on');
+viewChannelSeparator(handles);
+set(handles.markerTable,'Visible','off');
 
-function groups=getGroups(handles)
+function [groups, groupExample]=getGroups(handles)
 selectedTemplateNr = get(handles.templateSelector,'Value');
 if(selectedTemplateNr<1)
   groups=[];
@@ -319,6 +322,30 @@ if(selectedTemplateNr<1)
 end
 wizardhandles=getappdata(0','wizardhandles');
 groups=wizardhandles.templates{selectedTemplateNr}.getGroupbyList();
+regExp=getSelectedRegExp(handles);
+if(isempty(regExp))
+  warndlg('No Template have been selected, you must select a template!');
+  return;
+end
+groupExample=wizardhandles.templates{selectedTemplateNr}.getGroupExampleList();
+
+
+function viewChannelSeparator(handles)
+selectedTemplateNr = get(handles.templateSelector,'Value');
+if(selectedTemplateNr<1)
+  return;
+end
+wizardhandles=getappdata(0','wizardhandles');
+if(wizardhandles.templates{selectedTemplateNr}.isMultiChannel)
+  set(handles.channelSeparatorTF,'Visible','off');
+  set(handles.text5,'Visible','off');
+  set(handles.selectSingleChannelCB,'Value',0);
+else
+  set(handles.channelSeparatorTF,'Visible','on');
+  set(handles.text5,'Visible','on');
+  set(handles.selectSingleChannelCB,'Value',1);  
+end
+selectSingleChannelCB_Callback('','',handles);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -380,8 +407,10 @@ function doneBT_Callback(hObject, eventdata, handles)
 % hObject    handle to doneBT (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-getWizardData(handles);
-
+data=getWizardData(handles);
+myhandles=getappdata(0,'myhandles');
+myhandles.wizardData=data;
+setappdata(0,'myhandles',myhandles);
 
 function data=getWizardData(handles)
 selectedFolder=get(handles.rootdirTF,'String');

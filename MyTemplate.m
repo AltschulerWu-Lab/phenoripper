@@ -12,11 +12,16 @@ classdef MyTemplate
     %__EXTENSION__ replace any kind of file extension (e.g. png, tiff etc...)
     Pattern = '';
     Description='';
+    isMultiChannel=false;
   end
   
   methods
-    function obj = MyTemplate(a,b)
-      if(nargin == 2)
+    function obj = MyTemplate(a,b,c)
+      if(nargin == 3)
+        obj.Example = a;
+        obj.Pattern = b;
+        obj.isMultiChannel = c;
+      elseif(nargin == 2)
         obj.Example = a;
         obj.Pattern = b;
       elseif(nargin == 1)
@@ -35,10 +40,10 @@ classdef MyTemplate
     function regExpression=getRegularExpression(obj,fileExtension,channelSep)
       %Replace first the channel separator tag  by the selected one
       %regExpression = regexprep(obj.Pattern,'.*\(\?<Separator>(?<Sep>.*?)\).*',channelSep);
-      regExpression = regexprep(obj.Pattern,'__SEPARATOR__',channelSep)
+      regExpression = regexprep(obj.Pattern,'__SEPARATOR__',channelSep);
       %Then replace first the file extension tag by the selected one
       %regExpression = regexprep(regExpression,'.*\(\?<Extension>(?<Ext>*?)\).*',fileExtension);
-      regExpression = regexprep(regExpression,'__EXTENSION__',fileExtension)
+      regExpression = regexprep(regExpression,'__EXTENSION__',fileExtension);
     end
     
        
@@ -54,14 +59,14 @@ classdef MyTemplate
     
     
     function obj=setPattern(obj,pattern)      
-      %Replace first the channel by the Tag channel
+      %Replace first the separator by the Tag separator
       [~, ~, ~, ~, ~, group]=regexp(pattern,'.*\(\?<Separator>(?<Sep>.*?)\).*');      
-      if(isfield(group,'Sep') && ~isempty(group.Sep))
+      if(isfield(group,'Sep') && length(group)>0 && ~isempty(group.Sep))
         obj.Pattern = regexprep(pattern,'group.Sep','__SEPARATOR__');  
       end
       %Then replace first the file extension by the Tag file extension
       [~, ~, ~, ~, ~, group]=regexp(pattern,'.*\(\?<Extension>(?<Ext>.*?)\)');      
-      if(isfield(group,'Ext') && ~isempty(group))
+      if(isfield(group,'Ext') && length(group)>0 && ~isempty(group))
         obj.Pattern = regexprep(pattern,'group.Ext','.__EXTENSION__');  
       end
     end
@@ -79,9 +84,16 @@ classdef MyTemplate
       else
         %Remove the internal group used to indicate Separator, Extension
         %and Channel
-        group=rmfield(group,'Separator');
+        if(~obj.isMultiChannel)
+          try
+          group=rmfield(group,'Separator');
+          group=rmfield(group,'Channel');
+          catch
+            warndlg('Single Channel Template must contain the Separator and Channel identifier in their regular expression');
+            return;
+          end
+        end
         group=rmfield(group,'Extension');
-        group=rmfield(group,'Channel');
         groupbyList=fieldnames(group);
       end
         [~, ~, ~, ~, ~, group]=regexp(obj.Example,['.*(?<sep>' filesep ').*'],'start','end','tokenExtents','match','tokens','names');
@@ -89,6 +101,36 @@ classdef MyTemplate
         
         position=length(groupbyList)+1;
         groupbyList{position}='Dir';
+      end
+    end
+    
+    function groupExampleList=getGroupExampleList(obj)
+      [~, ~, ~, ~, ~, group]=regexp(obj.Example, obj.Pattern, 'start','end','tokenExtents','match','tokens','names');
+      if(isempty(group))
+        warndlg('Regular expression doesn''t match with the example!');
+      else
+        %Remove the internal group used to indicate Separator, Extension
+        %and Channel
+        if(~obj.isMultiChannel)
+          try
+          group=rmfield(group,'Separator');
+          group=rmfield(group,'Channel');
+          catch
+            warndlg('Single Channel Template must contain the Separator and Channel identifier in their regular expression');
+            return;
+          end
+        end
+        group=rmfield(group,'Extension');
+        
+        fieldValues=(struct2cell(group));
+        groupExampleList=cellfun(@(x,y) [x '=' y],fieldnames(group),fieldValues,'uni',0);
+      end
+        [tokenExt,group]=...
+          regexp(obj.Example,['.*(?<sep>' filesep ').*'],'tokenExtents','names');
+      if(~isempty(group))
+        dirName=obj.Example(1:tokenExt{1}(1));
+        position=length(groupExampleList)+1;
+        groupExampleList{position}=['Dir=' dirName];
       end
     end
     

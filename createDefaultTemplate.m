@@ -14,7 +14,7 @@ function templates=createDefaultTemplate()
   templates{4}=MyTemplate('Well A03/Alexa 488 - n000000.__EXTENSION__','Well (?<Row>[A-Z]*)(?<Column>[0-9]{1,2})\/(?<Channel>.*)(?<Separator> - )\S*(?<Extension>.__EXTENSION__)$');
   
   
-  
+  templates{5}=MyTemplate('HT01/HT01A004/image_1.__EXTENSION__','\S*\/HT(?<Plate>[0-9]*)(?<Row>[A-Z]*)(?<Column>[0-9]*)\/\S*_(?<ImgNum>[0-4]*)(?<Extension>.__EXTENSION__)$',true);
   
   
   

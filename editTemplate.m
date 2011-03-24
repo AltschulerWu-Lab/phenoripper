@@ -22,7 +22,7 @@ function varargout = editTemplate(varargin)
 
 % Edit the above text to modify the response to help editTemplate
 
-% Last Modified by GUIDE v2.5 16-Mar-2011 15:47:55
+% Last Modified by GUIDE v2.5 23-Mar-2011 12:52:12
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -61,6 +61,7 @@ wizardhandles=getappdata(0,'wizardhandles');
 template=wizardhandles.templates{wizardhandles.selectedTemplateID};
 example=template.Example;
 regExp=template.Pattern;
+set(handles.multiChannelCB,'Value',template.isMultiChannel)
 %regExp=template.getRegularExpression(wizardhandles.fileExtension,wizardhandles.channelSeparator);
 
 set(handles.exampleTF,'String',example);
@@ -142,7 +143,7 @@ example=get(handles.exampleTF,'String');
 
 pattern=get(handles.regularExpressionTF,'String');
 
-wizardhandles.newTemplate=MyTemplate(example,pattern);
+wizardhandles.newTemplate=MyTemplate(example,pattern,get(handles.multiChannelCB,'Value'));
 wizardhandles.newTemplate=wizardhandles.newTemplate.setPattern(pattern);
 %wizardhandles.newTemplate=wizardhandles.newTemplate.setExample(example);
 
@@ -228,18 +229,17 @@ if(existAlready)
   switch answer
     case 'No'
       return;
-    case 'Yes'  
-      pattern=get(handles.regularExpressionTF,'String');
-      wizardhandles.newTemplate=MyTemplate(example,pattern);
-      wizardhandles.newTemplate.Description=get(handles.descriptionTF,'String');
-      wizardhandles.templates{position}=wizardhandles.newTemplate.setPattern(pattern);
   end
 else
-  pattern=get(handles.regularExpressionTF,'String');
-  wizardhandles.newTemplate=MyTemplate(example,pattern);
-  wizardhandles.newTemplate.Description=get(handles.descriptionTF,'String');
-  wizardhandles.templates{length(wizardhandles.templates)+1}=wizardhandles.newTemplate.setPattern(pattern);
+  position=length(wizardhandles.templates)+1;
 end
+%Add the new template
+pattern=get(handles.regularExpressionTF,'String');
+isMultiChannel=get(handles.multiChannelCB,'Value');
+wizardhandles.newTemplate=MyTemplate(example,pattern,isMultiChannel);
+wizardhandles.newTemplate.Description=get(handles.descriptionTF,'String');
+wizardhandles.templates{position}=wizardhandles.newTemplate.setPattern(pattern);
+
 setappdata(0,'wizardhandles',wizardhandles);
 delete(gcf);
 
@@ -253,3 +253,10 @@ function [exist,i]=isExampleExist(example,templates)
   end
 
 
+% --- Executes on button press in multiChannelCB.
+function multiChannelCB_Callback(hObject, eventdata, handles)
+% hObject    handle to multiChannelCB (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of multiChannelCB
