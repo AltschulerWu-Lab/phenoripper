@@ -192,8 +192,13 @@ function blockSizeChangedCallback(jSpinner,jEventData)
           end
           
           axis(myhandles.h);
-      
-          image(img1,'parent',myhandles.h);
+          img2=zeros(size(img1,1),size(img1,2),3);
+          if(myhandles.number_of_channels<3)
+                  img2(:,:,1:myhandles.number_of_channels)=img1;
+          else
+                  img2=img1(:,:,1:3);
+          end
+          image(img2,'parent',myhandles.h);
           set(gca,'XTick',[0:myhandles.block_size:myhandles.yres])
           set(gca,'XTickLabel',[])
           set(gca,'YTick',[0:myhandles.block_size:myhandles.xres])
@@ -462,7 +467,13 @@ for channel=1:myhandles.number_of_channels
   img1(:,:,channel)=min(img1(:,:,channel)+ 0.25*(~mask),1);
 end
 axis(myhandles.h);
-image(img1,'parent',myhandles.h);
+img2=zeros(size(img1,1),size(img1,2),3);
+if(myhandles.number_of_channels<3)
+        img2(:,:,1:myhandles.number_of_channels)=img1;
+else
+        img2=img1(:,:,1:3);
+end
+image(img2,'parent',myhandles.h);
 if(get(handles.checkbox1,'Value'));
     set(gca,'XTick',[0:myhandles.block_size:yres]);
     set(gca,'XTickLabel',[]);
