@@ -457,8 +457,8 @@ regExp=regexprep(regExp,'?<Separator>','');
 regExp=regexprep(regExp,'?<Extension>','');
 
 %Return the markerData in Structure
-markers=cell(1,length(markersData));
-for i=1:length(markersData)
+markers=cell(1,size(markersData,1));
+for i=1:length(markers)
   markers{i}.isUse=markersData{i,1};
   markers{i}.marker=markersData{i,2};
   markers{i}.name=markersData{i,3};
