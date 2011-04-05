@@ -317,7 +317,8 @@ function SelectDirectory_Callback(hObject, eventdata, handles)
 %     setappdata(0,'myhandles',myhandles);
 % end
 
-scroll_panel;
+%scroll_panel;
+wizard;
 uiwait;
 myhandles=getappdata(0,'myhandles');
 
@@ -330,7 +331,7 @@ end
 set(handles.PointColor_popupmenu,'String',myhandles.grouping_fields);
 set(handles.PointLabel_popupmenu,'String',myhandles.grouping_fields);
 setappdata(0,'myhandles',myhandles);
-%SetButtonState(hObject,handles,true);
+SetButtonState(hObject,handles,true);
 guidata(hObject, handles);
 
 
@@ -513,10 +514,10 @@ mean_sb=mean(superblock_profiles);
 %     superblock_profiles(i,:)=log((superblock_profiles(i,:)+1E-7)./mean_sb);
 % end
 
-%dists=pdist(superblock_profiles);
+dists=pdist(superblock_profiles);
 
 
-%myhandles.mds_data=mdscale(dists,3);
+myhandles.mds_data=mdscale(dists,3);
 setappdata(0,'myhandles',myhandles);
 %SetButtonState(hObject,handles,true);
 set(handles.ExplorerButton,'Visible','on');

@@ -411,6 +411,152 @@ data=getWizardData(handles);
 myhandles=getappdata(0,'myhandles');
 myhandles.wizardData=data;
 setappdata(0,'myhandles',myhandles);
+total_number_of_channels=length(myhandles.wizardData.markers);
+myhandles.channels_used=[];
+for i=1:total_number_of_channels
+   if(myhandles.wizardData.markers{i}.isUse)
+       myhandles.channels_used=[myhandles.channels_used;i];
+   end
+end
+myhandles.allfiles=getAllFiles(myhandles.wizardData.rootDir);
+setappdata(0,'myhandles',myhandles);
+[file_matrix,metadata,matched_files]=construct_filetable();
+myhandles=getappdata(0,'myhandles');
+myhandles.wizard_handle=gcf;
+myhandles.file_matrix=file_matrix;
+myhandles.metadata=metadata;
+myhandles.matched_files=matched_files;
+setappdata(0,'myhandles',myhandles);
+wizard_accept;
+%disp('meow');
+%delete(gcf);
+
+
+
+function [file_matrix,metadata,matched_files]=construct_filetable()
+myhandles=getappdata(0,'myhandles');
+handles=getappdata(0,'handles');
+myhandles.number_of_channels=length(myhandles.channels_used);
+myhandles.files_per_image=myhandles.number_of_channels;
+if(myhandles.wizardData.nrChannelPerFile>1)
+    myhandles.files_per_image=1;
+end
+
+setappdata(0,'myhandles',myhandles);
+
+channel_wise_matches=cell(1,myhandles.files_per_image);
+root_directory=myhandles.wizardData.rootDir;
+temp=regexp(myhandles.allfiles,[root_directory filesep],'split');
+all_files=cellfun(@(x) x(end),temp);
+
+rexp=cell(1,myhandles.files_per_image);
+%matches=true(length(myhandles.all_files));
+
+
+for channel=1:myhandles.files_per_image
+    rexp{channel}=myhandles.wizardData.markers{myhandles.channels_used(channel)}.regExp;
+    channel_names{channel}=myhandles.wizardData.markers{myhandles.channels_used(channel)}.marker;
+    %rexp{channel}=get(myhandles.marker_handles(channel).marker_ending_edit,'String');
+    
+    %temp=regexp(matches,[rexp{channel} '$'] ,'split');
+    %channel_wise_matches{channel}=cellfun(@(x) x(1),temp);
+end
+%matches=myhandles.all_files(~cellfun('isempty',regexp(myhandles.all_files,...
+     %   [rexp{1} '$'],'match')));
+ [idx edx ext mat tok nam] = regexp(all_files,rexp{1},...
+                    'start','end','tokenExtents','match','tokens','names');
+               
+ matched_bool=~cellfun('isempty',mat);    
+ matches=all_files(matched_bool);
+ matched=find(matched_bool);
+ if(~isempty(matches))
+     fnames=fieldnames(nam{matched(1)});
+ else
+     errordlg('No matches');
+ end
+ 
+ 
+%file_matrix=cell(length(matches),myhandles.files_per_image);
+regExp=getSelectedRegExp(handles);
+if(myhandles.files_per_image~=1)
+    file_matrix=matched_filenames(matches,regExp,channel_names);
+else
+    file_matrix=matches;
+end
+
+[membership_matrix,member_position]=ismember(file_matrix,all_files);
+file_matrix=file_matrix(all(membership_matrix,2),:);
+matched_files=false(length(all_files),1);
+matched_files(member_position(:))=true;
+
+
+[number_of_images,files_per_image]=size(file_matrix);
+metadata=cell(1,number_of_images);
+
+dir_start=regexp(file_matrix(:,1),filesep);
+
+for i=1:number_of_images
+   temp=file_matrix(i,:);
+  % handles=getappdata(0,'handles');
+   for j=1:files_per_image
+        if(isempty(regexpi(temp{j},['^' root_directory],'match')))
+                metadata{i}.FileNames{j}=[root_directory filesep temp{j}];
+        else
+                metadata{i}.FileNames{j}=temp{j};
+        end
+   end
+   metadata{i}.None=file_matrix{i,1}; 
+   if(~isempty(dir_start{i}))
+       metadata{i}.Directory=file_matrix{i,1}(1:dir_start{i}(end));
+   else
+       metadata{i}.Directory='';
+   end
+end
+
+nam=nam(matched_bool);
+for i=1:number_of_images
+    %if(matched_bool(i))
+        for j=1:length(fnames)
+            temp=nam{i}.(fnames{j});
+            if(strcmp(temp,''))
+                metadata{i}.(fnames{j})=[];
+            else
+                metadata{i}.(fnames{j})=temp;
+            end
+            
+        end
+        
+%     else
+%         for j=1:length(fnames)
+%             metadata{i}.(fnames{j})=[];
+%         end
+%     end
+end
+%disp('meow');
+% files_with_matches(:,channel)=matched_bool;
+% files_with_matches=any(files_with_matches,2);
+% metadata=metadata(files_with_matches);
+%metadata=metadata(matched_bool);
+% 
+% for channel=2:myhandles.files_per_image
+%     common_files=intersect(common_files,channel_wise_matches{channel});
+% end
+% 
+% if(isempty(common_files))
+%    file_matrix={'No Files In Common'}; 
+% else
+%     file_matrix=cell(length(common_files),myhandles.files_per_image);
+%     for match_num=1:length(common_files)
+%         temp=common_files{match_num}(length(get(handles.rootdirectory_edit,'String'))+2:end);
+%         for channel=1:myhandles.files_per_image
+%             file_matrix{match_num,channel}=[temp rexp{channel}];
+%         end
+%     end
+%   myhandles.common_files=file_matrix;
+  setappdata(0,'myhandles',myhandles);
+
+
+
 
 function data=getWizardData(handles)
 selectedFolder=get(handles.rootdirTF,'String');
@@ -463,12 +609,13 @@ for i=1:length(markers)
   markers{i}.marker=markersData{i,2};
   markers{i}.name=markersData{i,3};
   markers{i}.color=markersData{i,4};
-  markers{i}.regExp=regexprep(regExp,'\(\?<Channel>.\*\)',markersData{i,2});
+  markers{i}.regExp=regexprep(regExp,'\(\?<Channel>.+?\)',markersData{i,2});
+  %markers{i}.regExp=regexprep(regExp,'\(\?<Channel>.\*\)',markersData{i,2});
   %markers{i}.regexp=
 end
 data.markers=markers;
 data.nrChannelPerFile=1;
-if(get(handles.selectSingleChannelCB,'Value'))
+if(get(handles.selectSingleChannelCB,'Value')==0)
   data.nrChannelPerFile=get(handles.nrChannelPerImageDB,'Value');
 end
 data.pattern=getFullRegExp(handles);
@@ -488,6 +635,8 @@ function advancedEditBT_Callback(hObject, eventdata, handles)
 % hObject    handle to advancedEditBT (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+delete(gcf);
+scroll_panel;
 
 
 % --- Executes on button press in saveAllTemplatesBT.
