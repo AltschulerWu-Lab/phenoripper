@@ -58,7 +58,7 @@ myhandles.number_of_block_clusters=10;
 myhandles.number_of_blocks_per_training_image=1000;
 myhandles.rgb_samples_per_training_image=3000;
 myhandles.number_of_block_representatives=3;
-myhandles.number_of_superblocks=20;
+%myhandles.number_of_superblocks=20;
 %myhandles.files_per_image=3;
 myhandles.imageDirectory='/home/z/My Paper Stuff/Images/Test';
 myhandles.is_directory_usable=false;
@@ -318,6 +318,7 @@ function SelectDirectory_Callback(hObject, eventdata, handles)
 % end
 
 %scroll_panel;
+
 wizard;
 uiwait;
 myhandles=getappdata(0,'myhandles');
@@ -358,6 +359,7 @@ number_of_blocks_per_training_image=1000;
 rgb_samples_per_training_image=3000;
 number_of_block_representatives=3;
 number_of_superblocks=str2double(get(handles.SuperBlockNr,'String'));
+myhandles.number_of_superblocks=number_of_superblocks;
 files_per_image=myhandles.files_per_image;%str2double(get(handles.ChannelNr,'String'));
 imageDirectory=get(handles.ImageRootDirectory,'String');
 
@@ -376,7 +378,7 @@ for condition=1:length(chosen_conditions)
     end
   
 end
-
+setappdata(0,'myhandles',myhandles);
 
 set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
 %set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximum',myhandles.number_of_files, 'Value',0);
@@ -394,7 +396,7 @@ myhandles.statusbarHandles=statusbar(hObject,'Generating Neighborhood Statistics
 %try
 third_order=ThirdOrder_Basis(global_filenames,global_data,number_of_superblocks);
 global_data.superblock_centroids=third_order.superblock_centroids;
-global_data.mean_superblock_profile=third_order.mean_superblock_profile;
+%global_data.mean_superblock_profile=third_order.mean_superblock_profile;
 global_data.superblock_representatives=third_order.superblock_representatives;
 myhandles.global_data=global_data;
 %catch exception
