@@ -22,7 +22,7 @@ function varargout = ThresholdImage(varargin)
 
 % Edit the above text to modify the response to help ThresholdImage
 
-% Last Modified by GUIDE v2.5 25-Jan-2011 18:21:07
+% Last Modified by GUIDE v2.5 03-Jun-2011 11:26:08
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -494,3 +494,10 @@ else
     filelabel=['...' filename(length(filename)-length_limit:end)];
     set(handles.fileName,'String',filelabel);
 end
+
+
+% --- Executes on button press in Intensity_Scale_Button.
+function Intensity_Scale_Button_Callback(hObject, eventdata, handles)
+% hObject    handle to Intensity_Scale_Button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)

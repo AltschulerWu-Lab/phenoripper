@@ -317,11 +317,16 @@ function SelectDirectory_Callback(hObject, eventdata, handles)
 %     setappdata(0,'myhandles',myhandles);
 % end
 
+wizard;
 %scroll_panel;
 
-wizard;
+
 uiwait;
 myhandles=getappdata(0,'myhandles');
+if isfield(myhandles,'grouped_metadata')==0
+    return;
+end
+msgbox('Data Loaded Successfully');
 
 myhandles.number_of_conditions=length(myhandles.grouped_metadata);
 myhandles.number_of_files=0;
@@ -519,8 +524,8 @@ mean_sb=mean(superblock_profiles);
 dists=pdist(superblock_profiles);
 
 
-myhandles.mds_data=mdscale(dists,3);
-setappdata(0,'myhandles',myhandles);
+%myhandles.mds_data=mdscale(dists,3);
+%setappdata(0,'myhandles',myhandles);
 %SetButtonState(hObject,handles,true);
 set(handles.ExplorerButton,'Visible','on');
 set(handles.SaveOutputButton,'Visible','on');
@@ -815,11 +820,13 @@ function ExplorerButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 myhandles=getappdata(0,'myhandles');
-Explainer;
+%Explainer;
 MakePlots(hObject,eventdata,handles);
 myhandles=getappdata(0,'myhandles');
-CoolClustergram(myhandles.superblock_profiles,...
-     myhandles.global_data.superblock_representatives,myhandles.mds_text);
+% CoolClustergram(myhandles.superblock_profiles,...
+%     myhandles.global_data.superblock_representatives,myhandles.mds_text,myhandles.mds_colors);
+%clustergram(myhandles.superblock_profiles,'RowLabels',...
+%    cellfun(@(x) cell2mat(x),myhandles.mds_text,'UniformOutput',false))
  Explorer;
 
 
@@ -847,6 +854,9 @@ function LoadResultsButton_Callback(hObject, eventdata, handles)
 %uirestore;
 %guidata(hObject, handles);
 [filename,pathname]=uigetfile;
+if(filename==0)
+    return;
+end
 h=gcf;
 delete(h);
 hgload([pathname filesep filename]);
@@ -857,6 +867,7 @@ myhandles.statusbarHandles=statusbar(gcf,'Welcome to PhenoRipper ...Prepare to b
 set(myhandles.statusbarHandles.TextPanel, 'Foreground',[1,1,1], 'Background','black', 'ToolTipText','Loading...')
 set(myhandles.statusbarHandles.ProgressBar, 'Background','white', 'Foreground',[0.4,0,0]);
 setappdata(0,'myhandles',myhandles);
+
 
 
 % old_handles=handles;
@@ -887,17 +898,20 @@ for condition=1:myhandles.number_of_conditions
 end
 
 myhandles.mds_text=cell(size(myhandles.superblock_profiles,1),1);
-myhandles.mds_colors=zeros(size(myhandles.superblock_profiles,1),3);       
-[colorsGroup,GN]=grp2idx(group_vals);
-colors=colormap(jet(max(colorsGroup)));
+myhandles.mds_colors=zeros(size(myhandles.superblock_profiles,1),3);  
+
+[colorsGroup,myhandles.group_labels]=grp2idx(group_vals);
+%colors=colormap(jet(max(colorsGroup)));
+colors=ColorBrewer(max(colorsGroup));
+myhandles.category_colors=colors;
 dists=pdist(myhandles.superblock_profiles);
 profile_mds=mdscale(dists,3);
-figure;
-scatter3(profile_mds(:,1),profile_mds(:,2),profile_mds(:,3),10);
+%figure;
+%scatter3(profile_mds(:,1),profile_mds(:,2),profile_mds(:,3),10);
 for i=1:myhandles.number_of_conditions
-    text(profile_mds(i,1),profile_mds(i,2),profile_mds(i,3),...
-        myhandles.grouped_metadata{i}.(label_field),...
-        'BackgroundColor',colors(colorsGroup(i),:));%not always cn
+ %   text(profile_mds(i,1),profile_mds(i,2),profile_mds(i,3),...
+  %      myhandles.grouped_metadata{i}.(label_field),...
+  %      'BackgroundColor',colors(colorsGroup(i),:));%not always cn
     myhandles.mds_text{i}=myhandles.grouped_metadata{i}.(label_field);
     myhandles.mds_colors(i,:)=colors(colorsGroup(i),:);
 end

@@ -22,7 +22,7 @@ function varargout = wizard_accept(varargin)
 
 % Edit the above text to modify the response to help wizard_accept
 
-% Last Modified by GUIDE v2.5 04-Apr-2011 15:36:38
+% Last Modified by GUIDE v2.5 24-May-2011 12:52:20
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -59,9 +59,10 @@ myhandles=getappdata(0,'myhandles');
 set(handles.popupmenu1,'String',field_names);
 set(handles.accepted_table,'Data',table_data);
 set(handles.rejected_table,'Data',myhandles.all_files(~myhandles.matched_files));
-
+popupmenu1_Callback(hObject, eventdata, handles)
 % Update handles structure
 guidata(hObject, handles);
+
 
 % UIWAIT makes wizard_accept wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
@@ -75,6 +76,7 @@ function varargout = wizard_accept_OutputFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Get default command line output from handles structure
+
 varargout{1} = handles.output;
 
 
@@ -89,7 +91,14 @@ function popupmenu1_Callback(hObject, eventdata, handles)
 %        popupmenu1
 myhandles=getappdata(0,'myhandles');
 number_of_files=length(myhandles.metadata);
-field_index=get(hObject,'Value');
+try
+    field_index=get(hObject,'Value');
+catch
+    
+    field_index=1;
+end
+    
+
 fnames=fieldnames(myhandles.metadata{1});
 file_class=cell(1,number_of_files);
 for i=1:number_of_files
@@ -179,7 +188,7 @@ table_data=cell(number_of_groups,length(fnames)-1);
 
 for i=1:number_of_groups
     for j=1:length(fnames)-1
-       table_data{i,j}=data{i}.(fnames{j+1}); 
+        table_data{i,j}=data{i}.(fnames{j+1});
     end
 end
 field_names=fnames(2:end);
@@ -193,6 +202,43 @@ colors={'#A6CEE3', '#1F78B4','#B2DF8A','#33A02C','#FB9A99','#3E31A1C',...
 for i=1:size(raw_data,1)
    for j=1:size(raw_data,2)
        fg_colors{i,j}=colors{rem(groups(i)-1,10)+1};
+      
    end
 end
 formatted_data=create_formatted_table(raw_data,fg_colors,bg_colors);
+
+
+% --- Executes on button press in metadata_button.
+function metadata_button_Callback(hObject, eventdata, handles)
+% hObject    handle to metadata_button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+[filename,pathname]=uigetfile('*.txt');
+[filenames,metadata]=ReadData([pathname filesep filename],',');
+myhandles=getappdata(0,'myhandles');
+file_matrix=cell(length(filenames),length(filenames{1}));
+for i=1:length(filenames)
+    for j=1:length(filenames{1})
+        file_matrix{i,j}=filenames{i}{j};
+        if(~exist(file_matrix{i,j},'file'))
+            errordlg('File Missing');
+            return;
+        end
+    end
+end
+[myhandles.metadata,matched_files]=extract_regexp_metadata(file_matrix,myhandles.regular_expressions);
+matched_files=find(matched_files);
+fnames=fieldnames(metadata);
+for i=1:length(matched_files)
+    for j=1:length(fnames)    
+        myhandles.metadata{i}.(fnames{j})=metadata(matched_files(i)).(fnames{j});
+    end
+end
+myhandles.files_per_image=length(filenames{1});
+handles=getappdata(0,'handles');
+fnames=fieldnames(myhandles.metadata{1});
+set(handles.groupby_listbox,'String',fnames(2:end));
+setappdata(0,'handles',handles);
+setappdata(0,'myhandles',myhandles); %Should probably throw in some checks to
+                                     % make sure that myhandles.files_per_image is not being reset
+                                    

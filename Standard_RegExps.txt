@@ -10,3 +10,7 @@ CellMorph Full:
 (?<plate>[a-z,A-Z,0-9]*)/[a-z,A-Z,0-9]*(?<well>[a-z,A-Z][0-9]*)/(image_)(?<img>[1-4]*).jpeg$
 Tian:
 2011_3T3L1_(?<Treatment>\S*)(-1\/)(?<Well>\S*)(\/)(\S*)(-1.tif)$
+
+
+Turnkey data(in CP directory)"
+(?<Group>[1-5])\/image_(?<img_num>[0-9]{2})(_1.png)$

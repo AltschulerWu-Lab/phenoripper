@@ -104,7 +104,7 @@ for image_counter=1:number_of_repeats
     image_in_discrete_block_states(foreground_blocks)=block_ids_in_image;
     
     %h=fspecial('gaussian',2,1);
-    h=[1 1 1;1 1 1; 1 1 1];
+    h=[1 1 1;1 0 1; 1 1 1];
 %filtered=imfilter(double(img),h);
     neighbor_profiles_in_image=zeros(length(foreground_blocks),number_of_block_clusters+1);
     
@@ -136,16 +136,11 @@ block_ids=block_ids_temp(1:block_counter);
 image_number_of_block=image_number_of_block_temp(1:block_counter);
 position_of_block=position_of_block_temp(1:block_counter,:);
 
-%neighbor_profiles=zeros(block_counter,number_of_block_clusters+1);
-neighbor_profiles=neighbor_profiles_temp(1:block_counter,:);
-mean_superblock_profile=mean(neighbor_profiles);
-data.mean_superblock_profile=mean_superblock_profile;
-%for i=1:block_counter
-%        neighbor_profiles(i,:)=log(neighbor_profiles(i,:)./mean_superblock_profile);
-%end
-%for i=1:block_counter
-%   neighbor_profiles(i,block_ids(i))=1000;
-%end
+neighbor_profiles=zeros(block_counter,2*number_of_block_clusters+1);
+neighbor_profiles(:,number_of_block_clusters+1:end)=neighbor_profiles_temp(1:block_counter,:);
+for i=1:block_counter
+   neighbor_profiles(i,block_ids(i))=1000;
+end
 
 [~,data.superblock_centroids,~,superblock_distances]=kmeans(neighbor_profiles,number_of_superblocks...
     ,'emptyaction','singleton','start','cluster');
