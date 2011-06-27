@@ -292,7 +292,8 @@ else
         img(:,:,channel)=imread(filenames{file_number,channel});
     end
 end
-image(img./max(img(:)),'parent',axis_handle);
+%image(img./max(img(:)),'parent',axis_handle);
+Display_Image(img,axis_handle,myhandles.marker_scales,myhandles.display_colors,[]);
 set(axis_handle,'XTick',[],'YTick',[]);
 box on;
 
@@ -432,11 +433,13 @@ if(all(myhandles.chosen_points~=0))
        positions(rep_num,:)=dsxy2figxy(h,[x_positions(rep_num),y_positions(rep_num),scale_factor*diff(XLims)/number_of_reps,scale_factor*diff(YLims)/5]);
        myhandles.temp_handles(rep_num)=axes('position', positions(rep_num,:));
        img=double(myhandles.global_data.superblock_representatives{p_indices(bar_order(rep_num)),1}(:,:,1:3));
-       max_col=max(img(:));
-       image(img/max_col);axis equal;axis off;
-       set(myhandles.temp_handles(rep_num),'Box','on','Color','w');
+       %max_col=max(img(:));
+       %image(img/max_col);axis equal;axis off;
+       
+       Display_Image(img,myhandles.temp_handles(rep_num),myhandles.marker_scales,myhandles.display_colors,[]);
+       %set(myhandles.temp_handles(rep_num),'Box','on','Color','w');
        %image(representatives{perm2(rep_num)}./max(max(max(representatives{perm2(rep_num)}))));axis equal;axis off;
-       %axis off;axis equal;
+       axis off;axis equal;
    end
    outerpos=get(h,'Position');
    setappdata(0,'myhandles',myhandles);

@@ -185,20 +185,23 @@ function blockSizeChangedCallback(jSpinner,jEventData)
           cutoff_intensity=myhandles.cutoff_intensity;
           mask=intensity>cutoff_intensity;
           %img1=tanh(img/2^14*10);
-          img1=myhandles.img1;
-          for channel=1:myhandles.number_of_channels
-              img1(:,:,channel)=min(img1(:,:,channel)+ 0.25*(~mask),1);
-              
-          end
-          
-          axis(myhandles.h);
-          img2=zeros(size(img1,1),size(img1,2),3);
-          if(myhandles.number_of_channels<3)
-                  img2(:,:,1:myhandles.number_of_channels)=img1;
-          else
-                  img2=img1(:,:,1:3);
-          end
-          image(img2,'parent',myhandles.h);
+ 
+          Display_Image(img,myhandles.h,myhandles.marker_scales,myhandles.display_colors,mask);
+%           
+%           img1=myhandles.img1;
+%           for channel=1:myhandles.number_of_channels
+%               img1(:,:,channel)=min(img1(:,:,channel)+ 0.25*(~mask),1);
+%               
+%           end
+%           
+%           axis(myhandles.h);
+%           img2=zeros(size(img1,1),size(img1,2),3);
+%           if(myhandles.number_of_channels<3)
+%                   img2(:,:,1:myhandles.number_of_channels)=img1;
+%           else
+%                   img2=img1(:,:,1:3);
+%           end
+%           image(img2,'parent',myhandles.h);
           set(gca,'XTick',[0:myhandles.block_size:myhandles.yres])
           set(gca,'XTickLabel',[])
           set(gca,'YTick',[0:myhandles.block_size:myhandles.xres])
@@ -461,19 +464,21 @@ img=myhandles.img;
 intensity=myhandles.intensity;
 cutoff_intensity=myhandles.cutoff_intensity;
 mask=intensity>cutoff_intensity;
-img1=myhandles.img1;
-%img1=tanh(img/2^myhandles.bit_depth*10);
-for channel=1:myhandles.number_of_channels
-  img1(:,:,channel)=min(img1(:,:,channel)+ 0.25*(~mask),1);
-end
+% img1=myhandles.img1;
+% %img1=tanh(img/2^myhandles.bit_depth*10);
+% for channel=1:myhandles.number_of_channels
+%   img1(:,:,channel)=min(img1(:,:,channel)+ 0.25*(~mask),1);
+% end
+% 
+% img2=zeros(size(img1,1),size(img1,2),3);
+% if(myhandles.number_of_channels<3)
+%         img2(:,:,1:myhandles.number_of_channels)=img1;
+% else
+%         img2=img1(:,:,1:3);
+% end
+% image(img2,'parent',myhandles.h);
+Display_Image(img,myhandles.h,myhandles.marker_scales,myhandles.display_colors,mask);
 axis(myhandles.h);
-img2=zeros(size(img1,1),size(img1,2),3);
-if(myhandles.number_of_channels<3)
-        img2(:,:,1:myhandles.number_of_channels)=img1;
-else
-        img2=img1(:,:,1:3);
-end
-image(img2,'parent',myhandles.h);
 if(get(handles.checkbox1,'Value'));
     set(gca,'XTick',[0:myhandles.block_size:yres]);
     set(gca,'XTickLabel',[]);
@@ -501,3 +506,12 @@ function Intensity_Scale_Button_Callback(hObject, eventdata, handles)
 % hObject    handle to Intensity_Scale_Button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+myhandles=getappdata(0,'myhandles');
+img=myhandles.img;
+intensity=myhandles.intensity;
+cutoff_intensity=myhandles.cutoff_intensity;
+mask=intensity>cutoff_intensity;
+Scale_Intensities(img,myhandles.h,[]);
+uiwait;
+display_image(handles);
+setappdata(0,'myhandles',myhandles);

@@ -589,6 +589,7 @@ yres=test.Width;
 img=zeros(xres,yres,number_of_channels);
 amplitudes=zeros(size(selected_files,1),1);
 max_val=0;
+color_scales=zeros(size(selected_files,1),number_of_channels);
 for file_num=1:size(selected_files,1)
     if(number_of_channels~=files_per_image)
         img=selected_files{file_num,1};
@@ -597,11 +598,19 @@ for file_num=1:size(selected_files,1)
                 img(:,:,channel)=imread(selected_files{file_num,channel});
         end
     end
+    for channel=1:number_of_channels
+        temp=img(:,:,channel);
+        color_scales(file_num,channel)=prctile(temp(:),95);
+    end
     max_val=max(max(img(:)),max_val);
     amp=sum(double(img).^2,3);
     amplitudes(file_num)=quantile(amp(:),0.66);
     set(myhandles.statusbarHandles.ProgressBar, 'Value',file_num);
 end
+myhandles.marker_scales=zeros(number_of_channels,2);
+myhandles.marker_scales(:,2)=mean(color_scales,1)';
+myhandles.color_order={'Blue','Green','Red','Gray','Yellow','Magenta'};
+myhandles.display_colors=myhandles.color_order(1:number_of_channels);
 set(myhandles.statusbarHandles.ProgressBar, 'Visible','off');
 myhandles.amplitude_range=max(cutoff_intensity,mean(amplitudes));
 myhandles.bit_depth=bit_depth(max_val,[8,12,14,16,32]);
@@ -823,11 +832,13 @@ myhandles=getappdata(0,'myhandles');
 %Explainer;
 MakePlots(hObject,eventdata,handles);
 myhandles=getappdata(0,'myhandles');
-% CoolClustergram(myhandles.superblock_profiles,...
-%     myhandles.global_data.superblock_representatives,myhandles.mds_text,myhandles.mds_colors);
+CoolClustergram(myhandles.superblock_profiles,...
+    myhandles.global_data.superblock_representatives,...
+    myhandles.mds_text,myhandles.mds_colors...
+    ,myhandles.marker_scales,myhandles.display_colors);
 %clustergram(myhandles.superblock_profiles,'RowLabels',...
 %    cellfun(@(x) cell2mat(x),myhandles.mds_text,'UniformOutput',false))
- Explorer;
+Explorer;
 
 
 

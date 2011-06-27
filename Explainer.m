@@ -168,8 +168,12 @@ for condition=1:myhandles.number_of_conditions
    group_vals{condition}=cell2mat(myhandles.grouped_metadata{condition}.(grouping_field)); 
 end
 [group_numbers,field_names]=grp2idx(group_vals);
-first_group=find(group_numbers==get(handles.popupmenu1,'Value'));
-second_group=find(group_numbers==get(handles.popupmenu2,'Value'));
+colors=ColorBrewer(max(group_numbers));
+
+group1=get(handles.popupmenu1,'Value');
+group2=get(handles.popupmenu2,'Value');
+first_group=find(group_numbers==group1);
+second_group=find(group_numbers==group2);
 
 data=[myhandles.superblock_profiles(first_group,:);myhandles.superblock_profiles(second_group,:)];
 categories=group_numbers([first_group;second_group]);
@@ -177,6 +181,8 @@ categories=group_numbers([first_group;second_group]);
 %svm_struct=svmtrain(data,categories);%,'AutoScale',false);
 %svm_function(svm_struct,myhandles.superblock_profiles(7,:))
 fraction_cutoff=0.05;
+
+
 if(length(first_group)>1 & length(second_group)>1)
     cutoff=0.05;
     p_vals=zeros(1,myhandles.number_of_superblocks);
@@ -221,8 +227,13 @@ end
 valdiff=bar_matrix(2,:)-bar_matrix(1,:);
 [~,bar_order]=sort(valdiff);
 figure;
+bar_colormap=zeros(2,3);
+bar_colormap(1,:)=colors(group1,:);
+bar_colormap(2,:)=colors(group2,:);
 bar(bar_matrix(:,bar_order)');
 ylabel('Superblock Fraction');
+colormap(bar_colormap);
+
 contents = cellstr(get(handles.listbox1,'String')); 
 class1_name=contents{get(handles.listbox1,'Value')};
 contents = cellstr(get(handles.popupmenu1,'String')); 

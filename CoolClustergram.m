@@ -1,4 +1,4 @@
-function positions=CoolClustergram(data,representatives,row_labels,row_bg_colors)
+function positions=CoolClustergram(data,representatives,row_labels,row_bg_colors,marker_scales,display_colors)
 number_of_representatives=length(representatives);
 number_of_data_points=size(data,1);
 if(size(data,2)~=number_of_representatives)
@@ -51,10 +51,11 @@ for rep_num=1:number_of_representatives
    units=get(gca,'Units');
   % set(gca,'Units','normalized');
    positions(rep_num,:)=dsxy2figxy(h,[x_positions(rep_num),y_positions(rep_num),scale_factor*1,scale_factor*number_of_data_points/number_of_representatives]);
-   axes('position', positions(rep_num,:),'parent',f);
+   h1=axes('position', positions(rep_num,:),'parent',f);
    img=double(representatives{perm2(rep_num),1}(:,:,1:3));
    max_col=max(img(:));
-   image(img/max_col);axis equal;axis off;
+   Display_Image(img,h1,marker_scales,display_colors,[]);axis equal;axis off;
+   %image(img/max_col);axis equal;axis off;
    %image(representatives{perm2(rep_num)}./max(max(max(representatives{perm2(rep_num)}))));axis equal;axis off;
    %axis off;axis equal;
 end
