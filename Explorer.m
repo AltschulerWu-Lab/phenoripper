@@ -166,6 +166,8 @@ function MDSPlot_ButtonDownFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 myhandles=getappdata(0,'myhandles');
+%disp([num2str(hittest()) ' ' num2str(myhandles.MDS_gca) ' ' num2str(overobj2('type','axes'))]);
+if(myhandles.MDSPlot_handle==overobj2('type','axes'))
 CP=get(myhandles.MDS_gca,'CurrentPoint');
 
 number_of_points=size(myhandles.mds_data,1);
@@ -273,6 +275,7 @@ ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
 
 setappdata(0,'myhandles',myhandles);
 Update_Bar_Plot;
+end
 
 
 function ShowImages(filenames,axis_handle,class_color,point_name,frame_handle)
