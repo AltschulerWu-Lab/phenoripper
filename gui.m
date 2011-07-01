@@ -58,7 +58,7 @@ myhandles.number_of_block_clusters=10;
 myhandles.number_of_blocks_per_training_image=1000;
 myhandles.rgb_samples_per_training_image=3000;
 myhandles.number_of_block_representatives=3;
-myhandles.number_of_superblocks=20;
+%myhandles.number_of_superblocks=20;
 %myhandles.files_per_image=3;
 myhandles.imageDirectory='/home/z/My Paper Stuff/Images/Test';
 myhandles.is_directory_usable=false;
@@ -317,12 +317,23 @@ function SelectDirectory_Callback(hObject, eventdata, handles)
 %     setappdata(0,'myhandles',myhandles);
 % end
 
-%scroll_panel;
 wizard;
-uiwait;
-myhandles=getappdata(0,'myhandles');
+%scroll_panel;
 
+
+uiwait;
+drawnow;
+myhandles=getappdata(0,'myhandles');
+if isfield(myhandles,'grouped_metadata')==0
+    return;
+end
 myhandles.number_of_conditions=length(myhandles.grouped_metadata);
+setappdata(0,'myhandles',myhandles);
+Calculate_Image_Parameters(hObject,handles,false);
+myhandles=getappdata(0,'myhandles');
+msgbox('Data Loaded Successfully');
+
+
 myhandles.number_of_files=0;
 for i=1:myhandles.number_of_conditions
     myhandles.number_of_files=myhandles.number_of_files+...
@@ -358,6 +369,7 @@ number_of_blocks_per_training_image=1000;
 rgb_samples_per_training_image=3000;
 number_of_block_representatives=3;
 number_of_superblocks=str2double(get(handles.SuperBlockNr,'String'));
+myhandles.number_of_superblocks=number_of_superblocks;
 files_per_image=myhandles.files_per_image;%str2double(get(handles.ChannelNr,'String'));
 imageDirectory=get(handles.ImageRootDirectory,'String');
 
@@ -376,7 +388,7 @@ for condition=1:length(chosen_conditions)
     end
   
 end
-
+setappdata(0,'myhandles',myhandles);
 
 set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
 %set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximum',myhandles.number_of_files, 'Value',0);
@@ -394,7 +406,7 @@ myhandles.statusbarHandles=statusbar(hObject,'Generating Neighborhood Statistics
 %try
 third_order=ThirdOrder_Basis(global_filenames,global_data,number_of_superblocks);
 global_data.superblock_centroids=third_order.superblock_centroids;
-global_data.mean_superblock_profile=third_order.mean_superblock_profile;
+%global_data.mean_superblock_profile=third_order.mean_superblock_profile;
 global_data.superblock_representatives=third_order.superblock_representatives;
 myhandles.global_data=global_data;
 %catch exception
@@ -517,8 +529,8 @@ mean_sb=mean(superblock_profiles);
 dists=pdist(superblock_profiles);
 
 
-myhandles.mds_data=mdscale(dists,3);
-setappdata(0,'myhandles',myhandles);
+%myhandles.mds_data=mdscale(dists,3);
+%setappdata(0,'myhandles',myhandles);
 %SetButtonState(hObject,handles,true);
 set(handles.ExplorerButton,'Visible','on');
 set(handles.SaveOutputButton,'Visible','on');
@@ -530,96 +542,106 @@ guidata(hObject, handles);
 
 % --- Executes on button press in SelectDirectory.
 function TestThreshold_Callback(hObject, eventdata, handles)
-% hObject    handle to SelectDirectory (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-myhandles=getappdata(0,'myhandles');
-% if(~myhandles.is_directory_usable)
-%     warndlg('Change Root Directory');
-%     return;
+% % hObject    handle to SelectDirectory (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% 
+% myhandles=getappdata(0,'myhandles');
+% % if(~myhandles.is_directory_usable)
+% %     warndlg('Change Root Directory');
+% %     return;
+% % end
+% %SetButtonState(hObject,handles,false);
+% 
+% 
+% cutoff_intensity=str2double(get(handles.ThreshodIntensity,'String'));
+% files_per_image=myhandles.files_per_image;%str2double(get(handles.ChannelNr,'String'));
+% number_of_channels=myhandles.number_of_channels;
+% %imageDirectory=get(handles.ImageRootDirectory,'String');
+%    
+% number_of_test_files=10;
+% 
+% selected_files=cell(number_of_test_files,files_per_image);
+% 
+% % if(strcmp(imageDirectory(length(imageDirectory):end),filesep))
+% %     imageDirectory=imageDirectory(1:length(imageDirectory)-1);
+% % end
+% % dir_list=dir(imageDirectory);
+% % subdirs={dir_list([(dir_list(:).isdir)]).name};
+% 
+% 
+% for test_num=1:number_of_test_files
+%     condition=randi(myhandles.number_of_conditions);
+%     imagenames=myhandles.grouped_metadata{condition}.files_in_group;
+%     
+%     file_num=randi(size(imagenames,1));
+%     
+%     for channel=1:files_per_image
+%         selected_files{test_num,channel}=imagenames{file_num,channel};
+%           
+%         
+%     end
+%     
+%     
 % end
-%SetButtonState(hObject,handles,false);
-
-
-cutoff_intensity=str2double(get(handles.ThreshodIntensity,'String'));
-files_per_image=myhandles.files_per_image;%str2double(get(handles.ChannelNr,'String'));
-number_of_channels=myhandles.number_of_channels;
-%imageDirectory=get(handles.ImageRootDirectory,'String');
-   
-number_of_test_files=10;
-
-selected_files=cell(number_of_test_files,files_per_image);
-
-% if(strcmp(imageDirectory(length(imageDirectory):end),filesep))
-%     imageDirectory=imageDirectory(1:length(imageDirectory)-1);
+% 
+% set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximum',size(selected_files,1), 'Value',0);
+% %myhandles.statusbarHandles(hObject, 'Calculating Image Parameters ...');
+% myhandles.statusbarHandles=statusbar(hObject,'Calculating Image Parameters ...');
+% test=imfinfo(selected_files{1,1});
+% xres=test.Height;
+% yres=test.Width;
+% img=zeros(xres,yres,number_of_channels);
+% amplitudes=zeros(size(selected_files,1),1);
+% max_val=0;
+% color_scales=zeros(size(selected_files,1),number_of_channels);
+% for file_num=1:size(selected_files,1)
+%     if(number_of_channels~=files_per_image)
+%         img=selected_files{file_num,1};
+%     else
+%         for channel=1:number_of_channels
+%                 img(:,:,channel)=imread(selected_files{file_num,channel});
+%         end
+%     end
+%     for channel=1:number_of_channels
+%         temp=img(:,:,channel);
+%         color_scales(file_num,channel)=prctile(temp(:),99.9);
+%     end
+%     max_val=max(max(img(:)),max_val);
+%     amp=sum(double(img).^2,3);
+%     amplitudes(file_num)=quantile(amp(:),0.66);
+%     set(myhandles.statusbarHandles.ProgressBar, 'Value',file_num);
 % end
-% dir_list=dir(imageDirectory);
-% subdirs={dir_list([(dir_list(:).isdir)]).name};
-
-
-for test_num=1:number_of_test_files
-    condition=randi(myhandles.number_of_conditions);
-    imagenames=myhandles.grouped_metadata{condition}.files_in_group;
-    
-    file_num=randi(size(imagenames,1));
-    
-    for channel=1:files_per_image
-        selected_files{test_num,channel}=imagenames{file_num,channel};
-          
-        
-    end
-    
-    
-end
-
-set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximum',size(selected_files,1), 'Value',0);
-%myhandles.statusbarHandles(hObject, 'Calculating Image Parameters ...');
-myhandles.statusbarHandles=statusbar(hObject,'Calculating Image Parameters ...');
-test=imfinfo(selected_files{1,1});
-xres=test.Height;
-yres=test.Width;
-img=zeros(xres,yres,number_of_channels);
-amplitudes=zeros(size(selected_files,1),1);
-max_val=0;
-for file_num=1:size(selected_files,1)
-    if(number_of_channels~=files_per_image)
-        img=selected_files{file_num,1};
-    else
-        for channel=1:number_of_channels
-                img(:,:,channel)=imread(selected_files{file_num,channel});
-        end
-    end
-    max_val=max(max(img(:)),max_val);
-    amp=sum(double(img).^2,3);
-    amplitudes(file_num)=quantile(amp(:),0.66);
-    set(myhandles.statusbarHandles.ProgressBar, 'Value',file_num);
-end
-set(myhandles.statusbarHandles.ProgressBar, 'Visible','off');
-myhandles.amplitude_range=max(cutoff_intensity,mean(amplitudes));
-myhandles.bit_depth=bit_depth(max_val,[8,12,14,16,32]);
-
-%myhandles=getappdata(0,'myhandles');
-myhandles.test_files=selected_files;
-myhandles.cutoff_intensity=cutoff_intensity;
-myhandles.block_size=str2double(get(handles.blockSize,'String'));
-%set(handles.ThreshodIntensity,'String',num2str(max(myhandles.cutoff_intensity,myhandles.amplitude_range)));
-setappdata(0,'myhandles',myhandles);
-myhandles.statusbarHandles=statusbar(hObject,'Testing Image In Other Window');
-try
-h=ThresholdImage;
-uiwait(h);
-catch exception
-     rethrow(exception);
-end
-
-myhandles.statusbarHandles=statusbar(hObject,'');
-handles=guidata(hObject);
-myhandles=getappdata(0,'myhandles');
-set(handles.ThreshodIntensity,'String',num2str(myhandles.cutoff_intensity));
-set(handles.blockSize,'String',num2str(myhandles.block_size));
-SetButtonState(hObject,handles,true);
-guidata(hObject, handles); 
+% myhandles.marker_scales=zeros(number_of_channels,2);
+% myhandles.marker_scales(:,2)=median(color_scales,1)';
+% myhandles.color_order={'Blue','Green','Red','Gray','Yellow','Magenta'};
+% myhandles.display_colors=myhandles.color_order(1:number_of_channels);
+% set(myhandles.statusbarHandles.ProgressBar, 'Visible','off');
+% myhandles.amplitude_range=max(cutoff_intensity,mean(amplitudes));
+% myhandles.bit_depth=bit_depth(max_val,[8,12,14,16,32]);
+% 
+% %myhandles=getappdata(0,'myhandles');
+% myhandles.test_files=selected_files;
+% myhandles.cutoff_intensity=cutoff_intensity;
+% myhandles.block_size=str2double(get(handles.blockSize,'String'));
+% %set(handles.ThreshodIntensity,'String',num2str(max(myhandles.cutoff_intensity,myhandles.amplitude_range)));
+% setappdata(0,'myhandles',myhandles);
+% myhandles.statusbarHandles=statusbar(hObject,'Testing Image In Other Window');
+% try
+% h=ThresholdImage;
+% uiwait(h);
+% catch exception
+%      rethrow(exception);
+% end
+% 
+% myhandles.statusbarHandles=statusbar(hObject,'');
+% handles=guidata(hObject);
+% myhandles=getappdata(0,'myhandles');
+% set(handles.ThreshodIntensity,'String',num2str(myhandles.cutoff_intensity));
+% set(handles.blockSize,'String',num2str(myhandles.block_size));
+% SetButtonState(hObject,handles,true);
+% guidata(hObject, handles); 
+Calculate_Image_Parameters(hObject,handles,true);
 
 
 
@@ -812,13 +834,17 @@ function ExplorerButton_Callback(hObject, eventdata, handles)
 % hObject    handle to ExplorerButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-myhandles=getappdata(0,'myhandles');
-Explainer;
-MakePlots(hObject,eventdata,handles);
-myhandles=getappdata(0,'myhandles');
-CoolClustergram(myhandles.superblock_profiles,...
-     myhandles.global_data.superblock_representatives,myhandles.mds_text);
- Explorer;
+%myhandles=getappdata(0,'myhandles');
+%Explainer;
+%MakePlots(hObject,eventdata,handles);
+%myhandles=getappdata(0,'myhandles');
+% CoolClustergram(myhandles.superblock_profiles,...
+%     myhandles.global_data.superblock_representatives,...
+%     myhandles.mds_text,myhandles.mds_colors...
+%     ,myhandles.marker_scales,myhandles.display_colors);
+%clustergram(myhandles.superblock_profiles,'RowLabels',...
+%    cellfun(@(x) cell2mat(x),myhandles.mds_text,'UniformOutput',false))
+Explorer;
 
 
 
@@ -845,6 +871,9 @@ function LoadResultsButton_Callback(hObject, eventdata, handles)
 %uirestore;
 %guidata(hObject, handles);
 [filename,pathname]=uigetfile;
+if(filename==0)
+    return;
+end
 h=gcf;
 delete(h);
 hgload([pathname filesep filename]);
@@ -857,6 +886,7 @@ set(myhandles.statusbarHandles.ProgressBar, 'Background','white', 'Foreground',[
 setappdata(0,'myhandles',myhandles);
 
 
+
 % old_handles=handles;
 % old_hObject=hObject;
 % uiopen('LOAD');
@@ -864,79 +894,7 @@ setappdata(0,'myhandles',myhandles);
 %guidata(hObject, handles);
 %setappdata(0,'myhandles',myhandles);
 
-function MakePlots(hObject,eventdata,handles)
-myhandles=getappdata(0,'myhandles');
 
-label_field=myhandles.grouping_fields{get(handles.PointLabel_popupmenu,'Value')};
-color_field=myhandles.grouping_fields{get(handles.PointColor_popupmenu,'Value')};
-
-
-% if (get(handles.OutputMDS,'Value') == get(handles.displayByColumn,'Max'))
-%     outputType=1;
-% elseif (get(handles.OutputHeatMap,'Value') == get(handles.displayByRow,'Max'))
-%     outputType=2;
-% else
-%     outputType=3;
-% end
-
-group_vals=cell(1,myhandles.number_of_conditions);
-for condition=1:myhandles.number_of_conditions
-   group_vals{condition}=cell2mat(myhandles.grouped_metadata{condition}.(color_field)); 
-end
-
-myhandles.mds_text=cell(size(myhandles.superblock_profiles,1),1);
-myhandles.mds_colors=zeros(size(myhandles.superblock_profiles,1),3);       
-[colorsGroup,GN]=grp2idx(group_vals);
-colors=colormap(jet(max(colorsGroup)));
-dists=pdist(myhandles.superblock_profiles);
-profile_mds=mdscale(dists,3);
-figure;
-scatter3(profile_mds(:,1),profile_mds(:,2),profile_mds(:,3),10);
-for i=1:myhandles.number_of_conditions
-    text(profile_mds(i,1),profile_mds(i,2),profile_mds(i,3),...
-        myhandles.grouped_metadata{i}.(label_field),...
-        'BackgroundColor',colors(colorsGroup(i),:));%not always cn
-    myhandles.mds_text{i}=myhandles.grouped_metadata{i}.(label_field);
-    myhandles.mds_colors(i,:)=colors(colorsGroup(i),:);
-end
-setappdata(0,'myhandles',myhandles);
-% 
-% 
-% well_names={Ripped_Data(:).well};
-% switch(outputType)
-%     case 1
-%         
-%         
-%         dists=pdist(myhandles.superblock_profiles);
-%         profile_mds=mdscale(dists,3);
-%         colors=colormap(jet(max(colorsGroup)));
-%         figure;
-%         scatter3(profile_mds(:,1),profile_mds(:,2),profile_mds(:,3),10);
-%         for i=1:length(Ripped_Data)
-%             text(profile_mds(i,1),profile_mds(i,2),profile_mds(i,3),Ripped_Data(i).well,...
-%                 'BackgroundColor',colors(colorsGroup(i),:));%not always cn
-%             myhandles.mds_text{i}=Ripped_Data(i).well;
-%             myhandles.mds_colors(i,:)=colors(colorsGroup(i),:);
-%         end
-%     case 2
-%         clustergram(myhandles.superblock_profiles,'RowLabels',well_names);
-%         
-%     case 3
-%         
-%         
-%         
-%         dists=pdist(myhandles.superblock_profiles);
-%         profile_mds=mdscale(dists,3);
-%         colors=colormap(jet(max(colorsGroup)));
-%         figure;
-%         scatter3(profile_mds(:,1),profile_mds(:,2),profile_mds(:,3),10);
-%         for i=1:length(Ripped_Data)
-%             text(profile_mds(i,1),profile_mds(i,2),profile_mds(i,3),Ripped_Data(i).well,...
-%                 'BackgroundColor',colors(colorsGroup(i),:));%not always cn
-%            
-%         end
-%         %clustergram(myhandles.superblock_profiles,'RowLabels',well_names);
-% end
 
 
 
@@ -989,3 +947,104 @@ function PointLabel_popupmenu_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in SelectDirectory.
+function Calculate_Image_Parameters(hObject,handles,Show_Visualization_Window)
+myhandles=getappdata(0,'myhandles');
+if(~Show_Visualization_Window)
+    
+    cutoff_intensity=str2double(get(handles.ThreshodIntensity,'String'));
+    files_per_image=myhandles.files_per_image;%str2double(get(handles.ChannelNr,'String'));
+    number_of_channels=myhandles.number_of_channels;
+    
+    number_of_test_files=10;
+    
+    selected_files=cell(number_of_test_files,files_per_image);
+    
+    for test_num=1:number_of_test_files
+        condition=randi(myhandles.number_of_conditions);
+        imagenames=myhandles.grouped_metadata{condition}.files_in_group;
+        
+        file_num=randi(size(imagenames,1));
+        
+        for channel=1:files_per_image
+            selected_files{test_num,channel}=imagenames{file_num,channel};
+            
+            
+        end
+        
+        
+    end
+    
+    set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximum',size(selected_files,1), 'Value',0);
+    %myhandles.statusbarHandles(hObject, 'Calculating Image Parameters ...');
+    myhandles.statusbarHandles=statusbar(hObject,'Calculating Image Parameters ...');
+    test=imfinfo(selected_files{1,1});
+    xres=test.Height;
+    yres=test.Width;
+    img=zeros(xres,yres,number_of_channels);
+    amplitudes=zeros(size(selected_files,1),1);
+    thresholds=zeros(size(selected_files,1),1);
+    max_val=0;
+    color_scales=zeros(size(selected_files,1),number_of_channels);
+    for file_num=1:size(selected_files,1)
+        if(number_of_channels~=files_per_image)
+            img=imread(selected_files{file_num,1});
+        else
+            for channel=1:number_of_channels
+                img(:,:,channel)=imread(selected_files{file_num,channel});
+            end
+        end
+        channel_thresholds=zeros(number_of_channels,1);
+        for channel=1:number_of_channels
+            intensity=img(:,:,channel);
+            color_scales(file_num,channel)=prctile(intensity(:),99.9);
+            max_intensity=max(intensity(:));
+            min_intensity=min(intensity(:));
+            intensity=(intensity-min_intensity)/(max_intensity-min_intensity);
+            channel_thresholds(channel)=graythresh(intensity)*(max_intensity-min_intensity)+min_intensity;
+            
+        end
+        max_val=max(max(img(:)),max_val);
+        amp=sum(double(img).^2,3);
+        amplitudes(file_num)=quantile(amp(:),0.66);
+        thresholds(file_num)=min(channel_thresholds).^2;
+        set(myhandles.statusbarHandles.ProgressBar, 'Value',file_num);
+    end
+    cutoff_intensity=round(min(thresholds));
+    set(handles.ThreshodIntensity,'String',num2str(cutoff_intensity));
+    myhandles.marker_scales=zeros(number_of_channels,2);
+    myhandles.marker_scales(:,2)=median(color_scales,1)';
+    myhandles.color_order={'Blue','Green','Red','Gray','Yellow','Magenta'};
+    myhandles.display_colors=myhandles.color_order(1:number_of_channels);
+    set(myhandles.statusbarHandles.ProgressBar, 'Visible','off');
+    myhandles.amplitude_range=max(cutoff_intensity,mean(amplitudes));
+    myhandles.bit_depth=bit_depth(double(max_val),[8,12,14,16,32]);
+    
+    %myhandles=getappdata(0,'myhandles');
+    myhandles.test_files=selected_files;
+    myhandles.cutoff_intensity=cutoff_intensity;
+    myhandles.block_size=str2double(get(handles.blockSize,'String'));
+    %set(handles.ThreshodIntensity,'String',num2str(max(myhandles.cutoff_intensity,myhandles.amplitude_range)));
+    setappdata(0,'myhandles',myhandles);
+    
+    
+else
+    myhandles.statusbarHandles=statusbar(hObject,'Testing Image In Other Window');
+    
+    try
+        h=ThresholdImage;
+        uiwait(h);
+    catch exception
+        rethrow(exception);
+    end
+    
+    myhandles.statusbarHandles=statusbar(hObject,'');
+    handles=guidata(hObject);
+    myhandles=getappdata(0,'myhandles');
+    set(handles.ThreshodIntensity,'String',num2str(myhandles.cutoff_intensity));
+    set(handles.blockSize,'String',num2str(myhandles.block_size));
+    SetButtonState(hObject,handles,true);
+end
+guidata(hObject, handles);

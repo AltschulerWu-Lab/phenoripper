@@ -18,6 +18,7 @@ function [filenames,metadata]=ReadData(filename,delim)
         tokens=regexp(data{1},delim,'split');
         tokens=tokens{1};
         filenames{line_counter}=regexp(tokens{1},';','split');
+        metadata(line_counter).None=tokens{1};
         for field_num=2:length(HeaderFields)
                 metadata(line_counter).(HeaderFields{field_num})=tokens{field_num};
         end

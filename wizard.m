@@ -22,7 +22,7 @@ function varargout = wizard(varargin)
 
 % Edit the above text to modify the response to help wizard
 
-% Last Modified by GUIDE v2.5 21-Mar-2011 14:20:02
+% Last Modified by GUIDE v2.5 24-May-2011 14:55:09
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -64,7 +64,9 @@ image(img,'parent',handles.header);
 axis off;
 
 %set(handles.header,'axes','off');
-
+myhandles=getappdata(0,'myhandles');
+myhandles.use_metadata=false;
+setappdata(0,'myhandles',myhandles);
 %Load the default template list
 wizardhandles=load('default-templates.mat','templates');
 setappdata(0,'wizardhandles',wizardhandles);
@@ -178,8 +180,12 @@ if(get(handles.selectSingleChannelCB,'Value')==0)
   set(handles.detectChannelBT,'Visible','off');
 else
   set(handles.nrChannelPerImageDB,'Visible','off');
-  set(handles.channelImageText,'Visible','off');
-  set(handles.detectChannelBT,'Visible','on');
+  set(handles.channelImageText,'Visible','off');  
+  myhandles=getappdata(0,'myhandles');
+  if(~myhandles.use_metadata)
+    set(handles.detectChannelBT,'Visible','on');
+  end
+ 
 end
 
 % --- Executes on selection change in nrChannelPerImageDB.
@@ -418,14 +424,23 @@ for i=1:total_number_of_channels
        myhandles.channels_used=[myhandles.channels_used;i];
    end
 end
-myhandles.allfiles=getAllFiles(myhandles.wizardData.rootDir);
-setappdata(0,'myhandles',myhandles);
-[file_matrix,metadata,matched_files]=construct_filetable();
-myhandles=getappdata(0,'myhandles');
+
+
+
+if(myhandles.use_metadata)
+    myhandles.matched_files=true(size(myhandles.file_matrix,1),1);
+    myhandles.number_of_channels=length(myhandles.channels_used);
+else
+    myhandles.allfiles=getAllFiles(myhandles.wizardData.rootDir);
+    setappdata(0,'myhandles',myhandles);
+    [file_matrix,metadata,matched_files]=construct_filetable();
+    myhandles=getappdata(0,'myhandles');
+    myhandles.file_matrix=file_matrix;
+    myhandles.metadata=metadata;
+    myhandles.matched_files=matched_files;
+end
+%myhandles=getappdata(0,'myhandles');
 myhandles.wizard_handle=gcf;
-myhandles.file_matrix=file_matrix;
-myhandles.metadata=metadata;
-myhandles.matched_files=matched_files;
 setappdata(0,'myhandles',myhandles);
 wizard_accept;
 %disp('meow');
@@ -635,8 +650,72 @@ function advancedEditBT_Callback(hObject, eventdata, handles)
 % hObject    handle to advancedEditBT (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-delete(gcf);
-scroll_panel;
+h=gcf;
+[filename,pathname]=uigetfile('*.txt');
+[filenames,metadata]=ReadData([pathname filesep filename],',');
+myhandles=getappdata(0,'myhandles');
+myhandles.use_metadata=true;
+enable_regexp_gui('off',handles);
+
+channelNr=length(filenames{1});
+if(channelNr<1)
+  warndlg('Couldn detect the channel. Did you select the template corresponding to your data?');
+  set(handles.markerTable,'Data',cell(0,3));
+  set(handles.markerTable,'Visible','off');
+  return;
+end
+data=cell(channelNr,3);
+for i=1:channelNr
+  data{i,1}=true;
+end
+for i=1:channelNr
+  data{i,2}=num2str(i);
+end
+for i=1:channelNr
+  data{i,3}='';
+end
+for i=1:channelNr
+  data{i,4}='';
+end
+set(handles.markerTable,'Visible','on');
+set(handles.markerTable,'Data',data);
+set(handles.markerTable, 'ColumnWidth', {30 110 220, 90});
+msgbox(['Marker have been detected, please enter the name of each marker'...
+  'and click on Done to use this configuration.']);
+
+file_matrix=cell(length(filenames),length(filenames{1}));
+for i=1:length(filenames)
+    for j=1:length(filenames{1})
+        file_matrix{i,j}=filenames{i}{j};
+        if(~exist(file_matrix{i,j},'file'))
+            errordlg('File Missing');
+            return;
+        end
+    end
+end
+myhandles.file_matrix=file_matrix;
+%[myhandles.metadata,matched_files]=extract_regexp_metadata(file_matrix,myhandles.regular_expressions);
+%matched_files=find(matched_files);
+fnames=fieldnames(metadata);
+for i=1:length(filenames)
+    myhandles.metadata{i}.FileNames={file_matrix{i,:}};
+    myhandles.metadata{i}.None=file_matrix{i,1};
+    for j=2:length(fnames)    
+        myhandles.metadata{i}.(fnames{j})=metadata(i).(fnames{j});
+    end
+end
+
+myhandles.files_per_image=length(filenames{1});
+handles=getappdata(0,'handles');
+%fnames=fieldnames(myhandles.metadata{1});
+set(handles.groupSelector,'String',fnames);
+setappdata(0,'handles',handles);
+setappdata(0,'myhandles',myhandles); %Should probably throw in some checks to
+                                     % make sure that myhandles.files_per_image is not being reset
+                                    
+%scroll_panel;
+%delete(h);
+
 
 
 % --- Executes on button press in saveAllTemplatesBT.
@@ -800,3 +879,30 @@ end
 wizardhandles=getappdata(0,'wizardhandles');
 selectedTemplate=wizardhandles.templates{selectedTemplateNr};
 regExp=selectedTemplate.Pattern;
+
+function enable_regexp_gui(is_visible,handles)
+
+set(handles.text4,'Visible',is_visible);
+set(handles.text5,'Visible',is_visible);
+set(handles.fileExtensionTF,'Visible',is_visible);
+%set(handles.channelImageText,'Visible',is_visible);
+%set(handles.nrChannelPerImageDB,'Visible',is_visible);
+set(handles.channelSeparatorTF,'Visible',is_visible);
+set(handles.testTemplateBT,'Visible',is_visible);
+%set(handles.selectSingleChannelCB,'Visible',is_visible);
+
+if(strcmp(is_visible,'on'))
+    set(handles.selectSingleChannelCB,'Enable','off');
+else    
+    set(handles.selectSingleChannelCB,'Enable','on');
+end
+set(handles.templateSelector,'Visible',is_visible);
+set(handles.editTemplateBT,'Visible',is_visible);
+set(handles.saveAllTemplatesBT,'Visible',is_visible);
+set(handles.removeSelectedTemplateBT,'Visible',is_visible);
+set(handles.upTemplateBT,'Visible',is_visible);
+set(handles.downTemplateBT,'Visible',is_visible);
+set(handles.detectChannelBT,'Visible',is_visible);
+set(handles.text6,'Visible',is_visible);
+%set(handles.text9,'Visible',is_visible);
+%set(handles.descriptionText,'Visible',is_visible);

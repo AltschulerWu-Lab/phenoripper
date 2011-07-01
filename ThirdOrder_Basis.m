@@ -46,7 +46,7 @@ foreground_blocks_per_image=zeros(number_of_repeats,1);
 foreground_blocks_temp=zeros(blocks_nx*blocks_ny*number_of_repeats,1);
 image_number_of_block_temp=zeros(blocks_nx*blocks_ny*number_of_repeats,1);
 position_of_block_temp=zeros(blocks_nx*blocks_ny*number_of_repeats,2);
-neighbor_profiles_temp=zeros(blocks_nx*blocks_ny*number_of_repeats,number_of_block_clusters+1);
+neighbor_profiles_temp=zeros(blocks_nx*blocks_ny*number_of_repeats,(number_of_block_clusters+1)^2);
 
 for image_counter=1:number_of_repeats
     %disp(['Reading Image ' num2str(image_counter) '....']);
@@ -87,6 +87,12 @@ for image_counter=1:number_of_repeats
     %toc;
     
     avg_block_intensities=A1*intensity*B1/(block_size^2);
+    %Ugly hack to prevent edge rows from contributing (to keep consistency
+    %with the Neighbor_Profile function)
+    avg_block_intensities(1,:)=0;
+    avg_block_intensities(:,1)=0;
+    avg_block_intensities(end,:)=0;
+    avg_block_intensities(:,end)=0;
     foreground_blocks=find(avg_block_intensities>cutoff_intensity);
     RGBprofiles_of_blocks=zeros(length(foreground_blocks),number_of_RGB_clusters+1);
     for rgb_cluster=0:number_of_RGB_clusters
@@ -104,17 +110,17 @@ for image_counter=1:number_of_repeats
     image_in_discrete_block_states(foreground_blocks)=block_ids_in_image;
     
     %h=fspecial('gaussian',2,1);
-    h=[1 1 1;1 1 1; 1 1 1];
+   % h=[1 1 1;1 0 1; 1 1 1];
 %filtered=imfilter(double(img),h);
-    neighbor_profiles_in_image=zeros(length(foreground_blocks),number_of_block_clusters+1);
-    
-    for i=0:number_of_block_clusters
-        temp=imfilter(double(image_in_discrete_block_states==i),h);
-        neighbor_profiles_in_image(:,i+1)=temp(foreground_blocks)/8;
-       
-    end
-    
-    
+%     neighbor_profiles_in_image=zeros(length(foreground_blocks),number_of_block_clusters+1);
+%     
+%     for i=0:number_of_block_clusters
+%         temp=imfilter(double(image_in_discrete_block_states==i),h);
+%         neighbor_profiles_in_image(:,i+1)=temp(foreground_blocks)/8;
+%        
+%     end
+%     
+    neighbor_profiles_in_image=Neighbor_Profile(image_in_discrete_block_states,number_of_block_clusters);
     data.image_in_discrete_block_states=image_in_discrete_block_states;
     
     
@@ -136,17 +142,12 @@ block_ids=block_ids_temp(1:block_counter);
 image_number_of_block=image_number_of_block_temp(1:block_counter);
 position_of_block=position_of_block_temp(1:block_counter,:);
 
-%neighbor_profiles=zeros(block_counter,number_of_block_clusters+1);
+%neighbor_profiles=zeros(block_counter,2*number_of_block_clusters+1);
+% neighbor_profiles(:,number_of_block_clusters+1:end)=neighbor_profiles_temp(1:block_counter,:);
+% for i=1:block_counter
+%    neighbor_profiles(i,block_ids(i))=1000;
+% end
 neighbor_profiles=neighbor_profiles_temp(1:block_counter,:);
-mean_superblock_profile=mean(neighbor_profiles);
-data.mean_superblock_profile=mean_superblock_profile;
-%for i=1:block_counter
-%        neighbor_profiles(i,:)=log(neighbor_profiles(i,:)./mean_superblock_profile);
-%end
-%for i=1:block_counter
-%   neighbor_profiles(i,block_ids(i))=1000;
-%end
-
 [~,data.superblock_centroids,~,superblock_distances]=kmeans(neighbor_profiles,number_of_superblocks...
     ,'emptyaction','singleton','start','cluster');
 data.block_profile=zeros(number_of_block_clusters,1);
@@ -210,10 +211,10 @@ for file_num=1:length(included_files)
             location_info=locations{included_files(file_num),i};
             for j=1:min(number_of_matches,number_of_superblock_representatives-supr_counter(i))
                 %rep_img=zeros(3*block_size,3*block_size,number_of_channels);
-                x1=max(location_info(j,1)-block_size,1);
-                x2=min(location_info(j,1)+2*block_size-1,xres);
-                y1=max(location_info(j,2)-block_size,1);
-                y2=min(location_info(j,2)+2*block_size-1,yres);
+                x1=max(location_info(j,1)-3*block_size,1);
+                x2=min(location_info(j,1)+4*block_size-1,xres);
+                y1=max(location_info(j,2)-3*block_size,1);
+                y2=min(location_info(j,2)+4*block_size-1,yres);
                 supr_counter(i)=supr_counter(i)+1;
                 superblock_representatives{i,supr_counter(i)}=img(x1:x2,y1:y2,:);
                 

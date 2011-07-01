@@ -22,7 +22,7 @@ function varargout = ThresholdImage(varargin)
 
 % Edit the above text to modify the response to help ThresholdImage
 
-% Last Modified by GUIDE v2.5 25-Jan-2011 18:21:07
+% Last Modified by GUIDE v2.5 27-Jun-2011 12:21:03
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -72,7 +72,7 @@ end
 SetFileLabel(filenames{myhandles.image_number,1},handles);
 
 intModel = javax.swing.SpinnerNumberModel(myhandles.block_size, 2, 50, 1);
-jhSpinner = addLabeledSpinner('', intModel, [20,20,60,20], @blockSizeChangedCallback,hObject);
+jhSpinner = addLabeledSpinner('', intModel, [20,20,60,20], {@blockSizeChangedCallback,handles},hObject);
 jEditor = javaObject('javax.swing.JSpinner$NumberEditor',jhSpinner, '#');
 jhSpinner.setEditor(jEditor);
 
@@ -168,7 +168,7 @@ function jhSpinner = addLabeledSpinner(label,model,pos,callbackFunc,hFig)
 %     jhLabel = javacomponent(jLabel,pos,hFig);
   % addLabeledSpinner
 
-function blockSizeChangedCallback(jSpinner,jEventData)
+function blockSizeChangedCallback(jSpinner,jEventData,handles)
    persistent inCallback
 %    try
       %if ~isempty(inCallback),  return;  end
@@ -176,37 +176,45 @@ function blockSizeChangedCallback(jSpinner,jEventData)
       blockSize = jSpinner.getValue;
       myhandles=getappdata(0,'myhandles');
       myhandles.block_size=blockSize;
-      
-     
-      if(myhandles.show_blocks) 
-          
-          img=myhandles.img;
-          intensity=myhandles.intensity;
-          cutoff_intensity=myhandles.cutoff_intensity;
-          mask=intensity>cutoff_intensity;
-          %img1=tanh(img/2^14*10);
-          img1=myhandles.img1;
-          for channel=1:myhandles.number_of_channels
-              img1(:,:,channel)=min(img1(:,:,channel)+ 0.25*(~mask),1);
-              
-          end
-          
-          axis(myhandles.h);
-          img2=zeros(size(img1,1),size(img1,2),3);
-          if(myhandles.number_of_channels<3)
-                  img2(:,:,1:myhandles.number_of_channels)=img1;
-          else
-                  img2=img1(:,:,1:3);
-          end
-          image(img2,'parent',myhandles.h);
-          set(gca,'XTick',[0:myhandles.block_size:myhandles.yres])
-          set(gca,'XTickLabel',[])
-          set(gca,'YTick',[0:myhandles.block_size:myhandles.xres])
-          set(gca,'YTickLabel',[])
-          set(gca,'GridLineStyle','-')
-          grid on;
-     
-      end
+      setappdata(0,'myhandles',myhandles);
+      display_image(handles);
+%       if(myhandles.show_blocks) 
+%           
+%           img=myhandles.img;
+%           intensity=myhandles.intensity;
+%           cutoff_intensity=myhandles.cutoff_intensity;
+%           mask=intensity>cutoff_intensity;
+%           %img1=tanh(img/2^14*10);
+%  
+%          % Display_Image(img,myhandles.h,myhandles.marker_scales,myhandles.display_colors,mask);
+%           if(get(handles.show_mask_checkbox,'Value'))
+%               Display_Image(img,myhandles.h,myhandles.marker_scales,myhandles.display_colors,mask);
+%           else
+%               Display_Image(img,myhandles.h,myhandles.marker_scales,myhandles.display_colors,[]);
+%           end
+% %           
+% %           img1=myhandles.img1;
+% %           for channel=1:myhandles.number_of_channels
+% %               img1(:,:,channel)=min(img1(:,:,channel)+ 0.25*(~mask),1);
+% %               
+% %           end
+% %           
+% %           axis(myhandles.h);
+% %           img2=zeros(size(img1,1),size(img1,2),3);
+% %           if(myhandles.number_of_channels<3)
+% %                   img2(:,:,1:myhandles.number_of_channels)=img1;
+% %           else
+% %                   img2=img1(:,:,1:3);
+% %           end
+% %           image(img2,'parent',myhandles.h);
+%           set(gca,'XTick',[0:myhandles.block_size:myhandles.yres])
+%           set(gca,'XTickLabel',[])
+%           set(gca,'YTick',[0:myhandles.block_size:myhandles.xres])
+%           set(gca,'YTickLabel',[])
+%           set(gca,'GridLineStyle','-')
+%           grid on;
+%      
+%       end
 setappdata(0,'myhandles',myhandles);
       
       
@@ -367,7 +375,7 @@ else
 end
 myhandles.img=img;
 myhandles.intensity=sum(img.^2,3);
-myhandles.img1=tanh(double(img)/2^myhandles.bit_depth*10);
+%myhandles.img1=tanh(double(img)/2^myhandles.bit_depth*10);
 setappdata(0,'myhandles',myhandles);
 display_image(handles);
 % %This could be displaying something different from the real thing
@@ -461,19 +469,25 @@ img=myhandles.img;
 intensity=myhandles.intensity;
 cutoff_intensity=myhandles.cutoff_intensity;
 mask=intensity>cutoff_intensity;
-img1=myhandles.img1;
-%img1=tanh(img/2^myhandles.bit_depth*10);
-for channel=1:myhandles.number_of_channels
-  img1(:,:,channel)=min(img1(:,:,channel)+ 0.25*(~mask),1);
+% img1=myhandles.img1;
+% %img1=tanh(img/2^myhandles.bit_depth*10);
+% for channel=1:myhandles.number_of_channels
+%   img1(:,:,channel)=min(img1(:,:,channel)+ 0.25*(~mask),1);
+% end
+% 
+% img2=zeros(size(img1,1),size(img1,2),3);
+% if(myhandles.number_of_channels<3)
+%         img2(:,:,1:myhandles.number_of_channels)=img1;
+% else
+%         img2=img1(:,:,1:3);
+% end
+% image(img2,'parent',myhandles.h);
+if(get(handles.show_mask_checkbox,'Value'))
+    Display_Image(img,myhandles.h,myhandles.marker_scales,myhandles.display_colors,mask);
+else
+    Display_Image(img,myhandles.h,myhandles.marker_scales,myhandles.display_colors,[]);
 end
 axis(myhandles.h);
-img2=zeros(size(img1,1),size(img1,2),3);
-if(myhandles.number_of_channels<3)
-        img2(:,:,1:myhandles.number_of_channels)=img1;
-else
-        img2=img1(:,:,1:3);
-end
-image(img2,'parent',myhandles.h);
 if(get(handles.checkbox1,'Value'));
     set(gca,'XTick',[0:myhandles.block_size:yres]);
     set(gca,'XTickLabel',[]);
@@ -494,3 +508,31 @@ else
     filelabel=['...' filename(length(filename)-length_limit:end)];
     set(handles.fileName,'String',filelabel);
 end
+
+
+% --- Executes on button press in Intensity_Scale_Button.
+function Intensity_Scale_Button_Callback(hObject, eventdata, handles)
+% hObject    handle to Intensity_Scale_Button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+myhandles=getappdata(0,'myhandles');
+img=myhandles.img;
+intensity=myhandles.intensity;
+cutoff_intensity=myhandles.cutoff_intensity;
+mask=intensity>cutoff_intensity;
+set(handles.show_mask_checkbox,'Value',0.0);
+Scale_Intensities(myhandles.h,[]);
+uiwait;
+myhandles=getappdata(0,'myhandles');
+display_image(handles);
+setappdata(0,'myhandles',myhandles);
+
+
+% --- Executes on button press in show_mask_checkbox.
+function show_mask_checkbox_Callback(hObject, eventdata, handles)
+% hObject    handle to show_mask_checkbox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of show_mask_checkbox
+display_image(handles);

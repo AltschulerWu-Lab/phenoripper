@@ -48,7 +48,9 @@ neighbor_profiles_temp=zeros(blocks_nx*blocks_ny*number_of_repeats,number_of_blo
 
 %if(exist('myhandles','var'));
 myhandles=getappdata(0,'myhandles');
-progress= get(myhandles.statusbarHandles.ProgressBar, 'Value');
+if(~isempty(myhandles))
+        progress= get(myhandles.statusbarHandles.ProgressBar, 'Value');
+end
 tStart1=tic; 
 %end
 for image_counter=1:number_of_repeats
@@ -130,6 +132,7 @@ for image_counter=1:number_of_repeats
     block_counter=block_counter+length(foreground_blocks);
   
    
+if(~isempty(myhandles))
  %   if(exist('myhandles','var'))  
     progress=progress+1;
     tElapsed1=toc(tStart1); 
@@ -145,6 +148,7 @@ for image_counter=1:number_of_repeats
     %setappdata(0,'myhandles',myhandles);
     %disp('done!');
  %   end
+end   
 end
 
 
