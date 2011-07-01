@@ -1,4 +1,5 @@
 function varargout = gui(varargin)
+%Some junk
 % GUI M-file for gui.fig
 %      GUI, by itself, creates a new GUI or raises the existing
 %      singleton*.
