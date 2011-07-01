@@ -22,7 +22,7 @@ function varargout = Explorer(varargin)
 
 % Edit the above text to modify the response to help Explorer
 
-% Last Modified by GUIDE v2.5 23-May-2011 18:44:30
+% Last Modified by GUIDE v2.5 29-Jun-2011 16:03:25
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -62,6 +62,20 @@ myhandles.chosen_points=[0 0];
 setappdata(0,'myhandles',myhandles);
 myhandles.MDSPlot_handle=handles.MDSPlot;
 
+for i=1:length(myhandles.grouping_fields)
+    uimenu(handles.Color_Points_By_Menu,'Label',myhandles.grouping_fields{i}, ...
+        'Callback', {@color_by_callback,handles,i});
+    uimenu(handles.Label_Points_By_Menu,'Label',myhandles.grouping_fields{i}, ...
+        'Callback', {@label_by_callback,handles,i});
+end
+myhandles.label_field_number=1;
+myhandles.color_field_number=1;
+myhandles.show_mds_text=true;
+
+setappdata(0,'myhandles',myhandles);
+
+UpdatePlotColors();
+myhandles=getappdata(0,'myhandles');
 if(size(myhandles.mds_data,2)==2)
 %     scatter(handles.MDSPlot,myhandles.mds_data(:,1),myhandles.mds_data(:,2),5,'filled');
 %     for i=1:size(myhandles.mds_data,1)
@@ -72,7 +86,7 @@ if(size(myhandles.mds_data,2)==2)
 %     end
 %     
     Plot_MDS(myhandles.mds_data,2,myhandles.mds_text,myhandles.mds_colors,...
-        myhandles.chosen_points,myhandles.MDSPlot_handle);
+        myhandles.chosen_points,myhandles.MDSPlot_handle,myhandles.show_mds_text);
 else
 
 %     scatter3(myhandles.mds_data(:,1),myhandles.mds_data(:,2),myhandles.mds_data(:,3),50,myhandles.mds_colors,'parent',myhandles.MDSPlot_handle);
@@ -84,7 +98,7 @@ else
 %     end
     
      Plot_MDS(myhandles.mds_data,3,myhandles.mds_text,myhandles.mds_colors,...
-        myhandles.chosen_points,myhandles.MDSPlot_handle);
+        myhandles.chosen_points,myhandles.MDSPlot_handle,myhandles.show_mds_text);
    set(gca,...
 'XTickLabel','');
 set(gca,...
@@ -193,7 +207,7 @@ if(size(myhandles.mds_data,2)==2)
 %         
 %     end
  Plot_MDS(myhandles.mds_data,2,myhandles.mds_text,myhandles.mds_colors,...
-        myhandles.chosen_points,myhandles.MDSPlot_handle);
+        myhandles.chosen_points,myhandles.MDSPlot_handle,myhandles.show_mds_text);
 else
     
     if(~myhandles.mds_rotatable)
@@ -248,7 +262,7 @@ else
 %                 'FontSize',sizes(i));%not always cn
 %         end
         Plot_MDS(myhandles.mds_data,3,myhandles.mds_text,myhandles.mds_colors,...
-            myhandles.chosen_points,myhandles.MDSPlot_handle);
+            myhandles.chosen_points,myhandles.MDSPlot_handle,myhandles.show_mds_text);
         set(gca,'XTickLabel','','YTickLabel','','ZTickLabel','');
          set(gca, 'CameraPosition',camPos);
         set(gca, 'CameraTarget',camTgt);
@@ -384,8 +398,8 @@ if(all(myhandles.chosen_points~=0))
    %axis(myhandles.bar_axes);
    cla(myhandles.bar_axes);
    %profiles=zeros(2,myhandles.number_of_superblocks);
-   profile1=myhandles.superblock_profiles(myhandles.chosen_points(1),:);
-   profile2=myhandles.superblock_profiles(myhandles.chosen_points(2),:);
+   profile1=myhandles.superblock_profiles(myhandles.chosen_points(2),:);
+   profile2=myhandles.superblock_profiles(myhandles.chosen_points(1),:);
    important_blocks=(profile1>fraction_cutoff|profile2>fraction_cutoff);
    [~,p_indices]=sort(-abs(profile1-profile2));
    number_of_reps=min(nnz(important_blocks),5);
@@ -395,8 +409,8 @@ if(all(myhandles.chosen_points~=0))
    bar_matrix(1,:)=profile1(p_indices(1:number_of_reps));
    bar_matrix(2,:)=profile2(p_indices(1:number_of_reps));
    bar_colormap=zeros(2,3);
-   bar_colormap(1,:)=myhandles.mds_colors(myhandles.chosen_points(1),:);
-   bar_colormap(2,:)=myhandles.mds_colors(myhandles.chosen_points(2),:);
+   bar_colormap(1,:)=myhandles.mds_colors(myhandles.chosen_points(2),:);
+   bar_colormap(2,:)=myhandles.mds_colors(myhandles.chosen_points(1),:);
    valdiff=bar_matrix(2,:)-bar_matrix(1,:);
    [~,bar_order]=sort(valdiff);
    bar(bar_matrix(:,bar_order)','parent',myhandles.bar_axes);
@@ -404,11 +418,11 @@ if(all(myhandles.chosen_points~=0))
    ylabel('Superblock Fractions','Color','w','parent',myhandles.bar_axes);
  
     if(all(bar_colormap(1,:)==bar_colormap(2,:)))
-         legend(myhandles.bar_axes,[cell2mat(myhandles.mds_text{myhandles.chosen_points(1)}) ' (Left)'] ,...
-    [cell2mat(myhandles.mds_text{myhandles.chosen_points(2)}) ' (Right)'],'Location','NorthWest');
+         legend(myhandles.bar_axes,[cell2mat(myhandles.mds_text{myhandles.chosen_points(2)}) ' (Left)'] ,...
+    [cell2mat(myhandles.mds_text{myhandles.chosen_points(1)}) ' (Right)'],'Location','NorthWest');
     else    
-        legend(myhandles.bar_axes,cell2mat(myhandles.mds_text{myhandles.chosen_points(1)}),...
-    cell2mat(myhandles.mds_text{myhandles.chosen_points(2)}),'Location','NorthWest');
+        legend(myhandles.bar_axes,cell2mat(myhandles.mds_text{myhandles.chosen_points(2)}),...
+    cell2mat(myhandles.mds_text{myhandles.chosen_points(1)}),'Location','NorthWest');
     end
    %bar(profiles','parent',myhandles.bar_axes);
    set(myhandles.bar_axes,'Color','k','XColor','w','YColor','w');
@@ -438,8 +452,12 @@ if(all(myhandles.chosen_points~=0))
        img=double(myhandles.global_data.superblock_representatives{p_indices(bar_order(rep_num)),1}(:,:,1:3));
        %max_col=max(img(:));
        %image(img/max_col);axis equal;axis off;
-       
+       block_size=myhandles.global_data.block_size;
        Display_Image(img,myhandles.temp_handles(rep_num),myhandles.marker_scales,myhandles.display_colors,[]);
+       line([2*block_size,5*block_size],[2*block_size,2*block_size],'Color','y');
+       line([2*block_size,2*block_size],[5*block_size,2*block_size],'Color','y');
+       line([2*block_size,5*block_size],[5*block_size,5*block_size],'Color','y');
+       line([5*block_size,5*block_size],[5*block_size,2*block_size],'Color','y');
        %set(myhandles.temp_handles(rep_num),'Box','on','Color','w');
        %image(representatives{perm2(rep_num)}./max(max(max(representatives{perm2(rep_num)}))));axis equal;axis off;
        axis off;axis equal;
@@ -450,7 +468,7 @@ if(all(myhandles.chosen_points~=0))
    %set(h,'Position',[outerpos(1) outerpos(2)+0.1 outerpos(3) outerpos(4)-0.1]);
 end
 
-function Plot_MDS(positions,dim,labels,colors,selected_points,axis_handle)
+function Plot_MDS(positions,dim,labels,colors,selected_points,axis_handle,show_text)
 bool_points=false(length(labels),1);
 bool_points(selected_points(selected_points>0))=true;
 
@@ -466,27 +484,40 @@ point_sizes(bool_points)=selected_point_size;
 
 if(dim==2)
     scatter(axis_handle,positions(:,1),positions(:,2),point_sizes,colors,'filled');
-    for i=1:size(positions,1)
-       % text(positions(i,1),positions(i,2),labels{i},...
-       %     'BackgroundColor',colors(i,:),'FontSize',font_sizes(i),...
-       %     'parent',axis_handle);
-        text(positions(i,1),positions(i,2),labels{i},...
-            'FontSize',font_sizes(i),...
-            'parent',axis_handle);
-        
+    if(show_text)
+        for i=1:size(positions,1)
+            % text(positions(i,1),positions(i,2),labels{i},...
+            %     'BackgroundColor',colors(i,:),'FontSize',font_sizes(i),...
+            %     'parent',axis_handle);
+            
+            text(positions(i,1),positions(i,2),labels{i},...
+                'FontSize',font_sizes(i),...
+                'parent',axis_handle);
+        end
     end
 else
     
+        rotate3d off;
+        camPos = get(gca, 'CameraPosition'); % camera position
+        camTgt = get(gca, 'CameraTarget'); % where the camera is pointing to
+        camUpVect = get(gca, 'CameraUpVector'); % camera 'up' vector
+        
+           
     scatter3(positions(:,1),positions(:,2),positions(:,3),point_sizes,colors,'filled','parent',axis_handle);
-    
-    for i=1:size(positions,1)
-%        text(positions(i,1),positions(i,2),positions(i,3),labels{i},...
-%            'BackgroundColor',colors(i,:),'parent',axis_handle,...
-%            'FontSize',font_sizes(i));
-        text(positions(i,1),positions(i,2),positions(i,3),['  ', cell2mat(labels{i})],...
-            'parent',axis_handle,...
-            'FontSize',font_sizes(i));
+    if(show_text)
+        for i=1:size(positions,1)
+            %        text(positions(i,1),positions(i,2),positions(i,3),labels{i},...
+            %            'BackgroundColor',colors(i,:),'parent',axis_handle,...
+            %            'FontSize',font_sizes(i));
+            text(positions(i,1),positions(i,2),positions(i,3),['  ', cell2mat(labels{i})],...
+                'parent',axis_handle,...
+                'FontSize',font_sizes(i));
+        end
     end
+    set(gca,'XTickLabel','','YTickLabel','','ZTickLabel','');
+         set(gca, 'CameraPosition',camPos);
+        set(gca, 'CameraTarget',camTgt);
+        set(gca, 'CameraUpVector',camUpVect);
 end
 
 
@@ -525,3 +556,149 @@ uicontrol( ...
     'Units','normalized',...
     'Position',[lmarg startY 0.04 0.04], ...
     'BackgroundColor', color);
+
+
+% --------------------------------------------------------------------
+function MDS_Plot_Menu_Callback(hObject, eventdata, handles)
+% hObject    handle to MDS_Plot_Menu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function Data_Display_Menu_Callback(hObject, eventdata, handles)
+% hObject    handle to Data_Display_Menu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function Show_MDS_Label_Callback(hObject, eventdata, handles)
+% hObject    handle to Show_MDS_Label (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+myhandles=getappdata(0,'myhandles');
+myhandles.show_mds_text=~myhandles.show_mds_text;
+setappdata(0,'myhandles',myhandles);
+if strcmp(get(gcbo, 'Checked'),'on')
+    set(gcbo, 'Checked', 'off');
+else 
+    set(gcbo, 'Checked', 'on');
+end
+Plot_MDS(myhandles.mds_data,3,myhandles.mds_text,myhandles.mds_colors,...
+            myhandles.chosen_points,myhandles.MDSPlot_handle,myhandles.show_mds_text);
+
+
+% --------------------------------------------------------------------
+function Color_Points_By_Menu_Callback(hObject, eventdata, handles)
+% hObject    handle to Color_Points_By_Menu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function Label_Points_By_Menu_Callback(hObject, eventdata, handles)
+% hObject    handle to Label_Points_By_Menu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function Untitled_2_Callback(hObject, eventdata, handles)
+% hObject    handle to Untitled_2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+function color_by_callback(hObject, eventdata, handles,group_num)
+myhandles=getappdata(0,'myhandles');
+bar_update_needed=false;
+myhandles.color_field_number=group_num;
+setappdata(0,'myhandles',myhandles);
+UpdatePlotColors();
+myhandles=getappdata(0,'myhandles');
+Plot_MDS(myhandles.mds_data,3,myhandles.mds_text,myhandles.mds_colors,...
+            myhandles.chosen_points,myhandles.MDSPlot_handle,myhandles.show_mds_text);
+for point_number=1:2
+    if(myhandles.chosen_points(point_number)~=0)
+        
+        switch(point_number)
+            case 1
+                frame_handle=handles.uipanel7; 
+            case 2
+                frame_handle=handles.uipanel3; 
+        end
+        class_color=myhandles.mds_colors(myhandles.chosen_points(point_number),:);
+        class_text=myhandles.mds_text{myhandles.chosen_points(point_number)};
+         set(frame_handle,'Title',class_text,'HighlightColor',class_color,...
+    'ShadowColor',class_color);
+        bar_update_needed=true;
+    end
+end
+if(bar_update_needed)
+    Update_Bar_Plot();
+end
+
+
+
+
+
+function label_by_callback(hObject, eventdata, handles,group_num)
+myhandles=getappdata(0,'myhandles');
+myhandles.label_field_number=group_num;
+setappdata(0,'myhandles',myhandles);
+UpdatePlotColors();
+myhandles=getappdata(0,'myhandles');
+Plot_MDS(myhandles.mds_data,3,myhandles.mds_text,myhandles.mds_colors,...
+    myhandles.chosen_points,myhandles.MDSPlot_handle,myhandles.show_mds_text);
+for point_number=1:2
+    if(myhandles.chosen_points(point_number)~=0)
+        
+        switch(point_number)
+            case 1
+                frame_handle=handles.uipanel7;
+            case 2
+                frame_handle=handles.uipanel3;
+        end
+        
+        class_text=myhandles.mds_text{myhandles.chosen_points(point_number)};
+        set(frame_handle,'Title',class_text);
+    end
+end
+
+
+        
+        
+
+
+function UpdatePlotColors()
+myhandles=getappdata(0,'myhandles');
+
+label_field=myhandles.grouping_fields{myhandles.label_field_number};
+color_field=myhandles.grouping_fields{myhandles.color_field_number};
+
+
+group_vals=cell(1,myhandles.number_of_conditions);
+for condition=1:myhandles.number_of_conditions
+   
+   if(iscell(myhandles.grouped_metadata{condition}.(color_field)))
+        group_vals{condition}=cell2mat(myhandles.grouped_metadata{condition}.(color_field)); 
+   else
+       group_vals{condition}='Not Defined';
+   end
+    
+end
+
+myhandles.mds_text=cell(size(myhandles.superblock_profiles,1),1);
+myhandles.mds_colors=zeros(size(myhandles.superblock_profiles,1),3);  
+
+[colorsGroup,myhandles.group_labels]=grp2idx(group_vals);
+%colors=colormap(jet(max(colorsGroup)));
+colors=ColorBrewer(max(colorsGroup));
+myhandles.category_colors=colors;
+
+for i=1:myhandles.number_of_conditions
+
+    myhandles.mds_text{i}=myhandles.grouped_metadata{i}.(label_field);
+    myhandles.mds_colors(i,:)=colors(colorsGroup(i),:);
+end
+setappdata(0,'myhandles',myhandles);

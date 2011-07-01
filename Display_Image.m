@@ -1,5 +1,5 @@
 function Display_Image(img,axis_handle,color_scaling,colors,mask)
-
+img=double(img);
 [xres,yres,nch]=size(img);
 final_image=zeros(xres,yres,3);
 

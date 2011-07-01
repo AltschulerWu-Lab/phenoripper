@@ -834,14 +834,14 @@ function ExplorerButton_Callback(hObject, eventdata, handles)
 % hObject    handle to ExplorerButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-myhandles=getappdata(0,'myhandles');
+%myhandles=getappdata(0,'myhandles');
 %Explainer;
-MakePlots(hObject,eventdata,handles);
-myhandles=getappdata(0,'myhandles');
-CoolClustergram(myhandles.superblock_profiles,...
-    myhandles.global_data.superblock_representatives,...
-    myhandles.mds_text,myhandles.mds_colors...
-    ,myhandles.marker_scales,myhandles.display_colors);
+%MakePlots(hObject,eventdata,handles);
+%myhandles=getappdata(0,'myhandles');
+% CoolClustergram(myhandles.superblock_profiles,...
+%     myhandles.global_data.superblock_representatives,...
+%     myhandles.mds_text,myhandles.mds_colors...
+%     ,myhandles.marker_scales,myhandles.display_colors);
 %clustergram(myhandles.superblock_profiles,'RowLabels',...
 %    cellfun(@(x) cell2mat(x),myhandles.mds_text,'UniformOutput',false))
 Explorer;
@@ -894,82 +894,7 @@ setappdata(0,'myhandles',myhandles);
 %guidata(hObject, handles);
 %setappdata(0,'myhandles',myhandles);
 
-function MakePlots(hObject,eventdata,handles)
-myhandles=getappdata(0,'myhandles');
 
-label_field=myhandles.grouping_fields{get(handles.PointLabel_popupmenu,'Value')};
-color_field=myhandles.grouping_fields{get(handles.PointColor_popupmenu,'Value')};
-
-
-% if (get(handles.OutputMDS,'Value') == get(handles.displayByColumn,'Max'))
-%     outputType=1;
-% elseif (get(handles.OutputHeatMap,'Value') == get(handles.displayByRow,'Max'))
-%     outputType=2;
-% else
-%     outputType=3;
-% end
-
-group_vals=cell(1,myhandles.number_of_conditions);
-for condition=1:myhandles.number_of_conditions
-   group_vals{condition}=cell2mat(myhandles.grouped_metadata{condition}.(color_field)); 
-end
-
-myhandles.mds_text=cell(size(myhandles.superblock_profiles,1),1);
-myhandles.mds_colors=zeros(size(myhandles.superblock_profiles,1),3);  
-
-[colorsGroup,myhandles.group_labels]=grp2idx(group_vals);
-%colors=colormap(jet(max(colorsGroup)));
-colors=ColorBrewer(max(colorsGroup));
-myhandles.category_colors=colors;
-dists=pdist(myhandles.superblock_profiles);
-profile_mds=mdscale(dists,3);
-%figure;
-%scatter3(profile_mds(:,1),profile_mds(:,2),profile_mds(:,3),10);
-for i=1:myhandles.number_of_conditions
- %   text(profile_mds(i,1),profile_mds(i,2),profile_mds(i,3),...
-  %      myhandles.grouped_metadata{i}.(label_field),...
-  %      'BackgroundColor',colors(colorsGroup(i),:));%not always cn
-    myhandles.mds_text{i}=myhandles.grouped_metadata{i}.(label_field);
-    myhandles.mds_colors(i,:)=colors(colorsGroup(i),:);
-end
-setappdata(0,'myhandles',myhandles);
-% 
-% 
-% well_names={Ripped_Data(:).well};
-% switch(outputType)
-%     case 1
-%         
-%         
-%         dists=pdist(myhandles.superblock_profiles);
-%         profile_mds=mdscale(dists,3);
-%         colors=colormap(jet(max(colorsGroup)));
-%         figure;
-%         scatter3(profile_mds(:,1),profile_mds(:,2),profile_mds(:,3),10);
-%         for i=1:length(Ripped_Data)
-%             text(profile_mds(i,1),profile_mds(i,2),profile_mds(i,3),Ripped_Data(i).well,...
-%                 'BackgroundColor',colors(colorsGroup(i),:));%not always cn
-%             myhandles.mds_text{i}=Ripped_Data(i).well;
-%             myhandles.mds_colors(i,:)=colors(colorsGroup(i),:);
-%         end
-%     case 2
-%         clustergram(myhandles.superblock_profiles,'RowLabels',well_names);
-%         
-%     case 3
-%         
-%         
-%         
-%         dists=pdist(myhandles.superblock_profiles);
-%         profile_mds=mdscale(dists,3);
-%         colors=colormap(jet(max(colorsGroup)));
-%         figure;
-%         scatter3(profile_mds(:,1),profile_mds(:,2),profile_mds(:,3),10);
-%         for i=1:length(Ripped_Data)
-%             text(profile_mds(i,1),profile_mds(i,2),profile_mds(i,3),Ripped_Data(i).well,...
-%                 'BackgroundColor',colors(colorsGroup(i),:));%not always cn
-%            
-%         end
-%         %clustergram(myhandles.superblock_profiles,'RowLabels',well_names);
-% end
 
 
 
@@ -1065,7 +990,7 @@ if(~Show_Visualization_Window)
     color_scales=zeros(size(selected_files,1),number_of_channels);
     for file_num=1:size(selected_files,1)
         if(number_of_channels~=files_per_image)
-            img=selected_files{file_num,1};
+            img=imread(selected_files{file_num,1});
         else
             for channel=1:number_of_channels
                 img(:,:,channel)=imread(selected_files{file_num,channel});
@@ -1095,7 +1020,7 @@ if(~Show_Visualization_Window)
     myhandles.display_colors=myhandles.color_order(1:number_of_channels);
     set(myhandles.statusbarHandles.ProgressBar, 'Visible','off');
     myhandles.amplitude_range=max(cutoff_intensity,mean(amplitudes));
-    myhandles.bit_depth=bit_depth(max_val,[8,12,14,16,32]);
+    myhandles.bit_depth=bit_depth(double(max_val),[8,12,14,16,32]);
     
     %myhandles=getappdata(0,'myhandles');
     myhandles.test_files=selected_files;
