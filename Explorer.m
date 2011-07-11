@@ -22,7 +22,7 @@ function varargout = Explorer(varargin)
 
 % Edit the above text to modify the response to help Explorer
 
-% Last Modified by GUIDE v2.5 11-Jul-2011 00:28:49
+% Last Modified by GUIDE v2.5 11-Jul-2011 17:01:52
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -78,7 +78,8 @@ for i=1:length(myhandles.grouping_fields)
 end
 
 
-
+set(handles.DiscardFrame1_Pushbutton,'Callback',{@DiscardFrame_Callback,1});
+set(handles.DiscardFrame2_Pushbutton,'Callback',{@DiscardFrame_Callback,2});
 
 myhandles.label_field_number=1;
 myhandles.color_field_number=1;
@@ -302,9 +303,17 @@ else
    frame_handle=handles.uipanel7;  
 end
 
+fnames=fieldnames(myhandles.grouped_metadata{point_number});
+panel_text=myhandles.grouped_metadata{point_number}.(fnames{myhandles.chosen_grouping_field});
+if(iscell(panel_text))
+    panel_text=panel_text{1};
+end
+if(length(panel_text)>43)
+    panel_text=['...' panel_text(end-40:end)];
+end
 ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,1,...
     myhandles.axes_chosen,myhandles.mds_colors(point_number,:),...
-    myhandles.mds_text{point_number},frame_handle);
+    panel_text,frame_handle);
 
 setappdata(0,'myhandles',myhandles);
 Update_Bar_Plot;
@@ -473,13 +482,30 @@ if(all(myhandles.chosen_points~=0))
    colormap(bar_colormap);
    ylabel('Superblock Fractions','Color','w','parent',myhandles.bar_axes);
  
+   fnames=fieldnames(myhandles.grouped_metadata{1});
+   point_number=myhandles.chosen_points(2);
+   legend_text1=myhandles.grouped_metadata{point_number}.(fnames{myhandles.chosen_grouping_field});
+   if(iscell(legend_text1))
+       legend_text1=legend_text1{1};
+   end
+   if(length(legend_text1)>43)
+       legend_text1=['...' legend_text1(end-40:end)];
+   end
+   point_number=myhandles.chosen_points(1);
+   legend_text2=myhandles.grouped_metadata{point_number}.(fnames{myhandles.chosen_grouping_field});
+   if(iscell(legend_text2))
+       legend_text2=legend_text2{1};
+   end
+   if(length(legend_text2)>43)
+       legend_text2=['...' legend_text2(end-40:end)];
+   end
     if(all(bar_colormap(1,:)==bar_colormap(2,:)))
-         legend(myhandles.bar_axes,[cell2mat(myhandles.mds_text{myhandles.chosen_points(2)}) ' (Left)'] ,...
-    [cell2mat(myhandles.mds_text{myhandles.chosen_points(1)}) ' (Right)'],'Location','NorthWest');
+         legend(myhandles.bar_axes,[legend_text1 ' (Left)'] ,...
+    [legend_text2 ' (Right)'],'Location','NorthWest','Interpreter', 'none');
     else    
-        legend(myhandles.bar_axes,cell2mat(myhandles.mds_text{myhandles.chosen_points(2)}),...
-    cell2mat(myhandles.mds_text{myhandles.chosen_points(1)}),'Location','NorthWest');
+        legend(myhandles.bar_axes,{legend_text1,legend_text2},'Location','NorthWest','Interpreter', 'none');
     end
+    %set(0,'defaulttextinterpreter','none');
    %bar(profiles','parent',myhandles.bar_axes);
    set(myhandles.bar_axes,'Color','k','XColor','w','YColor','w');
    scale_factor=0.9;
@@ -716,9 +742,16 @@ for point_number=1:2
             case 2
                 frame_handle=handles.uipanel3;
         end
-        
-        class_text=myhandles.mds_text{myhandles.chosen_points(point_number)};
-        set(frame_handle,'Title',class_text);
+        fnames=fieldnames(myhandles.grouped_metadata{myhandles.chosen_points(point_number)});
+        panel_text=myhandles.grouped_metadata{myhandles.chosen_points(point_number)}.(fnames{myhandles.chosen_grouping_field});
+        if(iscell(panel_text))
+           panel_text=panel_text{1}; 
+        end
+        if(length(panel_text)>43)
+            panel_text=['...' panel_text(end-40:end)];
+        end
+       % class_text=myhandles.mds_text{myhandles.chosen_points(point_number)};
+        set(frame_handle,'Title',panel_text);
     end
 end
 
@@ -798,7 +831,8 @@ myhandles.chosen_grouping_field=group_num;
 [myhandles.grouped_metadata,myhandles.superblock_profiles,~,~,...
 myhandles.metadata_file_indices]=CalculateGroups(...
 myhandles.chosen_grouping_field,myhandles.metadata,...
-myhandles.individual_superblock_profiles,myhandles.individual_number_foreground_blocks);
+myhandles.individual_superblock_profiles,...
+myhandles.individual_number_foreground_blocks,myhandles.is_file_blacklisted);
 myhandles.number_of_conditions=length(myhandles.grouped_metadata);
 if(myhandles.number_of_conditions~=1)
 %     superblock_profiles=myhandles.superblock_profiles;
@@ -926,9 +960,17 @@ point_number=myhandles.chosen_points(2);
 % ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
 %     handles.axes2, myhandles.mds_colors(point_number,:),...
 %     myhandles.mds_text{point_number},handles.uipanel3,full_size_boundary);
+fnames=fieldnames(myhandles.grouped_metadata{point_number});
+panel_text=myhandles.grouped_metadata{point_number}.(fnames{myhandles.chosen_grouping_field});
+if(iscell(panel_text))
+    panel_text=panel_text{1};
+end
+if(length(panel_text)>43)
+    panel_text=['...' panel_text(end-40:end)];
+end
 ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
     myhandles.file_number1,handles.axes2, myhandles.mds_colors(point_number,:),...
-    myhandles.mds_text{point_number},handles.uipanel3,[]);
+    panel_text,handles.uipanel3,[]);
 
 [row,col]=find(mask);
 fg_mask=(myhandles.image1_in_sb_states>0);
@@ -955,9 +997,17 @@ for i=1:length(row)
 end
 
 point_number=myhandles.chosen_points(1);
+fnames=fieldnames(myhandles.grouped_metadata{point_number});
+panel_text=myhandles.grouped_metadata{point_number}.(fnames{myhandles.chosen_grouping_field});
+if(iscell(panel_text))
+    panel_text=panel_text{1};
+end
+if(length(panel_text)>43)
+    panel_text=['...' panel_text(end-40:end)];
+end
 ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
     myhandles.file_number2,handles.axes3, myhandles.mds_colors(point_number,:),...
-    myhandles.mds_text{point_number},handles.uipanel7,[]);
+    panel_text,handles.uipanel7,[]);
 mask=(myhandles.image2_in_sb_states==sb_number);
 [row,col]=find(mask);
 fg_mask=(myhandles.image2_in_sb_states>0);
@@ -1007,9 +1057,17 @@ myhandles=getappdata(0,'myhandles');
 myhandles.file_number1=max(1,myhandles.file_number1-1);
 point_number=myhandles.chosen_points(2);
 UpdateMetadata(handles.Point1Info,point_number,myhandles.file_number1); 
+fnames=fieldnames(myhandles.grouped_metadata{point_number});
+panel_text=myhandles.grouped_metadata{point_number}.(fnames{myhandles.chosen_grouping_field});
+if(iscell(panel_text))
+    panel_text=panel_text{1};
+end
+if(length(panel_text)>43)
+    panel_text=['...' panel_text(end-40:end)];
+end
 ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
     myhandles.file_number1,handles.axes2, myhandles.mds_colors(point_number,:),...
-    myhandles.mds_text{point_number},handles.uipanel3,[]);
+    panel_text,handles.uipanel3,[]);
 setappdata(0,'myhandles',myhandles);    
 
 % --- Executes on button press in PreviousImage2_pushbutton.
@@ -1021,9 +1079,17 @@ myhandles=getappdata(0,'myhandles');
 myhandles.file_number2=max(1,myhandles.file_number2-1);
 point_number=myhandles.chosen_points(1);
 UpdateMetadata(handles.Point2Info,point_number,myhandles.file_number2);
+fnames=fieldnames(myhandles.grouped_metadata{point_number});
+panel_text=myhandles.grouped_metadata{point_number}.(fnames{myhandles.chosen_grouping_field});
+if(iscell(panel_text))
+    panel_text=panel_text{1};
+end
+if(length(panel_text)>43)
+    panel_text=['...' panel_text(end-40:end)];
+end
 ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
     myhandles.file_number2,handles.axes3, myhandles.mds_colors(point_number,:),...
-    myhandles.mds_text{point_number},handles.uipanel7,[]);
+    panel_text,handles.uipanel7,[]);
 setappdata(0,'myhandles',myhandles); 
 
 
@@ -1037,9 +1103,17 @@ point_number=myhandles.chosen_points(1);
 number_of_images=size(myhandles.grouped_metadata{point_number}.files_in_group,1);
 myhandles.file_number2=min(number_of_images,myhandles.file_number2+1);
 UpdateMetadata(handles.Point2Info,point_number,myhandles.file_number2);
+fnames=fieldnames(myhandles.grouped_metadata{point_number});
+panel_text=myhandles.grouped_metadata{point_number}.(fnames{myhandles.chosen_grouping_field});
+if(iscell(panel_text))
+    panel_text=panel_text{1};
+end
+if(length(panel_text)>43)
+    panel_text=['...' panel_text(end-40:end)];
+end
 ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
     myhandles.file_number2,handles.axes3, myhandles.mds_colors(point_number,:),...
-    myhandles.mds_text{point_number},handles.uipanel7,[]);
+    panel_text,handles.uipanel7,[]);
 setappdata(0,'myhandles',myhandles);
   
 
@@ -1053,9 +1127,17 @@ point_number=myhandles.chosen_points(2);
 number_of_images=size(myhandles.grouped_metadata{point_number}.files_in_group,1);
 myhandles.file_number1=min(number_of_images,myhandles.file_number1+1);
 UpdateMetadata(handles.Point1Info,point_number,myhandles.file_number1);
+fnames=fieldnames(myhandles.grouped_metadata{point_number});
+panel_text=myhandles.grouped_metadata{point_number}.(fnames{myhandles.chosen_grouping_field});
+if(iscell(panel_text))
+    panel_text=panel_text{1};
+end
+if(length(panel_text)>43)
+    panel_text=['...' panel_text(end-40:end)];
+end
 ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
     myhandles.file_number1,handles.axes2, myhandles.mds_colors(point_number,:),...
-    myhandles.mds_text{point_number},handles.uipanel3,[]);
+    panel_text,handles.uipanel3,[]);
 setappdata(0,'myhandles',myhandles);  
 
 
@@ -1165,3 +1247,25 @@ setappdata(0,'myhandles',myhandles);
 if(all(myhandles.chosen_points~=0))
     Update_Bar_Plot();
 end
+
+
+function DiscardFrame_Callback(hObject, eventdata, panel_number)
+choice = questdlg('Are you sure you want to discard this frame? To see effect you need to run grouping again', ...
+    'Discard Frame?','Yes', 'No','No');
+switch choice
+    case 'Yes'
+        myhandles=getappdata(0,'myhandles');
+        if(panel_number==1)
+            point_number=myhandles.chosen_points(2);
+            file_number=myhandles.metadata_file_indices{point_number}(myhandles.file_number1);
+            myhandles.is_file_blacklisted(file_number)=true;
+        else
+            point_number=myhandles.chosen_points(1);
+            file_number=myhandles.metadata_file_indices{point_number}(myhandles.file_number2);
+            myhandles.is_file_blacklisted(file_number)=true;
+        end
+        setappdata(0,'myhandles',myhandles);
+end
+
+
+

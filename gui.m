@@ -444,11 +444,12 @@ myhandles.Ripped_Data=Ripped_Data;
 myhandles.individual_superblock_profiles=individual_superblock_profiles;
 myhandles.individual_block_profiles=individual_block_profiles;
 myhandles.individual_number_foreground_blocks=individual_number_foreground_blocks;
+myhandles.is_file_blacklisted=false(length(myhandles.metadata),1);
 SetButtonState(hObject,handles,true);
 [myhandles.grouped_metadata,myhandles.superblock_profiles,~,~,...
 myhandles.metadata_file_indices]=CalculateGroups(...
 myhandles.chosen_grouping_field,myhandles.metadata,...
-individual_superblock_profiles,individual_number_foreground_blocks);
+individual_superblock_profiles,individual_number_foreground_blocks,myhandles.is_file_blacklisted);
 
 setappdata(0,'myhandles',myhandles);
 %mean_sb=mean(superblock_profiles);

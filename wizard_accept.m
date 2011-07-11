@@ -143,7 +143,7 @@ myhandles.chosen_grouping_field=group_index;
 %myhandles.grouped_metadata=grouped_metadata;
 %
 [myhandles.grouped_metadata,~,order,groups,~]=...
-CalculateGroups(group_index,myhandles.metadata,[],[]);
+CalculateGroups(group_index,myhandles.metadata,[],[],[]);
 ordered_data=myhandles.metadata(order);
 [raw_table_data,colnames]=convert_struct_to_table(ordered_data);
 temp=color_table(raw_table_data,groups);
