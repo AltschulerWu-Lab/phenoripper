@@ -28,8 +28,7 @@ for channel=1:nch
 end
 
 final_image=min(max(final_image,0),1);
-axes(axis_handle);
-image(final_image);
+image(final_image,'Parent',axis_handle);
 %axis off;
 
 end

@@ -78,7 +78,7 @@ for image_counter=1:number_of_repeats
         foreground_points(:,channel_counter)=temp(intensity>cutoff_intensity);
     end
     for rgb_cluster=1:number_of_RGB_clusters
-        rgb_mat=ones(length(foreground_points),number_of_channels);
+        rgb_mat=ones(size(foreground_points,1),number_of_channels);
         for i=1:number_of_channels
             rgb_mat(:,i)=rgb_mat(:,i).*global_data.RGB_centroids(rgb_cluster,i);
         end
@@ -163,7 +163,7 @@ block_ids=block_ids_temp(1:block_counter);
 % for i=1:block_counter
 %    neighbor_profiles(i,block_ids(i))=1;
 % end
-
+data.number_of_foreground_blocks=block_counter;
 neighbor_profiles=neighbor_profiles_temp(1:block_counter,:);
 
 superblock_distmat=zeros(length(block_ids),number_of_superblocks);
@@ -171,8 +171,27 @@ superblock_distmat=zeros(length(block_ids),number_of_superblocks);
         temp=repmat(global_data.superblock_centroids(superblock_cluster,:),length(block_ids),1);
         superblock_distmat(:,superblock_cluster) =sum((neighbor_profiles-temp).^2,2);
     end
-[~,superblock_ids]=min(superblock_distmat,[],2);
+[distances,superblock_ids]=min(superblock_distmat,[],2);
 
+%% Added to remove superblocks that are far away from superblock centroids
+%For a given centroid, superblocks that were assigned to it, but are
+%further away than the closest other centroid will considered as background
+%superblocks
+superblock_centroid_distmat=squareform(pdist(global_data.superblock_centroids));
+superblock_centroid_distmat(eye(number_of_superblocks)>0)=Inf;
+dist_2_closest_centroid=min(superblock_centroid_distmat);
+for i=1:number_of_superblocks
+   ids_of_sbs=find(superblock_ids==i); 
+   bad_ids=ids_of_sbs(sqrt(distances(ids_of_sbs))>dist_2_closest_centroid(i));
+   superblock_ids(bad_ids)=0;
+end
+
+%%
+image_superblock_states=zeros(blocks_nx,blocks_ny);
+image_superblock_states(foreground_blocks)=superblock_ids;
+data.image_superblock_states=image_superblock_states;
+data.distance_to_superblock_centroid=zeros(blocks_nx,blocks_ny);
+data.distance_to_superblock_centroid(foreground_blocks)=distances;
 
 data.block_profile=zeros(number_of_block_clusters,1);
 for block_cluster=1:number_of_block_clusters

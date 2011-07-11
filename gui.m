@@ -1,5 +1,4 @@
 function varargout = gui(varargin)
-%Some junk
 % GUI M-file for gui.fig
 %      GUI, by itself, creates a new GUI or raises the existing
 %      singleton*.
@@ -410,22 +409,11 @@ global_data.superblock_centroids=third_order.superblock_centroids;
 %global_data.mean_superblock_profile=third_order.mean_superblock_profile;
 global_data.superblock_representatives=third_order.superblock_representatives;
 myhandles.global_data=global_data;
-%catch exception
-%   disp(exception); 
-%end
-
-% 
-% if(strcmp(imageDirectory(length(imageDirectory):end),filesep))
-%     imageDirectory=imageDirectory(1:length(imageDirectory)-1);
-% end
-%     
-% dir_list=dir(imageDirectory);
-% subdirs={dir_list([(dir_list(:).isdir)]).name};
-% subdirs=subdirs(3:end);
 Ripped_Data=struct;
-block_profiles=zeros(myhandles.number_of_conditions,number_of_block_clusters);
-superblock_profiles=zeros(myhandles.number_of_conditions,number_of_superblocks);
-well_names=cell(myhandles.number_of_conditions,1);
+individual_block_profiles=zeros(myhandles.number_of_files,number_of_block_clusters);
+individual_superblock_profiles=zeros(myhandles.number_of_files,number_of_superblocks);
+individual_number_foreground_blocks=zeros(myhandles.number_of_files,1);
+
 set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','off');
 set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximum',myhandles.number_of_files, 'Value',0);
 myhandles.statusbarHandles=statusbar(hObject,'Calculating Block Profiles per Image...');
@@ -433,25 +421,18 @@ myhandles.statusbarHandles=statusbar(hObject,'Calculating Block Profiles per Ima
 tStart=tic; 
  myhandles.files_analyzed=0;
  
-for condition=1:myhandles.number_of_conditions
+for file_num=1:length(myhandles.metadata)
     myhandles.tElapsed=toc(tStart); 
     setappdata(0,'myhandles',myhandles);
-    filenames=myhandles.grouped_metadata{condition}.files_in_group;
+    filenames=myhandles.metadata{file_num}.FileNames;
        
     results=SecondOrder(filenames,global_data);
-    Ripped_Data(condition).block_profile=results.block_profile;
-    block_profiles(condition,:)=results.block_profile;
-    superblock_profiles(condition,:)=results.superblock_profile;
-    Ripped_Data(condition).superblock_profile=results.superblock_profile;
-%     dir_name=subdirs{condition};
-%     Ripped_Data(condition).row_name=dir_name(1);
-%     Ripped_Data(condition).column_number=dir_name(2:end);
-%     Ripped_Data(condition).well=dir_name;
-%     well_names{condition}=dir_name;
+    Ripped_Data(file_num).block_profile=results.block_profile;
+    individual_block_profiles(file_num,:)=results.block_profile;
+    individual_superblock_profiles(file_num,:)=results.superblock_profile;
+    individual_number_foreground_blocks(file_num)=results.number_of_foreground_blocks;
     
-%    waitbar(subdir_num/length(subdirs),h,sprintf('%3f minutes
-%    left',(length(subdirs)-subdir_num)*tElapsed/(60*subdir_num)));
-   %set(myhandles.statusbarHandles.ProgressBar, 'Value',subdir_num);
+    Ripped_Data(condition).superblock_profile=results.superblock_profile;
     myhandles.files_analyzed=myhandles.files_analyzed+size(filenames,1);
     setappdata(0,'myhandles',myhandles);
     drawnow;
@@ -460,74 +441,19 @@ end
  
 set(myhandles.statusbarHandles.ProgressBar, 'Visible','off','StringPainted','off');
 myhandles.Ripped_Data=Ripped_Data;
-myhandles.superblock_profiles=superblock_profiles;
-myhandles.block_profiles=block_profiles;
-setappdata(0,'myhandles',myhandles);
-% 
-% row_names=cell(0);
-% col_names=cell(0);
-% for subdir_num=1:length(subdirs)
-%    row_names{subdir_num}= Ripped_Data(subdir_num).row_name;
-%    col_names{subdir_num}= Ripped_Data(subdir_num).column_number;
-% end
-% 
-% 
-%         
-% [r,rn]=grp2idx(row_names);
-% [c,cn]=grp2idx(col_names);
-% 
-% switch(outputDisplay)
-%     case 1
-%         colorsGroup=c;
-%     case 2
-%         colorsGroup=r;
-%     case 3
-%         colorsGroup=(1:length(subdirs));
-% end
-% 
-% myhandles.mds_text=cell(size(block_profiles,1),1);
-% myhandles.mds_colors=zeros(size(block_profiles,1),3);
-% switch(outputType)
-%     case 1
-%         
-%         
-%         dists=pdist(superblock_profiles);
-%         profile_mds=mdscale(dists,3);
-%         colors=colormap(jet(max(colorsGroup)));
-%         figure;
-%         scatter3(profile_mds(:,1),profile_mds(:,2),profile_mds(:,3),10);
-%         for i=1:size(block_profiles,1)
-%             text(profile_mds(i,1),profile_mds(i,2),profile_mds(i,3),Ripped_Data(i).well,...
-%                 'BackgroundColor',colors(colorsGroup(i),:));%not always cn
-%             myhandles.mds_text{i}=Ripped_Data(i).well;
-%             myhandles.mds_colors(i,:)=colors(colorsGroup(i),:);
-%         end
-%     case 2
-%         clustergram(superblock_profiles,'RowLabels',well_names);
-%         
-%     case 3
-%         
-%         clustergram(superblock_profiles,'RowLabels',well_names);
-%         
-%         dists=pdist(superblock_profiles);
-%         profile_mds=mdscale(dists,3);
-%         colors=colormap(jet(max(colorsGroup)));
-%         figure;
-%         scatter3(profile_mds(:,1),profile_mds(:,2),profile_mds(:,3),10);
-%         for i=1:size(block_profiles,1)
-%             text(profile_mds(i,1),profile_mds(i,2),profile_mds(i,3),Ripped_Data(i).well,...
-%                 'BackgroundColor',colors(colorsGroup(i),:));%not always cn
-%             myhandles.mds_text{i}=Ripped_Data(i).well;
-%             myhandles.mds_colors(i,:)=colors(colorsGroup(i),:);
-%         end
-% end
-% 
-mean_sb=mean(superblock_profiles);
-% for i=1:size(superblock_profiles,1)
-%     superblock_profiles(i,:)=log((superblock_profiles(i,:)+1E-7)./mean_sb);
-% end
+myhandles.individual_superblock_profiles=individual_superblock_profiles;
+myhandles.individual_block_profiles=individual_block_profiles;
+myhandles.individual_number_foreground_blocks=individual_number_foreground_blocks;
+SetButtonState(hObject,handles,true);
+[myhandles.grouped_metadata,myhandles.superblock_profiles,~,~,...
+myhandles.metadata_file_indices]=CalculateGroups(...
+myhandles.chosen_grouping_field,myhandles.metadata,...
+individual_superblock_profiles,individual_number_foreground_blocks);
 
-dists=pdist(superblock_profiles);
+setappdata(0,'myhandles',myhandles);
+%mean_sb=mean(superblock_profiles);
+
+%dists=pdist(superblock_profiles);
 
 
 %myhandles.mds_data=mdscale(dists,3);

@@ -75,7 +75,7 @@ for image_counter=1:number_of_repeats
         foreground_points(:,channel_counter)=temp(intensity>cutoff_intensity);
     end
     for rgb_cluster=1:number_of_RGB_clusters
-        rgb_mat=ones(length(foreground_points),number_of_channels);
+        rgb_mat=ones(size(foreground_points,1),number_of_channels);
         for i=1:number_of_channels
             rgb_mat(:,i)=rgb_mat(:,i).*global_data.RGB_centroids(rgb_cluster,i);
         end

@@ -92,55 +92,58 @@ function popupmenu1_Callback(hObject, eventdata, handles)
 myhandles=getappdata(0,'myhandles');
 number_of_files=length(myhandles.metadata);
 try
-    field_index=get(hObject,'Value');
+    group_index=get(hObject,'Value');
 catch
     
-    field_index=1;
+    group_index=1;
 end
-    
+   
+myhandles.chosen_grouping_field=group_index;
 
-fnames=fieldnames(myhandles.metadata{1});
-file_class=cell(1,number_of_files);
-for i=1:number_of_files
-    file_class{i}=myhandles.metadata{i}.(cell2mat(fnames(field_index+1)));
-end
-root_indices=find(ismember(file_class,''));
-for i=1:length(root_indices)
-    file_class{i}='root_directory'; %This is an ugly hack, fix it
-end
-[G,GN]=grp2idx(file_class);
-number_of_groups=max(G);
-grouped_metadata=cell(1,number_of_groups);
-counter=1;
-order=zeros(number_of_files,1);
-groups=zeros(number_of_files,1);
-for group_number=1:number_of_groups
-   group_indices=find(G==group_number);
-
-   filenames=cell(length(group_indices),myhandles.files_per_image);
-   for i=1:length(group_indices)
-       filenames(i,:)=myhandles.metadata{group_indices(i)}.FileNames;
-       order(counter)=group_indices(i);
-       groups(counter)=group_number;
-       counter=counter+1;
-   end
-   grouped_metadata{group_number}.files_in_group=filenames;
-    
-   for field_num=3:length(fnames)
-       field_vals=cell(1,length(group_indices));
-       for i=1:length(group_indices)
-           field_vals{i}=myhandles.metadata{group_indices(i)}.(cell2mat(fnames(field_num)));
-       end
-       [G1,GN1]=grp2idx(field_vals);
-       if(max(G1)<=1)
-           grouped_metadata{group_number}.(cell2mat(fnames(field_num)))=GN1(1);
-       else
-           grouped_metadata{group_number}.(cell2mat(fnames(field_num)))=NaN;
-       end
-   end
-end
-myhandles.grouped_metadata=grouped_metadata;
-
+%fnames=fieldnames(myhandles.metadata{1});
+%file_class=cell(1,number_of_files);
+%for i=1:number_of_files
+%    file_class{i}=myhandles.metadata{i}.(cell2mat(fnames(group_index+1)));
+%end
+%root_indices=find(ismember(file_class,''));
+%for i=1:length(root_indices)
+%    file_class{i}='root_directory'; %This is an ugly hack, fix it
+%end
+%[G,GN]=grp2idx(file_class);
+%number_of_groups=max(G);
+%grouped_metadata=cell(1,number_of_groups);
+%counter=1;
+%order=zeros(number_of_files,1);
+%groups=zeros(number_of_files,1);
+%for group_number=1:number_of_groups
+%   group_indices=find(G==group_number);
+%
+%   filenames=cell(length(group_indices),myhandles.files_per_image);
+%   for i=1:length(group_indices)
+%       filenames(i,:)=myhandles.metadata{group_indices(i)}.FileNames;
+%       order(counter)=group_indices(i);
+%       groups(counter)=group_number;
+%       counter=counter+1;
+%   end
+%   grouped_metadata{group_number}.files_in_group=filenames;
+%    
+%   for field_num=3:length(fnames)
+%       field_vals=cell(1,length(group_indices));
+%       for i=1:length(group_indices)
+%           field_vals{i}=myhandles.metadata{group_indices(i)}.(cell2mat(fnames(field_num)));
+%       end
+%       [G1,GN1]=grp2idx(field_vals);
+%       if(max(G1)<=1)
+%           grouped_metadata{group_number}.(cell2mat(fnames(field_num)))=GN1(1);
+%       else
+%           grouped_metadata{group_number}.(cell2mat(fnames(field_num)))=NaN;
+%       end
+%   end
+%end
+%myhandles.grouped_metadata=grouped_metadata;
+%
+[myhandles.grouped_metadata,~,order,groups,~]=...
+CalculateGroups(group_index,myhandles.metadata,[],[]);
 ordered_data=myhandles.metadata(order);
 [raw_table_data,colnames]=convert_struct_to_table(ordered_data);
 temp=color_table(raw_table_data,groups);
