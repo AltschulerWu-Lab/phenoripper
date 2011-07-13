@@ -650,7 +650,7 @@ for test_num=1:number_of_test_files
 end
 myhandles.statusbarHandles=statusbar(hObject,'');
 set(myhandles.statusbarHandles.ProgressBar, 'Visible','off');
-set(handles.ThreshodIntensity,'String',num2str(round(min(thresholds))));
+set(handles.ThreshodIntensity,'String',num2str(round(quantile(thresholds,0.25))));
 SetButtonState(hObject,handles,true);
 guidata(hObject, handles);
 setappdata(0,'myhandles',myhandles);

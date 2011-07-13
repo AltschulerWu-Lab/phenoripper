@@ -54,6 +54,8 @@ function Explorer_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Choose default command line output for Explorer
 myhandles=getappdata(0,'myhandles');
+myhandles.MDS_gca=gca;
+myhandles.MDS_gcf=gcf;
 % superblock_profiles=myhandles.superblock_profiles;
 % superblock_profiles(isnan(superblock_profiles))=0;
 % dists=pdist(superblock_profiles);
@@ -141,12 +143,11 @@ set(gca,...
     
 end
 
-set(gca,'GridLineStyle','-')
+set(myhandles.MDS_gca,'GridLineStyle','-')
 grid on;
-%set(gca,'ButtonDownFcn', @MDSPlot_ButtonDownFcn);
-set(gcf,'WindowButtonDownFcn',{@MDSPlot_ButtonDownFcn,handles});
-myhandles.MDS_gca=gca;
-myhandles.MDS_gcf=gcf;
+%set(gca,'ButtonDownFcn', {@MDSPlot_ButtonDownFcn,handles});
+set(myhandles.MDS_gcf,'WindowButtonDownFcn',{@MDSPlot_ButtonDownFcn,handles});
+
 myhandles.axes2_handle=handles.axes2;
 myhandles.axes3_handle=handles.axes3;
 myhandles.axes_chosen=handles.axes2;
@@ -170,6 +171,7 @@ handles.output = hObject;
 setappdata(0,'myhandles',myhandles);
 % Update handles structure
 guidata(hObject, handles);
+set(gcf,'WindowButtonDownFcn',{@MDSPlot_ButtonDownFcn,handles});
 
 % UIWAIT makes Explorer wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
@@ -317,6 +319,7 @@ ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,1,...
 
 setappdata(0,'myhandles',myhandles);
 Update_Bar_Plot;
+
 end
 
 
@@ -618,7 +621,7 @@ set(mylegend, 'Name', 'MDS Plot Legend', 'NumberTitle', 'off',...
 for i=1:length(myhandles.group_labels)
     addElementToLegend(myhandles.category_colors(i,:), myhandles.group_labels{i}, i, mylegend);
 end
-
+set(gcf,'WindowButtonDownFcn',{@MDSPlot_ButtonDownFcn,handles});
 
 
 
@@ -834,6 +837,7 @@ myhandles.chosen_grouping_field,myhandles.metadata,...
 myhandles.individual_superblock_profiles,...
 myhandles.individual_number_foreground_blocks,myhandles.is_file_blacklisted);
 myhandles.number_of_conditions=length(myhandles.grouped_metadata);
+ResetAxes(handles);
 if(myhandles.number_of_conditions~=1)
 %     superblock_profiles=myhandles.superblock_profiles;
 %     superblock_profiles(isnan(superblock_profiles))=0;
@@ -849,8 +853,10 @@ myhandles.chosen_points=[0 0];
 setappdata(0,'myhandles',myhandles);
 UpdatePlotColors();
 myhandles=getappdata(0,'myhandles');
+
 Plot_MDS(myhandles.mds_data,3,myhandles.mds_text,myhandles.mds_colors,...
     myhandles.chosen_points,myhandles.MDSPlot_handle,myhandles.show_mds_text);
+%set(gcf,'WindowButtonDownFcn',{@MDSPlot_ButtonDownFcn,handles});
 % for point_number=1:2
 %     if(myhandles.chosen_points(point_number)~=0)
 %         
@@ -1266,6 +1272,18 @@ switch choice
         end
         setappdata(0,'myhandles',myhandles);
 end
+
+
+
+function ResetAxes(handles)
+myhandles=getappdata(0,'myhandles');
+cla(handles.axes2);
+cla(handles.axes3);
+cla(myhandles.bar_axes);
+set(handles.Point1Info,'String','');
+set(handles.Point2Info,'String','');
+set(handles.uipanel7,'Title','');
+set(handles.uipanel3,'Title','');
 
 
 
