@@ -208,9 +208,9 @@ end
 for i=1:channelNr
   data{i,3}='';
 end
-for i=1:channelNr
-  data{i,4}='';
-end
+%for i=1:channelNr
+%  data{i,4}='';
+%end
 
 set(handles.markerTable,'Visible','on');
 set(handles.markerTable,'Data',data);
@@ -599,16 +599,16 @@ if(length(rx)>0 && length(cx))
   return;
 end
 %Warn if a color is used twice or more for markers
-if(length(unique(markersData(selectedMarkerIndex,4)))~=length(selectedMarkerIndex)) 
-  answer=questdlg(sprintf(['Color should be different for each marker.\n'...
-    'Are you sure you want to attribute the same color to more than 1 marker?']), ...
- 'Yes', 'No');
-% Handle response
-  switch answer
-    case 'No'
-      return;
-  end
-end
+% if(length(unique(markersData(selectedMarkerIndex,4)))~=length(selectedMarkerIndex)) 
+%   answer=questdlg(sprintf(['Color should be different for each marker.\n'...
+%     'Are you sure you want to attribute the same color to more than 1 marker?']), ...
+%  'Yes', 'No');
+% % Handle response
+%   switch answer
+%     case 'No'
+%       return;
+%   end
+% end
 %Get the choosen Regular Expression
 regExp=getSelectedRegExp(handles);
 if(isempty(regExp))
@@ -625,7 +625,7 @@ for i=1:length(markers)
   markers{i}.isUse=markersData{i,1};
   markers{i}.marker=markersData{i,2};
   markers{i}.name=markersData{i,3};
-  markers{i}.color=markersData{i,4};
+  %markers{i}.color=markersData{i,4};
   markers{i}.regExp=regexprep(regExp,'\(\?<Channel>.+?\)',markersData{i,2});
   %markers{i}.regExp=regexprep(regExp,'\(\?<Channel>.\*\)',markersData{i,2});
   %markers{i}.regexp=
@@ -846,11 +846,11 @@ for i=1:length(channelList)
   data{i,2}=channelList{i};
 end
 for i=1:length(channelList)
-  data{i,3}='';
+  data{i,3}=['marker ' num2str(i)];
 end
-for i=1:length(channelList)
-  data{i,4}='';
-end
+%for i=1:length(channelList)
+%  data{i,4}='';
+%end
 
 set(handles.markerTable,'Visible','on');
 set(handles.markerTable,'Data',data);

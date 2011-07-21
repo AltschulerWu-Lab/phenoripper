@@ -51,7 +51,6 @@ function ThresholdImage_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to ThresholdImage (see VARARGIN)
-
 myhandles=getappdata(0,'myhandles');
 %TODO modify it
 %myhandles.bit_depth=14;

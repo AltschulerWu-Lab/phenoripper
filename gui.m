@@ -339,8 +339,8 @@ for i=1:myhandles.number_of_conditions
     myhandles.number_of_files=myhandles.number_of_files+...
         size(myhandles.grouped_metadata{i}.files_in_group,1);
 end
-set(handles.PointColor_popupmenu,'String',myhandles.grouping_fields);
-set(handles.PointLabel_popupmenu,'String',myhandles.grouping_fields);
+%set(handles.PointColor_popupmenu,'String',myhandles.grouping_fields);
+%set(handles.PointLabel_popupmenu,'String',myhandles.grouping_fields);
 setappdata(0,'myhandles',myhandles);
 SetButtonState(hObject,handles,true);
 guidata(hObject, handles);
@@ -354,6 +354,11 @@ function RunBtn_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 myhandles=getappdata(0,'myhandles');
+if(~isfield(myhandles,'files_per_image'))
+  warndlg('You must load data first');
+  return;
+end
+
 % if(~myhandles.is_directory_usable)
 %     warndlg('Change Root Directory');
 %     return;
@@ -450,6 +455,7 @@ SetButtonState(hObject,handles,true);
 myhandles.metadata_file_indices]=CalculateGroups(...
 myhandles.chosen_grouping_field,myhandles.metadata,...
 individual_superblock_profiles,individual_number_foreground_blocks,myhandles.is_file_blacklisted);
+myhandles.statusbarHandles=statusbar(hObject,'Done... Click on Xplorer to Explore your data!');
 
 setappdata(0,'myhandles',myhandles);
 %mean_sb=mean(superblock_profiles);
@@ -465,11 +471,21 @@ set(handles.SaveOutputButton,'Visible','on');
 set(handles.ExplorerButton,'Enable','on');
 set(handles.SaveOutputButton,'Enable','on');
 %set(hObject,handles,true);
-guidata(hObject, handles); 
+
+
+
+guidata(hObject, handles);
 %display('end');
 
 % --- Executes on button press in SelectDirectory.
 function TestThreshold_Callback(hObject, eventdata, handles)
+myhandles=getappdata(0,'myhandles');
+if(~isfield(myhandles,'files_per_image'))
+  warndlg('You must load data or result first');
+  return;
+end
+
+
 % % hObject    handle to SelectDirectory (see GCBO)
 % % eventdata  reserved - to be defined in a future version of MATLAB
 % % handles    structure with handles and user data (see GUIDATA)
@@ -589,6 +605,12 @@ myhandles=getappdata(0,'myhandles');
 % end
 %SetButtonState(hObject,handles,false);
 cutoff_intensity=str2double(get(handles.ThreshodIntensity,'String'));
+
+if(~isfield(myhandles,'files_per_image'))
+  warndlg('You must load data or result first');
+  return;
+end
+
 files_per_image=myhandles.files_per_image;
 number_of_channels=myhandles.number_of_channels;
 %imageDirectory=get(handles.ImageRootDirectory,'String');
