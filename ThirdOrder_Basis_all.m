@@ -75,7 +75,7 @@ for image_counter=1:number_of_repeats
         foreground_points(:,channel_counter)=temp(intensity>cutoff_intensity);
     end
     for rgb_cluster=1:number_of_RGB_clusters
-        rgb_mat=ones(length(foreground_points),number_of_channels);
+        rgb_mat=ones(size(foreground_points,1),number_of_channels);
         for i=1:number_of_channels
             rgb_mat(:,i)=rgb_mat(:,i).*global_data.RGB_centroids(rgb_cluster,i);
         end
@@ -210,10 +210,10 @@ for file_num=1:length(included_files)
             location_info=locations{included_files(file_num),i};
             for j=1:min(number_of_matches,number_of_superblock_representatives-supr_counter(i))
                 %rep_img=zeros(3*block_size,3*block_size,number_of_channels);
-                x1=max(location_info(j,1)-block_size,1);
-                x2=min(location_info(j,1)+2*block_size-1,xres);
-                y1=max(location_info(j,2)-block_size,1);
-                y2=min(location_info(j,2)+2*block_size-1,yres);
+                x1=max(location_info(j,1)-3*block_size,1);
+                x2=min(location_info(j,1)+4*block_size-1,xres);
+                y1=max(location_info(j,2)-3*block_size,1);
+                y2=min(location_info(j,2)+4*block_size-1,yres);
                 supr_counter(i)=supr_counter(i)+1;
                 superblock_representatives{i,supr_counter(i)}=img(x1:x2,y1:y2,:);
                 

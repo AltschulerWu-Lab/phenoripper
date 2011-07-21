@@ -80,7 +80,7 @@ for image_counter=1:number_of_repeats
         foreground_points(:,channel_counter)=temp(intensity>cutoff_intensity);
     end
     for rgb_cluster=1:number_of_RGB_clusters
-        rgb_mat=ones(length(foreground_points),number_of_channels);
+        rgb_mat=ones(size(foreground_points,1),number_of_channels);
         for i=1:number_of_channels
             rgb_mat(:,i)=rgb_mat(:,i).*global_data.RGB_centroids(rgb_cluster,i);
         end
@@ -133,7 +133,7 @@ for image_counter=1:number_of_repeats
   
    
 if(~isempty(myhandles))
- %   if(exist('myhandles','var'))  
+%   if(exist('myhandles','var'))  
     progress=progress+1;
     tElapsed1=toc(tStart1); 
     tElapsed=myhandles.tElapsed+tElapsed1;
@@ -148,7 +148,7 @@ if(~isempty(myhandles))
     %setappdata(0,'myhandles',myhandles);
     %disp('done!');
  %   end
-end   
+end
 end
 
 
@@ -156,6 +156,7 @@ end
 block_ids=block_ids_temp(1:block_counter);
 
 %neighbor_profiles=zeros(block_counter,2*number_of_block_clusters+1);
+data.number_of_foreground_blocks=block_counter;
 neighbor_profiles=neighbor_profiles_temp(1:block_counter,:);
 
 %for i=1:block_counter
@@ -171,8 +172,13 @@ superblock_distmat=zeros(length(block_ids),number_of_superblocks);
         temp=repmat(global_data.superblock_centroids(superblock_cluster,:),length(block_ids),1);
         superblock_distmat(:,superblock_cluster) =sum((neighbor_profiles-temp).^2,2);
     end
-[~,superblock_ids]=min(superblock_distmat,[],2);
+[distances,superblock_ids]=min(superblock_distmat,[],2);
 
+image_superblock_states=zeros(blocks_nx,blocks_ny);
+image_superblock_states(foreground_blocks)=superblock_ids;
+data.image_superblock_states=image_superblock_states;
+data.distance_to_superblock_centroid=zeros(blocks_nx,blocks_ny);
+data.distance_to_superblock_centroid(foreground_blocks)=distances;
 
 data.block_profile=zeros(number_of_block_clusters,1);
 for block_cluster=1:number_of_block_clusters

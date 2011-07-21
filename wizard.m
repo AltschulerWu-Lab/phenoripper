@@ -461,7 +461,9 @@ setappdata(0,'myhandles',myhandles);
 
 channel_wise_matches=cell(1,myhandles.files_per_image);
 root_directory=myhandles.wizardData.rootDir;
-temp=regexp(myhandles.allfiles,[root_directory filesep],'split');
+%temp=regexp(myhandles.allfiles,[root_directory filesep],'split');
+root_directoryRegExp=regexptranslate('escape', [root_directory filesep]);
+temp=regexp(myhandles.allfiles,[root_directoryRegExp],'split');
 all_files=cellfun(@(x) x(end),temp);
 
 rexp=cell(1,myhandles.files_per_image);
@@ -688,7 +690,7 @@ for i=1:length(filenames)
     for j=1:length(filenames{1})
         file_matrix{i,j}=filenames{i}{j};
         if(~exist(file_matrix{i,j},'file'))
-            errordlg('File Missing');
+            errordlg(['File Missing:' file_matrix{i,j}] );
             return;
         end
     end
