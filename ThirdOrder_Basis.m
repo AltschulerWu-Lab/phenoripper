@@ -42,6 +42,7 @@ B1=sparse(B);
 
 block_ids_temp=zeros(blocks_nx*blocks_ny*number_of_repeats,1);
 block_counter=0;
+superblock_counter=0;
 foreground_blocks_per_image=zeros(number_of_repeats,1);
 foreground_blocks_temp=zeros(blocks_nx*blocks_ny*number_of_repeats,1);
 image_number_of_block_temp=zeros(blocks_nx*blocks_ny*number_of_repeats,1);
@@ -110,24 +111,32 @@ for image_counter=1:number_of_repeats
     
     for i=0:number_of_block_clusters
         temp=imfilter(double(image_in_discrete_block_states==i),h);
-        neighbor_profiles_in_image(:,i+1)=temp(foreground_blocks)/8;
+        neighbor_profiles_in_image(:,i+1)=temp(foreground_blocks)/9;
        
     end
+    is_foreground_sb=neighbor_profiles_in_image(:,1)==0;
+    foreground_superblocks=find(is_foreground_sb);
     
     
     data.image_in_discrete_block_states=image_in_discrete_block_states;
     
     
-    foreground_blocks_per_image(image_counter)=length(foreground_blocks);
+    foreground_blocks_per_image(image_counter)=length(foreground_superblocks);
     block_ids_temp(block_counter+1:block_counter+length(foreground_blocks))=block_ids_in_image;
     foreground_blocks_temp(block_counter+1:block_counter+length(foreground_blocks))=foreground_blocks;
-    neighbor_profiles_temp(block_counter+1:block_counter+length(foreground_blocks),:)=neighbor_profiles_in_image;
-    image_number_of_block_temp(block_counter+1:block_counter+length(foreground_blocks))=image_counter;
+    neighbor_profiles_temp(superblock_counter+1:superblock_counter+length(foreground_superblocks),:)=neighbor_profiles_in_image(foreground_superblocks,:);
+    
+    image_number_of_block_temp(superblock_counter+1:superblock_counter+length(foreground_superblocks))=image_counter;
+    
     [x_pos,y_pos]=find(avg_block_intensities>cutoff_intensity);%repeated operation,can be speeded up
-    position_of_block_temp(block_counter+1:block_counter+length(foreground_blocks),:)=...
+    x_pos=x_pos(is_foreground_sb);
+    y_pos=y_pos(is_foreground_sb);
+    
+    position_of_block_temp(superblock_counter+1:superblock_counter+length(foreground_superblocks),:)=...
         [(x_pos'-1)*block_size+x_offset;(y_pos'-1)*block_size+y_offset]';
     
     block_counter=block_counter+length(foreground_blocks);
+    superblock_counter=superblock_counter+length(foreground_superblocks);
     %disp('done!');
 end
 
@@ -137,7 +146,9 @@ image_number_of_block=image_number_of_block_temp(1:block_counter);
 position_of_block=position_of_block_temp(1:block_counter,:);
 
 %neighbor_profiles=zeros(block_counter,number_of_block_clusters+1);
-neighbor_profiles=neighbor_profiles_temp(1:block_counter,:);
+neighbor_profiles=neighbor_profiles_temp(1:superblock_counter,:);
+%sb_without_bg=neighbor_profiles(:,1)==0;
+%neighbor_profiles=neighbor_profiles(sb_without_bg,:);
 mean_superblock_profile=mean(neighbor_profiles);
 data.mean_superblock_profile=mean_superblock_profile;
 %for i=1:block_counter
