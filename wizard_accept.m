@@ -58,7 +58,9 @@ myhandles=getappdata(0,'myhandles');
 [table_data,field_names]=convert_struct_to_table(myhandles.metadata);
 set(handles.popupmenu1,'String',field_names);
 set(handles.accepted_table,'Data',table_data);
-set(handles.rejected_table,'Data',myhandles.all_files(~myhandles.matched_files));
+if(~myhandles.use_metadata)
+  set(handles.rejected_table,'Data',myhandles.all_files(~myhandles.matched_files));
+end
 popupmenu1_Callback(hObject, eventdata, handles)
 % Update handles structure
 guidata(hObject, handles);

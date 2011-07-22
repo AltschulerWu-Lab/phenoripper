@@ -577,7 +577,9 @@ end
 
 function data=getWizardData(handles)
 selectedFolder=get(handles.rootdirTF,'String');
-if(~isdir(selectedFolder))
+myhandles=getappdata(0,'myhandles');
+
+if(~isdir(selectedFolder)&& ~myhandles.use_metadata)
   warndlg('The choosen folder is not a valid directory. Please select a valid directory!');
   return;
 end
@@ -595,7 +597,7 @@ selectedMarkerIndex=find([markersData{:,1}]);
 indx=~cellfun(@isempty,markersData(selectedMarkerIndex,:));
 [rx,cx]=find(indx<1);
 if(length(rx)>0 && length(cx))
-  warndlg('You must described all the markers (Name and Color)');
+  warndlg('You must described all the markers (Name)');
   return;
 end
 %Warn if a color is used twice or more for markers
@@ -673,12 +675,12 @@ end
 for i=1:channelNr
   data{i,2}=num2str(i);
 end
-for i=1:channelNr
-  data{i,3}='';
+for i=1:channelNr  
+  data{i,3}=['marker ' num2str(i)];
 end
-for i=1:channelNr
-  data{i,4}='';
-end
+% for i=1:channelNr
+%   data{i,4}='';
+% end
 set(handles.markerTable,'Visible','on');
 set(handles.markerTable,'Data',data);
 set(handles.markerTable, 'ColumnWidth', {30 110 220, 90});
