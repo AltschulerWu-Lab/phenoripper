@@ -807,9 +807,9 @@ function SaveOutputButton_Callback(hObject, eventdata, handles)
 %uisave;
 %uiremember(findobj(gcf,'-depth',inf));
 myhandles=getappdata(0,'myhandles');
-filename=uiputfile;
+[filename,pathname]=uiputfile;
 setappdata(gcf,'myhandles', myhandles);
-hgsave(gcf,filename);
+hgsave(gcf,[pathname filesep filename]);
 
 
 

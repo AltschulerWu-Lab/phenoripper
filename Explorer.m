@@ -22,7 +22,7 @@ function varargout = Explorer(varargin)
 
 % Edit the above text to modify the response to help Explorer
 
-% Last Modified by GUIDE v2.5 21-Jul-2011 00:43:25
+% Last Modified by GUIDE v2.5 01-Aug-2011 15:10:50
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -100,10 +100,18 @@ for i=1:length(myhandles.Barplot_Method_Chosen_Handles)
         {@Barplot_Method_Chosen_Callback,handles,i});
 end
 
+
 myhandles.MDS_Dim_Menu_Handles=[handles.MDS_2D_Menu,handles.MDS_3D_Menu];
 for i=1:2
     set(myhandles.MDS_Dim_Menu_Handles(i),'Callback',...
         {@MDS_Dim_Menu_Callback,handles,i+1});
+end
+
+myhandles.Clustergram_SB_Displayed_Menu_Handles=[handles.Clustergram_SB_Displayed_All,...
+    handles.Clustergram_SB_Displayed_5percent,handles.Clustergram_SB_Displayed_10percent];
+for i=1:length(myhandles.Clustergram_SB_Displayed_Menu_Handles)
+    set(myhandles.Clustergram_SB_Displayed_Menu_Handles(i),'Callback',...
+        {@Clustergram_SB_Displayed_Menu_Handles_Callback,handles,i});
 end
 
 
@@ -121,8 +129,36 @@ myhandles.Superblocks_Shown_Menu_Handles(4)=...
 uimenu(handles.Superblocks_Shown_Menu,'Label','All','Callback',...
     {@superblocks_shown_callback,handles,4});
 
+%myhandles.Clustergram_SB_Ordering_Menu_Handles=zeros(length(myhandles.wizardData.markers)+1,1);
+myhandles.Clustergram_SB_Ordering_Menu_Handles=[];
+myhandles.Clustergram_SB_Ordering_Menu_Handles(1)=handles.CG_SB_Optimal_Order_Menu;
+set(myhandles.Clustergram_SB_Ordering_Menu_Handles(1),'Callback',...
+    {@cg_sb_ordering_callback,handles,1,1});
+counter=1;
+for i=1:length(myhandles.wizardData.markers)
+    counter=counter+1;
+    myhandles.Clustergram_SB_Ordering_Menu_Handles(counter)=...
+        uimenu(handles.CG_SB_Marker_Level_Order_Menu,'Label',myhandles.wizardData.markers{i}.name,...
+        'Callback', {@cg_sb_ordering_callback,handles,2,i});
+   % guidata(hObject, handles);
+  
+end
+for i=1:length(myhandles.wizardData.markers)
+    counter=counter+1;
+    myhandles.Clustergram_SB_Ordering_Menu_Handles(counter)=...
+        uimenu(handles.CG_SB_DG_Marker_Level_Order_Menu,'Label',myhandles.wizardData.markers{i}.name,...
+         'Callback', {@cg_sb_ordering_callback,handles,3,i});
+    
+end
 
 
+% for i=1:length(myhandles.grouping_fields)
+%     myhandles.Clustergram_SB_Ordering_Menu_Handles(i+1)=...
+%     uimenu(handles.CG_SB_Marker_Level_Order_Menu,'Label',myhandles.grouping_fields{i}, ...
+%         'Callback', {@cg_sb_ordering_callback,handles,handles,i+1});
+% end
+
+setappdata(0,'myhandles',myhandles);
 
 set(handles.DiscardFrame1_Pushbutton,'Callback',{@DiscardFrame_Callback,1});
 set(handles.DiscardFrame2_Pushbutton,'Callback',{@DiscardFrame_Callback,2});
@@ -143,12 +179,29 @@ end
 if(~exist('myhandles.superblock_shown_choice','var'))
     myhandles.superblocks_shown_choice=2;
 end
+
+if(~exist('myhandles.clustergram_SB_diplayed_method','var'))
+   myhandles.clustergram_SB_diplayed_method=1; 
+end
+if(~exist('myhandles.cg_sb_ordering_method','var'))
+   myhandles.cg_sb_ordering_method=1; 
+end
+if(~exist('myhandles.cg_sb_ordering_method_type','var'))
+   myhandles.cg_sb_ordering_method_type=1; 
+end
+if(~exist('myhandles.cg_sb_ordering_method_number','var'))
+   myhandles.cg_sb_ordering_method_number=1; 
+end
+
 MenuList_Checkmark(myhandles.color_field_number,myhandles.Color_Points_By_Menu_Handles);
 MenuList_Checkmark(myhandles.label_field_number,myhandles.Label_Points_By_Menu_Handles);
 MenuList_Checkmark(myhandles.chosen_grouping_field,myhandles.Group_Points_By_Menu_Handles);
 MenuList_Checkmark(myhandles.bar_plot_method,myhandles.Barplot_Method_Chosen_Handles);
 MenuList_Checkmark(myhandles.superblocks_shown_choice,myhandles.Superblocks_Shown_Menu_Handles);
 MenuList_Checkmark(myhandles.mds_dim-1,myhandles.MDS_Dim_Menu_Handles);
+MenuList_Checkmark(myhandles.clustergram_SB_diplayed_method,...
+    myhandles.Clustergram_SB_Displayed_Menu_Handles);
+MenuList_Checkmark_By_Handle(myhandles.Clustergram_SB_Ordering_Menu_Handles(1),myhandles.Clustergram_SB_Ordering_Menu_Handles);
 setappdata(0,'myhandles',myhandles);
 
 UpdatePlotColors();
@@ -544,7 +597,7 @@ if(all(myhandles.chosen_points~=0))
   
    myhandles.bar_order=p_indices(bar_order);
    bar(bar_matrix(:,bar_order)','parent',myhandles.bar_axes);
-   colormap(bar_colormap);
+   colormap(gcf,bar_colormap);
    ylabel('Superblock Fractions','Color','w','parent',myhandles.bar_axes);
  
    fnames=fieldnames(myhandles.grouped_metadata{1});
@@ -972,6 +1025,7 @@ myhandles=getappdata(0,'myhandles');
 
 Plot_MDS(myhandles.mds_data,3,myhandles.mds_text,myhandles.mds_colors,...
     myhandles.chosen_points,myhandles.MDSPlot_handle,myhandles.show_mds_text);
+setappdata(0,'myhandles',myhandles);
 %set(gcf,'WindowButtonDownFcn',{@MDSPlot_ButtonDownFcn,handles});
 % for point_number=1:2
 %     if(myhandles.chosen_points(point_number)~=0)
@@ -989,7 +1043,7 @@ Plot_MDS(myhandles.mds_data,3,myhandles.mds_text,myhandles.mds_colors,...
 % end
 
 function mds_positions=Calculate_MDS(raw_profiles,dim)
-max_number_of_points_for_mds=400;
+max_number_of_points_for_mds=600;
 nan_pos=isnan(raw_profiles);
 raw_profiles(nan_pos)=rand(nnz(nan_pos),1)/100;
 if(size(raw_profiles)<max_number_of_points_for_mds)
@@ -1443,6 +1497,19 @@ for i=1:number_of_items
    end
 end
 
+function MenuList_Checkmark_By_Handle(chosen_item_handle,menu_handles_list)
+number_of_items=length(menu_handles_list);
+for i=1:number_of_items
+   if(menu_handles_list(i)==chosen_item_handle)
+      set(menu_handles_list(i),'Checked','on');
+   else
+       try
+        set(menu_handles_list(i),'Checked','off'); 
+       catch
+           disp(num2str(menu_handles_list(i)));
+       end
+   end
+end
 
 % --------------------------------------------------------------------
 function Clustergram_Menu_Callback(hObject, eventdata, handles)
@@ -1457,7 +1524,141 @@ function Launch_Clustergram_Menu_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 myhandles=getappdata(0,'myhandles');
-CoolClustergram(myhandles.superblock_profiles,...
-    myhandles.global_data.superblock_representatives,...
+switch(myhandles.clustergram_SB_diplayed_method)
+    case 1
+        preserved_columns=1:size(myhandles.superblock_profiles,2);
+    case 2
+        preserved_columns=find(max(myhandles.superblock_profiles)>0.05);
+        
+    case 3
+        preserved_columns=find(max(myhandles.superblock_profiles)>0.10);
+        
+end
+
+superblock_profiles=myhandles.superblock_profiles(:,preserved_columns);
+superblock_representatives=cell(length(preserved_columns),...
+    size(myhandles.global_data.superblock_representatives,2));
+for i=1:length(preserved_columns)
+    for j=1: size(myhandles.global_data.superblock_representatives,2)
+        superblock_representatives{i,j}=...
+            myhandles.global_data.superblock_representatives{preserved_columns(i),j};
+    end
+end
+
+
+
+RGB_centroids=myhandles.global_data.RGB_centroids;
+RGB_centroids=[zeros(1,size(RGB_centroids,2));RGB_centroids];
+block_centroids=myhandles.global_data.block_centroids;
+block_centroids=[zeros(1,size(block_centroids,2));block_centroids] ;block_centroids(1,1)=1;
+superblock_centroids=myhandles.global_data.superblock_centroids(preserved_columns,:);
+sb_marker_profiles=superblock_centroids*block_centroids*RGB_centroids;
+display_colors=myhandles.display_colors;
+% markers_shown=true(length(myhandles.display_colors),1);
+% counter=1;
+% for i=1:length(myhandles.display_colors)
+%    switch myhandles.display_colors{i}
+%        case {'','-' ,'None'}, markers_shown(i)=false;
+%    otherwise
+%        display_colors{counter}=myhandles.display_colors{i};
+%        counter=counter+1;
+%    end
+%    
+% end
+
+%sb_marker_profiles=zeros(myhandles.number_of_superblocks,length(myhandles.display_colors));
+% for i=1:myhandles.number_of_superblocks
+%     img=myhandles.global_data.superblock_representatives{i};
+%     for j=1:length(myhandles.display_colors)
+%         temp=img(:,:,j);
+%         sb_marker_profiles(i,j)=mean(temp(:));
+%     end
+% end
+% for i=1:size(sb_marker_profiles,2)
+%    sb_marker_profiles(:,i)= sb_marker_profiles(:,i)/max(sb_marker_profiles(:,i));
+%    sb_marker_profiles(:,i)= sb_marker_profiles(:,i)/myhandles.marker_scales(i,2);
+% end
+
+%sb_marker_profiles=sb_marker_profiles(:,find(markers_shown));
+myhandles.cg_sb_ordering_method_type
+switch(myhandles.cg_sb_ordering_method_type)
+    case 1
+        sb_ordering_score=[];
+        use_sb_dendrogram=true;
+    case 2
+        sb_ordering_score=sb_marker_profiles(:,myhandles.cg_sb_ordering_method_number);
+        use_sb_dendrogram=false;
+    case 3
+        sb_ordering_score=sb_marker_profiles(:,myhandles.cg_sb_ordering_method_number);
+        use_sb_dendrogram=true;
+end
+
+
+
+CoolClustergram(superblock_profiles,superblock_representatives,...
     myhandles.mds_text,myhandles.mds_colors...
-    ,myhandles.marker_scales,myhandles.display_colors);
+    ,myhandles.marker_scales,display_colors,sb_marker_profiles,...
+    myhandles.block_size,sb_ordering_score,use_sb_dendrogram);
+
+
+function Clustergram_SB_Displayed_Menu_Handles_Callback(hObject,eventdata,handles,number_chosen)
+myhandles=getappdata(0,'myhandles');
+myhandles.clustergram_SB_diplayed_method=number_chosen;
+MenuList_Checkmark(myhandles.clustergram_SB_diplayed_method,...
+    myhandles.Clustergram_SB_Displayed_Menu_Handles);
+setappdata(0,'myhandles',myhandles);
+
+
+% --------------------------------------------------------------------
+function Clustergram_SB_Ordering_Menu_Callback(hObject, eventdata, handles)
+% hObject    handle to Clustergram_SB_Ordering_Menu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function Clustergram_Point_Ordering_Menu_Callback(hObject, eventdata, handles)
+% hObject    handle to Clustergram_Point_Ordering_Menu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function CG_SB_Optimal_Order_Menu_Callback(hObject, eventdata, handles)
+% hObject    handle to CG_SB_Optimal_Order_Menu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function CG_SB_Marker_Level_Order_Menu_Callback(hObject, eventdata, handles)
+% hObject    handle to CG_SB_Marker_Level_Order_Menu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+function cg_sb_ordering_callback(hObject,eventdata,handles,method_type,method_number)
+myhandles=getappdata(0,'myhandles');
+myhandles.cg_sb_ordering_method_type=method_type;
+myhandles.cg_sb_ordering_method_number=method_number;
+MenuList_Checkmark_By_Handle(hObject,...
+    myhandles.Clustergram_SB_Ordering_Menu_Handles);
+setappdata(0,'myhandles',myhandles);
+
+
+% --------------------------------------------------------------------
+function CG_SB_DG_Marker_Level_Order_Menu_Callback(hObject, eventdata, handles)
+% hObject    handle to CG_SB_DG_Marker_Level_Order_Menu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function Discard_Empty_Frames_Menu_Callback(hObject, eventdata, handles)
+% hObject    handle to Discard_Empty_Frames_Menu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+myhandles=getappdata(0,'myhandles');
+myhandles.is_file_blacklisted(myhandles.individual_number_foreground_blocks<30)=true;
+setappdata(0,'myhandles',myhandles);
+group_by_callback(hObject, eventdata, handles,myhandles.chosen_grouping_field);

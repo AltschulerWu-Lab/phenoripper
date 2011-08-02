@@ -126,7 +126,13 @@ for image_counter=1:number_of_repeats
         neighbor_profiles_in_image(:,i+1)=temp(foreground_blocks)/9;
        
     end
-    foreground_superblocks=find(neighbor_profiles_in_image(:,1)==0);
+    sb_image=false(blocks_nx,blocks_ny);
+    sb_image(foreground_blocks)=true;
+    sb_image(1,:)=false;sb_image(:,1)=false;
+    sb_image(end,:)=false;sb_image(:,end)=false;
+    is_fg_sb=sb_image(foreground_blocks);
+    %is_fg_sb=neighbor_profiles_in_image(:,1)==0;
+    foreground_superblocks=find(is_fg_sb);
     neighbor_profiles_temp(superblock_counter+1:superblock_counter+length(foreground_superblocks),:)=neighbor_profiles_in_image(foreground_superblocks,:);
     
     
@@ -166,7 +172,7 @@ end
 block_ids=block_ids_temp(1:block_counter);
 
 %neighbor_profiles=zeros(block_counter,2*number_of_block_clusters+1);
-data.number_of_foreground_blocks=block_counter;
+data.number_of_foreground_blocks=superblock_counter;
 neighbor_profiles=neighbor_profiles_temp(1:superblock_counter,:);
 
 %for i=1:block_counter
@@ -185,7 +191,7 @@ superblock_distmat=zeros(superblock_counter,number_of_superblocks);
 [distances,superblock_ids]=min(superblock_distmat,[],2);
 
 image_superblock_states=zeros(blocks_nx,blocks_ny);
-%image_superblock_states(foreground_superblocks)=superblock_ids;
+image_superblock_states(foreground_blocks(is_fg_sb))=superblock_ids;
 data.image_superblock_states=image_superblock_states;
 data.distance_to_superblock_centroid=zeros(blocks_nx,blocks_ny);
 data.distance_to_superblock_centroid(foreground_superblocks)=distances;

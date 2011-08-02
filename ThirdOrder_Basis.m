@@ -114,7 +114,12 @@ for image_counter=1:number_of_repeats
         neighbor_profiles_in_image(:,i+1)=temp(foreground_blocks)/9;
        
     end
-    is_foreground_sb=neighbor_profiles_in_image(:,1)==0;
+    sb_image=false(blocks_nx,blocks_ny);
+    sb_image(foreground_blocks)=true;
+    sb_image(1,:)=false;sb_image(:,1)=false;
+    sb_image(end,:)=false;sb_image(:,end)=false;
+    is_foreground_sb=sb_image(foreground_blocks);
+    %is_foreground_sb=neighbor_profiles_in_image(:,1)==0;
     foreground_superblocks=find(is_foreground_sb);
     
     
@@ -142,8 +147,8 @@ end
 
 
 block_ids=block_ids_temp(1:block_counter);
-image_number_of_block=image_number_of_block_temp(1:block_counter);
-position_of_block=position_of_block_temp(1:block_counter,:);
+image_number_of_block=image_number_of_block_temp(1:superblock_counter);
+position_of_block=position_of_block_temp(1:superblock_counter,:);
 
 %neighbor_profiles=zeros(block_counter,number_of_block_clusters+1);
 neighbor_profiles=neighbor_profiles_temp(1:superblock_counter,:);
@@ -192,8 +197,8 @@ for i=1:number_of_superblocks
    end
 end
 
-included_files=find(bintprog(ones(number_of_repeats,1),-FvB',-number_of_superblock_representatives*ones(number_of_superblocks,1))>0.5);
-%included_files=1:number_of_repeats;
+%included_files=find(bintprog(ones(number_of_repeats,1),-FvB',-number_of_superblock_representatives*ones(number_of_superblocks,1))>0.5);
+included_files=1:number_of_repeats;
 superblock_representatives=cell(number_of_superblocks,number_of_superblock_representatives);
 
 supr_counter=zeros(number_of_superblocks,1);
