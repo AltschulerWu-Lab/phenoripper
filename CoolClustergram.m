@@ -8,7 +8,8 @@ if(size(data,2)~=number_of_representatives)
    error('Incorrect Number Of Representatives'); 
 end
 figure_handle=figure('Name','PhenoRipper Clustergram');
-cmap1=colormap(figure_handle,'Bone');
+%cmap1=colormap(figure_handle,'Bone');%Working only for Mtlab 2011
+cmap1=colormap('Bone');
 cmap2=DisplayColor2Cmap(display_colors);
 cmap=[cmap1;cmap2];
 data(isnan(data))=0;
@@ -44,11 +45,14 @@ imagesc(temp2);
 
 axis off;
 scale_factor=0.9;
+if(number_of_representatives<10)
+  scale_factor=0.2;
+end
 XLims=get(gca,'XLim');
 YLims=get(gca,'YLim');
 x_positions=linspace(1,number_of_representatives,number_of_representatives)-scale_factor/2;
 y_positions=(number_of_data_points+0.5)*ones(number_of_representatives,1);
-y_positions1=(number_of_data_points+0.5+(number_of_data_points)/number_of_representatives)*ones(number_of_representatives,1);
+y_positions1=(number_of_data_points+0.5+(number_of_data_points)/number_of_representatives*scale_factor)*ones(number_of_representatives,1);
 normalized_size=1/number_of_representatives;%(YLims(2)-YLims(1))/number_of_representatives;
 %units=get(gca,'Units');
 %set(gca,'Units','normalized');
@@ -160,5 +164,6 @@ bar_data=(max_val:(min_val-max_val)/10000:min_val)';
 imagesc(bar_data); 
 set(axis_handle,'CLim', [min_val min_val+(l1+l2)*(max_val-min_val)/(l1-1)]);
 set(axis_handle,'XTick',[],'YTick',[1,10000],'YTickLabel',{max_label,min_label});
-colormap(figure_handle,cmap);
+%colormap(figure_handle,cmap);%Working only for Mtlab 2011
+colormap(cmap);
 end

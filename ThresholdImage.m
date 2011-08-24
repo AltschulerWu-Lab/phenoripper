@@ -22,7 +22,7 @@ function varargout = ThresholdImage(varargin)
 
 % Edit the above text to modify the response to help ThresholdImage
 
-% Last Modified by GUIDE v2.5 27-Jun-2011 12:21:03
+% Last Modified by GUIDE v2.5 17-Aug-2011 17:04:48
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;

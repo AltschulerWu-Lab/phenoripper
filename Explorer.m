@@ -22,7 +22,7 @@ function varargout = Explorer(varargin)
 
 % Edit the above text to modify the response to help Explorer
 
-% Last Modified by GUIDE v2.5 01-Aug-2011 15:10:50
+% Last Modified by GUIDE v2.5 17-Aug-2011 16:06:52
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -54,8 +54,8 @@ function Explorer_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Choose default command line output for Explorer
 myhandles=getappdata(0,'myhandles');
-myhandles.MDS_gca=gca;
-myhandles.MDS_gcf=gcf;
+%myhandles.MDS_gca=gca;
+myhandles.MDS_gcf=handles.explorer;
 myhandles.MDS_panel=handles.uipanel2;
 % superblock_profiles=myhandles.superblock_profiles;
 % superblock_profiles(isnan(superblock_profiles))=0;
@@ -67,7 +67,7 @@ myhandles.mds_data=Calculate_MDS(myhandles.superblock_profiles,myhandles.mds_dim
 myhandles.chosen_points=[0 0];
 
 setappdata(0,'myhandles',myhandles);
-myhandles.MDSPlot_handle=handles.MDSPlot;
+%myhandles.MDSPlot_handle=handles.MDSPlot;
 grouping_fields={myhandles.grouping_fields{:},'Number_FG_Blocks'};
 %myhandles.grouping_fields_extended=grouping_fields;
 setappdata(0,'myhandles',myhandles);
@@ -216,7 +216,7 @@ if(myhandles.mds_dim==2)
 %     end
 %     
     Plot_MDS(myhandles.mds_data,2,myhandles.mds_text,myhandles.mds_colors,...
-        myhandles.chosen_points,myhandles.MDSPlot_handle,myhandles.show_mds_text);
+        myhandles.chosen_points,handles.MDSPlot,myhandles.show_mds_text);
 else
 
 %     scatter3(myhandles.mds_data(:,1),myhandles.mds_data(:,2),myhandles.mds_data(:,3),50,myhandles.mds_colors,'parent',myhandles.MDSPlot_handle);
@@ -227,38 +227,34 @@ else
 %             'FontSize',16);%not always cn
 %     end
     
-     Plot_MDS(myhandles.mds_data,3,myhandles.mds_text,myhandles.mds_colors,...
-        myhandles.chosen_points,myhandles.MDSPlot_handle,myhandles.show_mds_text);
-   set(gca,...
-'XTickLabel','');
-set(gca,...
-'YTickLabel','');
-set(gca,...
-'ZTickLabel','');
+    Plot_MDS(myhandles.mds_data,3,myhandles.mds_text,myhandles.mds_colors,...
+        myhandles.chosen_points,handles.MDSPlot,myhandles.show_mds_text);
+%     set(handles.MDSPlot, 'XTickLabel','');
+%     set(handles.MDSPlot, 'YTickLabel','');
+%     set(handles.MDSPlot, 'ZTickLabel','');
    %zoom  on;
    %dragzoom on;
    %h=zoom;
    %setAllowAxesZoom(h,gca,true);
-      myhandles.camPos = get(handles.MDSPlot, 'CameraPosition'); % camera position
-    myhandles.camTgt = get(handles.MDSPlot, 'CameraTarget'); % where the camera is pointing to
-    
-    myhandles.camUpVect = get(handles.MDSPlot, 'CameraUpVector'); % camera 'up' vector
-    myhandles.camViewAngle = get(handles.MDSPlot, 'CameraViewAngle');
-    
-   %  set(handles.MDSPlot, 'CameraViewAngle',myhandles.camViewAngle);
-     set(handles.MDSPlot, 'CameraPosition',myhandles.camPos);
-     set(handles.MDSPlot, 'CameraTarget',myhandles.camTgt);
-     set(handles.MDSPlot, 'CameraUpVector',myhandles.camUpVect);
+%       myhandles.camPos = get(handles.MDSPlot, 'CameraPosition'); % camera position
+%     myhandles.camTgt = get(handles.MDSPlot, 'CameraTarget'); % where the camera is pointing to
+%     
+%     myhandles.camUpVect = get(handles.MDSPlot, 'CameraUpVector'); % camera 'up' vector
+%     myhandles.camViewAngle = get(handles.MDSPlot, 'CameraViewAngle');
+%     
+%    %  set(handles.MDSPlot, 'CameraViewAngle',myhandles.camViewAngle);
+%      set(handles.MDSPlot, 'CameraPosition',myhandles.camPos);
+%      set(handles.MDSPlot, 'CameraTarget',myhandles.camTgt);
+%      set(handles.MDSPlot, 'CameraUpVector',myhandles.camUpVect);
 
 %     
-    
     rotate3d off;
+%    rotate3d(handles.MDSPlot ,'Enable','off');
     myhandles.mds_rotatable=0;
-    
 end
 
-set(myhandles.MDS_gca,'GridLineStyle','-')
-grid on;
+set(handles.MDSPlot,'GridLineStyle','-')
+%grid(handles.MDSPlot ,'Enable','on');
 %set(gca,'ButtonDownFcn', {@MDSPlot_ButtonDownFcn,handles});
 set(myhandles.MDS_gcf,'WindowButtonDownFcn',{@MDSPlot_ButtonDownFcn,handles});
 
@@ -267,16 +263,12 @@ myhandles.axes3_handle=handles.axes3;
 myhandles.axes_chosen=handles.axes2;
 myhandles.bar_axes=handles.BarAxes;
 
-%rotate3d off;
+rotate3d off;
 
 %set(handles.MDSPlot, 'CameraPositionMode','manual');
 %set(handles.MDSPlot, 'CameraTargetMode','manual');
 %set(handles.MDSPlot, 'CameraUpVectorMode','manual');
 %set(handles.MDSPlot, 'CameraViewAngleMode','manual');
-
-    
-
-
 % for i=1:size(myhandles.mds_data,1)
 %    %text 
 % end
@@ -285,10 +277,40 @@ handles.output = hObject;
 setappdata(0,'myhandles',myhandles);
 % Update handles structure
 guidata(hObject, handles);
-set(gcf,'WindowButtonDownFcn',{@MDSPlot_ButtonDownFcn,handles});
+%set(gcf,'WindowButtonDownFcn',{@MDSPlot_ButtonDownFcn,handles});
 
 % UIWAIT makes Explorer wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+% uiwait(handles.explorer);
+
+%Change the button color to black for Mac because of a Matlab Bug
+% if ismac
+%   set(handles.LegendCheckBox,'CData',cat(3,zeros(500),zeros(500),zeros(500)));
+%   set(handles.CalcSB_1_Button,'CData',cat(3,zeros(500),zeros(500),zeros(500)));
+%   set(handles.SB_Num1_popupmenu,'CData',cat(3,zeros(500),zeros(500),zeros(500)));
+%   set(handles.DiscardFrame1_Pushbutton,'CData',cat(3,zeros(500),zeros(500),zeros(500)));
+%   set(handles.DiscardFrame2_Pushbutton,'CData',cat(3,zeros(500),zeros(500),zeros(500)));
+%   set(handles.PreviousImage1_pushbutton,'CData',cat(3,zeros(500),zeros(500),zeros(500)));
+%   set(handles.PreviousImage2_pushbutton,'CData',cat(3,zeros(500),zeros(500),zeros(500)));
+%   set(handles.NextImage1_pushbotton,'CData',cat(3,zeros(500),zeros(500),zeros(500)));
+%   set(handles.NextImage2_pushbotton,'CData',cat(3,zeros(500),zeros(500),zeros(500)));
+% end
+generateShowGroupingFieldMenu(handles)
+
+
+function generateShowGroupingFieldMenu(handles)
+myhandles=getappdata(0,'myhandles');
+myhandles.Show_Points_Menu_Handles=zeros(length(myhandles.mds_text),1);
+for i=1:length(myhandles.mds_text)
+    myhandles.Show_Points_Menu_Handles(i)=...
+    uimenu(handles.Show_Point,'Label',myhandles.mds_text{i}{1}, ...
+        'Checked','on','Callback', {@show_point_callback,handles,i});
+end
+setappdata(0,'myhandles',myhandles);
+
+function show_point_callback(hObject, eventdata, handles,group_num)
+myhandles=getappdata(0,'myhandles');
+
+
 
 
 % --- Outputs from this function are returned to the command line.
@@ -311,135 +333,144 @@ function MDSPlot_ButtonDownFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 myhandles=getappdata(0,'myhandles');
 %disp([num2str(hittest()) ' ' num2str(myhandles.MDS_gca) ' ' num2str(overobj2('type','axes'))]);
-if(myhandles.MDSPlot_handle==overobj2('type','axes'))
-CP=get(myhandles.MDS_gca,'CurrentPoint');
 
-number_of_points=size(myhandles.mds_data,1);
-% sizes=50*ones(number_of_points,1);
-% sizes(point_number)=200;
-% scatter(myhandles.mds_data(:,1),myhandles.mds_data(:,2),sizes,'filled','parent',myhandles.MDSPlot_handle);
-if(myhandles.mds_dim==2)
-    dists=pdist2(myhandles.mds_data,CP(1,1:size(myhandles.mds_data,2)));
-    [~,point_number]=min(dists);
-    disp(num2str(point_number));
-    if(myhandles.axes_chosen==handles.axes2)
-        myhandles.chosen_points(2)=point_number;
-         UpdateMetadata(handles.Point1Info,point_number,1);
-    else
-        myhandles.chosen_points(1)=point_number;
-        UpdateMetadata(handles.Point2Info,point_number,1);
-    end
-%     scatter(myhandles.mds_data(:,1),myhandles.mds_data(:,2),50,myhandles.mds_colors,'parent',myhandles.MDSPlot_handle);
-%     sizes=16*ones(number_of_points,1);
-%     sizes(point_number)=24;
-%     for i=1:size(myhandles.mds_data,1)
-%         text(myhandles.mds_data(i,1),myhandles.mds_data(i,2),myhandles.mds_text{i},...
-%             'BackgroundColor',myhandles.mds_colors(i,:),'parent',myhandles.MDSPlot_handle,...
-%             'FontSize',sizes(i));%not always cn
-%         
-%     end
- Plot_MDS(myhandles.mds_data,2,myhandles.mds_text,myhandles.mds_colors,...
-        myhandles.chosen_points,myhandles.MDSPlot_handle,myhandles.show_mds_text);
-else
-    
-    if(~myhandles.mds_rotatable)
-        
-    
-        
-        rotate3d off;
-        point = get(gca, 'CurrentPoint'); % mouse click position
-        camPos = get(gca, 'CameraPosition'); % camera position
-        camTgt = get(gca, 'CameraTarget'); % where the camera is pointing to
-        camViewAngle = get(gca, 'CameraViewAngle');
-        camDir = camPos - camTgt; % camera direction
-        camUpVect = get(gca, 'CameraUpVector'); % camera 'up' vector
-        
-        % build an orthonormal frame based on the viewing direction and the
-        % up vector (the "view frame")
-        zAxis = camDir/norm(camDir);
-        upAxis = camUpVect/norm(camUpVect);
-        xAxis = cross(upAxis, zAxis);
-        yAxis = cross(zAxis, xAxis);
-        
-        rot = [xAxis; yAxis; zAxis]; % view rotation
-        
-        
-        % the point cloud represented in the view frame
-        rotatedPointCloud = rot * myhandles.mds_data';
-        
-        % the clicked point represented in the view frame
-        rotatedPointFront = rot * point' ;
-        
-        point_number = dsearchn(rotatedPointCloud(1:2,:)', ...
-            rotatedPointFront(1:2));
-        %disp(num2str(point_number));
-        if(myhandles.axes_chosen==handles.axes2)
-           UpdateMetadata(handles.Point1Info,point_number,1); 
-           %set(handles.Point1Info,'String',['Point Chosen=' myhandles.mds_text{point_number} ]); 
-        else
-           UpdateMetadata(handles.Point2Info,point_number,1); 
-           %set(handles.Point2Info,'String',['Point Chosen=' myhandles.mds_text{point_number}]);  
-        end
-        if(myhandles.axes_chosen==handles.axes2)
-            myhandles.chosen_points(2)=point_number;
-            myhandles.file_number1=1;
-        else
-            myhandles.chosen_points(1)=point_number;
-            myhandles.file_number2=1;
-        end
-        
-%         scatter3(myhandles.mds_data(:,1),myhandles.mds_data(:,2),myhandles.mds_data(:,3),50,myhandles.mds_colors,'parent',myhandles.MDSPlot_handle);
-%        
-%         sizes=16*ones(number_of_points,1);
-%         sizes(point_number)=24;
-%         for i=1:size(myhandles.mds_data,1)
-%             text(myhandles.mds_data(i,1),myhandles.mds_data(i,2),myhandles.mds_data(i,3),myhandles.mds_text{i},...
-%                 'BackgroundColor',myhandles.mds_colors(i,:),'parent',myhandles.MDSPlot_handle,...
-%                 'FontSize',sizes(i));%not always cn
-%         end
-        Plot_MDS(myhandles.mds_data,3,myhandles.mds_text,myhandles.mds_colors,...
-            myhandles.chosen_points,myhandles.MDSPlot_handle,myhandles.show_mds_text);
-        set(gca,'XTickLabel','','YTickLabel','','ZTickLabel','');
-         set(gca, 'CameraPosition',camPos);
-        set(gca, 'CameraTarget',camTgt);
-        set(gca, 'CameraUpVector',camUpVect);
-        %set(gca, 'CameraViewAngle',camViewAngle);
-    else
-        rotate3d on;
-    end
-    
-end
-myhandles.MDS_gca=gca;
-myhandles.MDS_gcf=gcf;
-if(exist('point_number','var'))
-    myhandles.selected_point=point_number;
-    
-    if(myhandles.axes_chosen==handles.axes2)
-        frame_handle=handles.uipanel3;
-    else
-        frame_handle=handles.uipanel7;
-    end
-    
-    fnames=fieldnames(myhandles.grouped_metadata{point_number});
-    panel_text=myhandles.grouped_metadata{point_number}.(fnames{myhandles.chosen_grouping_field});
-    if(iscell(panel_text))
-        panel_text=panel_text{1};
-    end
-    if(length(panel_text)>43)
-        panel_text=['...' panel_text(end-40:end)];
-    end
-    ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,1,...
-        myhandles.axes_chosen,myhandles.mds_colors(point_number,:),...
-        panel_text,frame_handle);
-    
-    setappdata(0,'myhandles',myhandles);
-    Update_Bar_Plot;
-end
+%overobj2('type','axes')
+
+% if(handles.MDSPlot==overobj2('type','axes'))
+%   CP=get(handles.MDSPlot,'CurrentPoint');
+point=hittest(handles.explorer);
+point_parent=get(point,'Parent');
+if((handles.MDSPlot==point)||(handles.MDSPlot==point_parent))
+  CP=get(handles.MDSPlot,'CurrentPoint');
+  %number_of_points=size(myhandles.mds_data,1);
+  % sizes=50*ones(number_of_points,1);
+  % sizes(point_number)=200;
+  % scatter(myhandles.mds_data(:,1),myhandles.mds_data(:,2),sizes,'filled','parent',myhandles.MDSPlot_handle);
+  if(myhandles.mds_dim==2)
+      dists=pdist2(myhandles.mds_data,CP(1,1:size(myhandles.mds_data,2)));
+      [~,point_number]=min(dists);
+      disp(num2str(point_number));
+      if(myhandles.axes_chosen==handles.axes2)
+          myhandles.chosen_points(2)=point_number;
+           UpdateMetadata(handles.Point1Info,point_number,1);
+      else
+          myhandles.chosen_points(1)=point_number;
+          UpdateMetadata(handles.Point2Info,point_number,1);
+      end
+  %     scatter(myhandles.mds_data(:,1),myhandles.mds_data(:,2),50,myhandles.mds_colors,'parent',myhandles.MDSPlot_handle);
+  %     sizes=16*ones(number_of_points,1);
+  %     sizes(point_number)=24;
+  %     for i=1:size(myhandles.mds_data,1)
+  %         text(myhandles.mds_data(i,1),myhandles.mds_data(i,2),myhandles.mds_text{i},...
+  %             'BackgroundColor',myhandles.mds_colors(i,:),'parent',myhandles.MDSPlot_handle,...
+  %             'FontSize',sizes(i));%not always cn
+  %         
+  %     end
+   Plot_MDS(myhandles.mds_data,2,myhandles.mds_text,myhandles.mds_colors,...
+          myhandles.chosen_points,handles.MDSPlot,myhandles.show_mds_text);
+  else
+
+      if(~myhandles.mds_rotatable)
+
+
+
+          rotate3d off;
+          point = get(handles.MDSPlot, 'CurrentPoint'); % mouse click position
+          camPos = get(handles.MDSPlot, 'CameraPosition'); % camera position
+          camTgt = get(handles.MDSPlot, 'CameraTarget'); % where the camera is pointing to
+          camViewAngle = get(handles.MDSPlot, 'CameraViewAngle');
+          camDir = camPos - camTgt; % camera direction
+          camUpVect = get(handles.MDSPlot, 'CameraUpVector'); % camera 'up' vector
+
+          % build an orthonormal frame based on the viewing direction and the
+          % up vector (the "view frame")
+          zAxis = camDir/norm(camDir);
+          upAxis = camUpVect/norm(camUpVect);
+          xAxis = cross(upAxis, zAxis);
+          yAxis = cross(zAxis, xAxis);
+
+          rot = [xAxis; yAxis; zAxis]; % view rotation
+
+
+          % the point cloud represented in the view frame
+          rotatedPointCloud = rot * myhandles.mds_data';
+
+          % the clicked point represented in the view frame
+          rotatedPointFront = rot * point' ;
+
+          point_number = dsearchn(rotatedPointCloud(1:2,:)', ...
+              rotatedPointFront(1:2));
+          %disp(num2str(point_number));
+          if(myhandles.axes_chosen==handles.axes2)
+             UpdateMetadata(handles.Point1Info,point_number,1); 
+             %set(handles.Point1Info,'String',['Point Chosen=' myhandles.mds_text{point_number} ]); 
+          else
+             UpdateMetadata(handles.Point2Info,point_number,1); 
+             %set(handles.Point2Info,'String',['Point Chosen=' myhandles.mds_text{point_number}]);  
+          end
+          if(myhandles.axes_chosen==handles.axes2)
+              myhandles.chosen_points(2)=point_number;
+              myhandles.file_number1=1;
+          else
+              myhandles.chosen_points(1)=point_number;
+              myhandles.file_number2=1;
+          end
+
+  %         scatter3(myhandles.mds_data(:,1),myhandles.mds_data(:,2),myhandles.mds_data(:,3),50,myhandles.mds_colors,'parent',myhandles.MDSPlot_handle);
+  %        
+  %         sizes=16*ones(number_of_points,1);
+  %         sizes(point_number)=24;
+  %         for i=1:size(myhandles.mds_data,1)
+  %             text(myhandles.mds_data(i,1),myhandles.mds_data(i,2),myhandles.mds_data(i,3),myhandles.mds_text{i},...
+  %                 'BackgroundColor',myhandles.mds_colors(i,:),'parent',myhandles.MDSPlot_handle,...
+  %                 'FontSize',sizes(i));%not always cn
+  %         end
+          Plot_MDS(myhandles.mds_data,3,myhandles.mds_text,myhandles.mds_colors,...
+              myhandles.chosen_points,handles.MDSPlot,myhandles.show_mds_text);
+          set(handles.MDSPlot,'XTickLabel','','YTickLabel','','ZTickLabel','');
+          set(handles.MDSPlot, 'CameraPosition',camPos);
+          set(handles.MDSPlot, 'CameraTarget',camTgt);
+          set(handles.MDSPlot, 'CameraUpVector',camUpVect);
+          %set(gca, 'CameraViewAngle',camViewAngle);
+      else
+          rotate3d on;
+      end
+
+  end
+  %myhandles.MDS_gca=gca;
+  %myhandles.MDS_gcf=handles.explorer;
+  if(exist('point_number','var'))
+      myhandles.selected_point=point_number;
+
+      if(myhandles.axes_chosen==handles.axes2)
+          frame_handle=handles.uipanel3;
+      else
+          frame_handle=handles.uipanel7;
+      end
+
+      fnames=fieldnames(myhandles.grouped_metadata{point_number});
+      panel_text=myhandles.grouped_metadata{point_number}.(fnames{myhandles.chosen_grouping_field});
+      if(iscell(panel_text))
+          panel_text=panel_text{1};
+      end
+      if(length(panel_text)>43)
+          panel_text=['...' panel_text(end-40:end)];
+      end
+      ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,1,...
+          myhandles.axes_chosen,myhandles.mds_colors(point_number,:),...
+          panel_text,frame_handle);
+
+      setappdata(0,'myhandles',myhandles);
+      Update_Bar_Plot;
+  end
 end
 
 
 function ShowImages(filenames,file_number,axis_handle,class_color,point_name,frame_handle,boundary_mask)
+
 myhandles=getappdata(0,'myhandles');
+filenames=cellfun(@(x) concatenateString(myhandles.rootDir,x),...
+          filenames,'UniformOutput',false);
 set(frame_handle,'Title',point_name,'HighlightColor',class_color,...
     'ShadowColor',class_color);
 axis(axis_handle);
@@ -597,7 +628,7 @@ if(all(myhandles.chosen_points~=0))
   
    myhandles.bar_order=p_indices(bar_order);
    bar(bar_matrix(:,bar_order)','parent',myhandles.bar_axes);
-   colormap(gcf,bar_colormap);
+   colormap(myhandles.bar_axes,bar_colormap);
    ylabel('Superblock Fractions','Color','w','parent',myhandles.bar_axes);
  
    fnames=fieldnames(myhandles.grouped_metadata{1});
@@ -632,7 +663,7 @@ if(all(myhandles.chosen_points~=0))
    x_positions=linspace(1,number_of_reps,number_of_reps)-scale_factor/2;
    y_positions=-(diff(YLims)/12)*ones(number_of_reps,1);
    h=myhandles.bar_axes;
-   f=gcf;
+   %f=gcf;
    positions=zeros(number_of_reps,4);
   % units=get(gca,'Units');
   if( any(strcmp(fieldnames(myhandles),'temp_handles')))
@@ -697,14 +728,15 @@ if(dim==2)
         end
     end
 else
-    
-        rotate3d off;
-        camPos = get(gca, 'CameraPosition'); % camera position
-        camTgt = get(gca, 'CameraTarget'); % where the camera is pointing to
-        camUpVect = get(gca, 'CameraUpVector'); % camera 'up' vector
+  
+    rotate3d off;
+       %rotate3d(axis_handle,'Enable','off');
+%         camPos = get(axis_handle, 'CameraPosition'); % camera position
+%         camTgt = get(axis_handle, 'CameraTarget'); % where the camera is pointing to
+%         camUpVect = get(axis_handle, 'CameraUpVector'); % camera 'up' vector
         
            
-    scatter3(positions(:,1),positions(:,2),positions(:,3),point_sizes,colors,'filled','parent',axis_handle);
+    scatter3(axis_handle,positions(:,1),positions(:,2),positions(:,3),point_sizes,colors,'filled');
     if(show_text)
         for i=1:size(positions,1)
             %        text(positions(i,1),positions(i,2),positions(i,3),labels{i},...
@@ -715,10 +747,10 @@ else
                 'FontSize',font_sizes(i));
         end
     end
-    set(gca,'XTickLabel','','YTickLabel','','ZTickLabel','');
-         set(gca, 'CameraPosition',camPos);
-        set(gca, 'CameraTarget',camTgt);
-        set(gca, 'CameraUpVector',camUpVect);
+    set(axis_handle,'XTickLabel','','YTickLabel','','ZTickLabel','');
+  %  set(axis_handle, 'CameraPosition',camPos);
+   % set(axis_handle, 'CameraTarget',camTgt);
+   % set(axis_handle, 'CameraUpVector',camUpVect);
     
        
 end
@@ -753,7 +785,7 @@ set(mylegend, 'Name', 'MDS Plot Legend', 'NumberTitle', 'off',...
 for i=1:length(myhandles.group_labels)
     addElementToLegend(myhandles.category_colors(i,:), myhandles.group_labels{i}, i, mylegend);
 end
-set(gcf,'WindowButtonDownFcn',{@MDSPlot_ButtonDownFcn,handles});
+set(handles.explorer,'WindowButtonDownFcn',{@MDSPlot_ButtonDownFcn,handles});
 
 
 
@@ -804,7 +836,7 @@ else
     set(gcbo, 'Checked', 'on');
 end
 Plot_MDS(myhandles.mds_data,myhandles.mds_dim,myhandles.mds_text,myhandles.mds_colors,...
-            myhandles.chosen_points,myhandles.MDSPlot_handle,myhandles.show_mds_text);
+            myhandles.chosen_points,handles.MDSPlot,myhandles.show_mds_text);
 
 
 % --------------------------------------------------------------------
@@ -836,7 +868,7 @@ MenuList_Checkmark(group_num,myhandles.Color_Points_By_Menu_Handles);
 UpdatePlotColors();
 myhandles=getappdata(0,'myhandles');
 Plot_MDS(myhandles.mds_data,myhandles.mds_dim,myhandles.mds_text,myhandles.mds_colors,...
-            myhandles.chosen_points,myhandles.MDSPlot_handle,myhandles.show_mds_text);
+            myhandles.chosen_points,handles.MDSPlot,myhandles.show_mds_text);
 for point_number=1:2
     if(myhandles.chosen_points(point_number)~=0)
         
@@ -869,7 +901,7 @@ MenuList_Checkmark(group_num,myhandles.Label_Points_By_Menu_Handles);
 UpdatePlotColors();
 myhandles=getappdata(0,'myhandles');
 Plot_MDS(myhandles.mds_data,3,myhandles.mds_text,myhandles.mds_colors,...
-    myhandles.chosen_points,myhandles.MDSPlot_handle,myhandles.show_mds_text);
+    myhandles.chosen_points,handles.MDSPlot,myhandles.show_mds_text);
 for point_number=1:2
     if(myhandles.chosen_points(point_number)~=0)
         
@@ -1024,7 +1056,7 @@ UpdatePlotColors();
 myhandles=getappdata(0,'myhandles');
 
 Plot_MDS(myhandles.mds_data,3,myhandles.mds_text,myhandles.mds_colors,...
-    myhandles.chosen_points,myhandles.MDSPlot_handle,myhandles.show_mds_text);
+    myhandles.chosen_points,handles.MDSPlot,myhandles.show_mds_text);
 setappdata(0,'myhandles',myhandles);
 %set(gcf,'WindowButtonDownFcn',{@MDSPlot_ButtonDownFcn,handles});
 % for point_number=1:2
@@ -1069,20 +1101,29 @@ else
 end
 
 
-% --- Executes on button press in CalcSB_1_Button.
+% --- Executes on button press in CalcSB_1_Button
+% Super Block Calculation Buton
 function CalcSB_1_Button_Callback(hObject, eventdata, handles)
 % hObject    handle to CalcSB_1_Button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 myhandles=getappdata(0,'myhandles');
 image_num=myhandles.file_number1;
-filenames=myhandles.grouped_metadata{myhandles.chosen_points(2)}.files_in_group(image_num,:);
+%filenames=myhandles.grouped_metadata{myhandles.chosen_points(2)}.files_in_group(image_num,:);
+filenames=cellfun(@(x) concatenateString(myhandles.rootDir,x),...
+          myhandles.grouped_metadata{myhandles.chosen_points(2)}.files_in_group(image_num,:),...
+          'UniformOutput',false);
 results=SecondOrder(filenames,myhandles.global_data);
 myhandles.image1_in_sb_states=results.image_superblock_states;
 myhandles.distance_to_superblock_centroid1=results.distance_to_superblock_centroid;
 
 image_num=myhandles.file_number2;
-filenames=myhandles.grouped_metadata{myhandles.chosen_points(1)}.files_in_group(image_num,:);
+%filenames=myhandles.grouped_metadata{myhandles.chosen_points(1)}.files_in_group(image_num,:);
+filenames=cellfun(@(x) concatenateString(myhandles.rootDir,x),...
+          myhandles.grouped_metadata{myhandles.chosen_points(1)}.files_in_group(image_num,:),...
+          'UniformOutput',false);
+
+
 results=SecondOrder(filenames,myhandles.global_data);
 myhandles.image2_in_sb_states=results.image_superblock_states;
 myhandles.distance_to_superblock_centroid2=results.distance_to_superblock_centroid;
@@ -1117,7 +1158,11 @@ block_size=myhandles.global_data.block_size;
 %    temp((block_size*(row(i)-1)+1):(block_size*(row(i))),...
 %        (block_size*(col(i)-1)+1):(block_size*(col(i))))=true; 
 % end
-filenames=myhandles.grouped_metadata{myhandles.chosen_points(2)}.files_in_group(1,:);
+%filenames=myhandles.grouped_metadata{myhandles.chosen_points(2)}.files_in_group(1,:);
+filenames=cellfun(@(x) concatenateString(myhandles.rootDir,x),...
+          myhandles.grouped_metadata{myhandles.chosen_points(2)}.files_in_group(1,:),...
+          'UniformOutput',false);
+
 info=imfinfo(filenames{1});
 xres=info.Height;
 %yres=info.Width;
@@ -1353,7 +1398,7 @@ myhandles.mds_data=Calculate_MDS(myhandles.superblock_profiles,myhandles.mds_dim
 setappdata(0,'myhandles',myhandles);
 set(handles.MDS_Rotatable,'Visible','on');
 Plot_MDS(myhandles.mds_data,myhandles.mds_dim,myhandles.mds_text,myhandles.mds_colors,...
-    myhandles.chosen_points,myhandles.MDSPlot_handle,myhandles.show_mds_text);
+    myhandles.chosen_points,handles.MDSPlot,myhandles.show_mds_text);
 
 % --------------------------------------------------------------------
 function BarPlot_Method_Menu_Callback(hObject, eventdata, handles)
@@ -1662,3 +1707,138 @@ myhandles=getappdata(0,'myhandles');
 myhandles.is_file_blacklisted(myhandles.individual_number_foreground_blocks<30)=true;
 setappdata(0,'myhandles',myhandles);
 group_by_callback(hObject, eventdata, handles,myhandles.chosen_grouping_field);
+
+
+function result=concatenateString(string1,string2)
+  result=[string1 string2];
+
+
+% --------------------------------------------------------------------
+function Export_menu_Callback(hObject, eventdata, handles)
+% hObject    handle to Export_menu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function Export_figures_Callback(hObject, eventdata, handles)
+% hObject    handle to Export_figures (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function Export_data_Callback(hObject, eventdata, handles)
+  %fileName='/tmp/test.txt';
+  lastPath=loadLastPath('save');
+  if(~exist(char(lastPath),'dir'))
+    [filename,pathname]=uiputfile();
+  else
+    [filename,pathname]=uiputfile('*.tsv','Save the PhenoRipped data into TSV format', lastPath);
+  end
+  if(~exist(char(pathname),'dir'))
+    filename='';
+    warndlg('Invalid Root Directory');
+  else
+    saveLastPath(pathname,'save');
+  end
+  myhandles=getappdata(0,'myhandles');
+  nrGroup=size(myhandles.grouped_metadata,2);
+  nrBlockType=size(myhandles.superblock_profiles,2);
+  %Open the file
+  fid =fopen([pathname filename],'w');  
+  if(fid<0)
+    isSucceed=false;
+    return;
+  end
+  %Write the header
+  fieldNames=fieldnames(myhandles.grouped_metadata{1});
+  fprintf(fid, '%s\t', 'group');
+  for i=2:size(fieldNames,1)
+    if(i<size(fieldNames,1))
+      fprintf(fid, '%s,', fieldNames{i});
+    else
+      fprintf(fid, '%s\t', fieldNames{i});
+    end
+  end
+  for i=1:nrBlockType
+    fprintf(fid, '%s\t', ['sb' num2str(i)]);
+  end
+  fprintf(fid, '%s\r\n', '');
+
+  %For each group, write the metadata and the superblock values
+  for i=1:nrGroup
+    %Write the group label
+    fprintf(fid, '%s\t', myhandles.group_labels{i});
+    %Write the metadata values
+    for j=2:size(fieldNames,1)
+      if(j<size(fieldNames,1))
+        fprintf(fid, '%s,', myhandles.grouped_metadata{i}.(fieldNames{j}){1});
+      else
+        if isnumeric(myhandles.grouped_metadata{i}.(fieldNames{j}))
+          fprintf(fid, '%f\t', myhandles.grouped_metadata{i}.(fieldNames{j}));
+        else
+          fprintf(fid, '%s\t', myhandles.grouped_metadata{i}.(fieldNames{j}){1});
+        end
+      end
+    end
+    %Write the superblock values
+    for j=1:nrBlockType
+      fprintf(fid, '%s\t', num2str(myhandles.superblock_profiles(i,j)));
+    end
+    %Write a new line
+    fprintf(fid, '%s\r\n', '');
+  end
+  isSucceed=fclose(fid);
+if(~isSucceed)
+  msgbox(['Data have been exported into ' pathname filename]);
+else
+end
+  
+ 
+
+function Export_mds_Callback(hObject, eventdata, handles)
+  exportAxes('Save the MSD plot into PNG',handles.MDSPlot);
+
+
+function Export_point1_Callback(hObject, eventdata, handles)
+  exportAxes('Save the Point 1 Image into PNG',handles.axes2);
+
+
+function Export_point2_Callback(hObject, eventdata, handles)
+  exportAxes('Save the Point 2 Image into PNG',handles.axes3);
+
+
+function Export_histogram_Callback(hObject, eventdata, handles)
+  exportAxes('Save the Histogram into PNG',handles.BarAxes);
+
+function exportAxes(title,axis)
+  lastPath=loadLastPath('save');
+  if(~exist(char(lastPath),'dir'))
+    [filename,pathname]=uiputfile();
+  else
+    [filename,pathname]=uiputfile('*.png',title, lastPath);
+  end
+  if(~exist(char(pathname),'dir'))
+    filename='';
+    warndlg('Invalid Root Directory');
+  else
+    saveLastPath(pathname,'save');
+  end
+  fig2 = figure('visible','off');
+  % copy axes into the new figure
+  newax = copyobj(axis,fig2);
+  set(newax, 'units', 'normalized', 'position', [0.13 0.11 0.775 0.815]);
+  old_mode = get(fig2, 'PaperPositionMode');
+  set(fig2, 'PaperPositionMode', 'auto');
+  print(fig2, '-dpng', [pathname filename]);
+  set(fig2, 'PaperPositionMode', old_mode);
+  close(fig2) % clean up by closing it
+  msgbox(['Image as been saved in ' pathname filename]);
+
+
+% --------------------------------------------------------------------
+function Show_Point_Callback(hObject, eventdata, handles)
+% hObject    handle to Show_Point (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)

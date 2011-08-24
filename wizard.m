@@ -22,7 +22,7 @@ function varargout = wizard(varargin)
 
 % Edit the above text to modify the response to help wizard
 
-% Last Modified by GUIDE v2.5 24-May-2011 14:55:09
+% Last Modified by GUIDE v2.5 10-Aug-2011 17:58:00
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -68,7 +68,11 @@ myhandles=getappdata(0,'myhandles');
 myhandles.use_metadata=false;
 setappdata(0,'myhandles',myhandles);
 %Load the default template list
-wizardhandles=load('default-templates.mat','templates');
+if isunix
+  wizardhandles=load('default-templates_unix.mat','templates');
+else
+  wizardhandles=load('default-templates_windows.mat','templates');  
+end
 setappdata(0,'wizardhandles',wizardhandles);
 populateTemplateSelectorList(handles);
 setappdata(0,'wizardhandles',wizardhandles);
@@ -135,37 +139,24 @@ function rootDirSelectBT_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 %handles=getappdata(0,'handles');
-lastPath=loadLastPath();
+lastPath=loadLastPath('wizard');
 if(~exist(char(lastPath),'dir'))
   dir_name=uigetdir();
 else
   dir_name=uigetdir(lastPath);
 end
-myhandles=getappdata(0,'myhandles'); 
+myhandles=getappdata(0,'myhandles');
 if(~exist(char(dir_name),'dir'))
-        dir_name='';
-        warndlg('Invalid Root Directory');
+  dir_name='';
+  warndlg('Invalid Root Directory');
 else
-        myhandles.all_files=files_in_dir(dir_name);
-        %temp=regexp(myhandles.all_files,[dir_name filesep],'split');
-        saveLastPath(dir_name);
+  myhandles.all_files=files_in_dir(dir_name);
+  %temp=regexp(myhandles.all_files,[dir_name filesep],'split');
+  saveLastPath(dir_name,'wizard');
 end
 set(handles.rootdirTF,'String',dir_name);
-setappdata(0,'myhandles',myhandles);   
+setappdata(0,'myhandles',myhandles);
 setappdata(0,'handles',handles);
-
-function saveLastPath(path)
-fid = fopen('.lastPath.txt','w');
-fprintf(fid, '%s', path);
-fclose(fid);
-
-function path=loadLastPath()
-path=[];
-if(exist('.lastPath.txt','file'))
-  fid = fopen('.lastPath.txt', 'r');
-  path = fgetl(fid);
-end
-
 
 % --- Executes on button press in selectSingleChannelCB.
 function selectSingleChannelCB_Callback(hObject, eventdata, handles)
@@ -184,8 +175,7 @@ else
   myhandles=getappdata(0,'myhandles');
   if(~myhandles.use_metadata)
     set(handles.detectChannelBT,'Visible','on');
-  end
- 
+  end 
 end
 
 % --- Executes on selection change in nrChannelPerImageDB.
@@ -196,7 +186,6 @@ function nrChannelPerImageDB_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns nrChannelPerImageDB contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from nrChannelPerImageDB
-
 channelNr=get(handles.nrChannelPerImageDB,'Value');
 data=cell(channelNr,3);
 for i=1:channelNr
@@ -208,17 +197,12 @@ end
 for i=1:channelNr
   data{i,3}='';
 end
-%for i=1:channelNr
-%  data{i,4}='';
-%end
-
 set(handles.markerTable,'Visible','on');
+set(handles.ExportMetaDataButton,'Visible','on');
 set(handles.markerTable,'Data',data);
 set(handles.markerTable, 'ColumnWidth', {30 110 240, 90});
-msgbox('Marker have been detected, please enter the name of each marker and click on Done to use this configuration.');
-
-
-
+msgbox(['Marker have been detected, please enter the name'...
+  'of each marker and click on Done to use this configuration.']);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -229,7 +213,8 @@ function nrChannelPerImageDB_CreateFcn(hObject, eventdata, handles)
 
 % Hint: popupmenu controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+if ispc && isequal(get(hObject,'BackgroundColor'), ...
+    get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
@@ -252,7 +237,8 @@ function nrChannelDB_CreateFcn(hObject, eventdata, handles)
 
 % Hint: popupmenu controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+if ispc && isequal(get(hObject,'BackgroundColor'),...
+    get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
@@ -276,7 +262,8 @@ function fileExtensionTF_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+if ispc && isequal(get(hObject,'BackgroundColor'),...
+    get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
@@ -299,7 +286,8 @@ function channelSeparatorTF_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+if ispc && isequal(get(hObject,'BackgroundColor'),...
+    get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
@@ -319,6 +307,7 @@ set(handles.groupSelector,'Visible','on');
 set(handles.text8,'Visible','on');
 viewChannelSeparator(handles);
 set(handles.markerTable,'Visible','off');
+set(handles.ExportMetaDataButton,'Visible','off');
 
 function [groups, groupExample]=getGroups(handles)
 selectedTemplateNr = get(handles.templateSelector,'Value');
@@ -362,7 +351,8 @@ function templateSelector_CreateFcn(hObject, eventdata, handles)
 
 % Hint: popupmenu controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+if ispc && isequal(get(hObject,'BackgroundColor'),...
+    get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
@@ -377,7 +367,6 @@ wizardhandles.channelSeparator = get(handles.channelSeparatorTF,'String');
 setappdata(0,'wizardhandles',wizardhandles);
 editTemplate;
 uiwait;
-wizardhandles=getappdata(0,'wizardhandles');
 populateTemplateSelectorList(handles);
 
 % hObject    handle to editTemplateBT (see GCBO)
@@ -403,7 +392,8 @@ function groupSelector_CreateFcn(hObject, eventdata, handles)
 
 % Hint: listbox controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+if ispc && isequal(get(hObject,'BackgroundColor'),...
+    get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
@@ -415,6 +405,7 @@ function doneBT_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 data=getWizardData(handles);
 myhandles=getappdata(0,'myhandles');
+myhandles.rootDir=data.rootDir;
 myhandles.wizardData=data;
 setappdata(0,'myhandles',myhandles);
 total_number_of_channels=length(myhandles.wizardData.markers);
@@ -424,28 +415,29 @@ for i=1:total_number_of_channels
        myhandles.channels_used=[myhandles.channels_used;i];
    end
 end
-
-
-
-if(myhandles.use_metadata)
-    myhandles.matched_files=true(size(myhandles.file_matrix,1),1);
-    myhandles.number_of_channels=length(myhandles.channels_used);
-else
-    myhandles.allfiles=getAllFiles(myhandles.wizardData.rootDir);
-    setappdata(0,'myhandles',myhandles);
-    [file_matrix,metadata,matched_files]=construct_filetable();
-    myhandles=getappdata(0,'myhandles');
-    myhandles.file_matrix=file_matrix;
-    myhandles.metadata=metadata;
-    myhandles.matched_files=matched_files;
+myhandles.allfiles=getAllFiles(myhandles.rootDir);
+%Remove the rootDir from the full path    
+myhandles.allfiles=cellfun(@(x) substring(myhandles.rootDir,x),...
+  myhandles.allfiles,'UniformOutput',false);
+setappdata(0,'myhandles',myhandles);
+%Add the file separator at the end of the root directory if not exist
+if ~strcmp(myhandles.rootDir(1:end-1),'/')
+  myhandles.rootDir=[myhandles.rootDir '/'];
 end
-%myhandles=getappdata(0,'myhandles');
+
+setappdata(0,'myhandles',myhandles);
+[file_matrix,metadata,matched_files]=construct_filetable();
+myhandles=getappdata(0,'myhandles');
+myhandles.file_matrix=file_matrix;
+myhandles.metadata=metadata;
+myhandles.matched_files=matched_files;
 myhandles.wizard_handle=gcf;
 setappdata(0,'myhandles',myhandles);
 wizard_accept;
-%disp('meow');
-%delete(gcf);
 
+
+function result=substring(removeString,original)
+  result=original(length(removeString)+2:end);
 
 
 function [file_matrix,metadata,matched_files]=construct_filetable()
@@ -456,56 +448,35 @@ myhandles.files_per_image=myhandles.number_of_channels;
 if(myhandles.wizardData.nrChannelPerFile>1)
     myhandles.files_per_image=1;
 end
-
 setappdata(0,'myhandles',myhandles);
-
-channel_wise_matches=cell(1,myhandles.files_per_image);
 root_directory=myhandles.wizardData.rootDir;
-%temp=regexp(myhandles.allfiles,[root_directory filesep],'split');
 root_directoryRegExp=regexptranslate('escape', [root_directory filesep]);
-temp=regexp(myhandles.allfiles,[root_directoryRegExp],'split');
+temp=regexp(myhandles.allfiles, root_directoryRegExp,'split');
 all_files=cellfun(@(x) x(end),temp);
-
 rexp=cell(1,myhandles.files_per_image);
-%matches=true(length(myhandles.all_files));
-
-
 for channel=1:myhandles.files_per_image
     rexp{channel}=myhandles.wizardData.markers{myhandles.channels_used(channel)}.regExp;
     channel_names{channel}=myhandles.wizardData.markers{myhandles.channels_used(channel)}.marker;
-    %rexp{channel}=get(myhandles.marker_handles(channel).marker_ending_edit,'String');
-    
-    %temp=regexp(matches,[rexp{channel} '$'] ,'split');
-    %channel_wise_matches{channel}=cellfun(@(x) x(1),temp);
 end
-%matches=myhandles.all_files(~cellfun('isempty',regexp(myhandles.all_files,...
-     %   [rexp{1} '$'],'match')));
- [idx edx ext mat tok nam] = regexp(all_files,rexp{1},...
-                    'start','end','tokenExtents','match','tokens','names');
-               
- matched_bool=~cellfun('isempty',mat);    
- matches=all_files(matched_bool);
- matched=find(matched_bool);
- if(~isempty(matches))
-     fnames=fieldnames(nam{matched(1)});
- else
-     errordlg('No matches');
- end
- 
- 
-%file_matrix=cell(length(matches),myhandles.files_per_image);
+[mat nam] = regexp(all_files,rexp{1}, 'match','names');
+matched_bool=~cellfun('isempty',mat);    
+matches=all_files(matched_bool);
+matched=find(matched_bool);
+if(~isempty(matches))
+   fnames=fieldnames(nam{matched(1)});
+else
+   errordlg('No matches');
+end 
 regExp=getSelectedRegExp(handles);
 if(myhandles.files_per_image~=1)
     file_matrix=matched_filenames(matches,regExp,channel_names);
 else
     file_matrix=matches;
 end
-
 [membership_matrix,member_position]=ismember(file_matrix,all_files);
 file_matrix=file_matrix(all(membership_matrix,2),:);
 matched_files=false(length(all_files),1);
 matched_files(member_position(:))=true;
-
 
 [number_of_images,files_per_image]=size(file_matrix);
 metadata=cell(1,number_of_images);
@@ -513,74 +484,37 @@ metadata=cell(1,number_of_images);
 dir_start=regexp(file_matrix(:,1),filesep);
 
 for i=1:number_of_images
-   temp=file_matrix(i,:);
-  % handles=getappdata(0,'handles');
-   for j=1:files_per_image
-        if(isempty(regexpi(temp{j},['^' root_directory],'match')))
-                metadata{i}.FileNames{j}=[root_directory filesep temp{j}];
-        else
-                metadata{i}.FileNames{j}=temp{j};
-        end
-   end
-   metadata{i}.None=file_matrix{i,1}; 
-   if(~isempty(dir_start{i}))
-       metadata{i}.Directory=file_matrix{i,1}(1:dir_start{i}(end));
-   else
-       metadata{i}.Directory='';
-   end
+ temp=file_matrix(i,:);
+  for j=1:files_per_image
+    metadata{i}.FileNames{j}=temp{j};
+  end
+  metadata{i}.None=file_matrix{i,1}; 
+  if(~isempty(dir_start{i}))
+    metadata{i}.Directory=file_matrix{i,1}(1:dir_start{i}(end));
+  else
+    metadata{i}.Directory='';
+  end
 end
 
 nam=nam(matched_bool);
 for i=1:number_of_images
-    %if(matched_bool(i))
-        for j=1:length(fnames)
-            temp=nam{i}.(fnames{j});
-            if(strcmp(temp,''))
-                metadata{i}.(fnames{j})=[];
-            else
-                metadata{i}.(fnames{j})=temp;
-            end
-            
-        end
-        
-%     else
-%         for j=1:length(fnames)
-%             metadata{i}.(fnames{j})=[];
-%         end
-%     end
+  for j=1:length(fnames)
+    temp=nam{i}.(fnames{j});
+    if(strcmp(temp,''))
+        metadata{i}.(fnames{j})=[];
+    else
+        metadata{i}.(fnames{j})=temp;
+    end
+  end
 end
-%disp('meow');
-% files_with_matches(:,channel)=matched_bool;
-% files_with_matches=any(files_with_matches,2);
-% metadata=metadata(files_with_matches);
-%metadata=metadata(matched_bool);
-% 
-% for channel=2:myhandles.files_per_image
-%     common_files=intersect(common_files,channel_wise_matches{channel});
-% end
-% 
-% if(isempty(common_files))
-%    file_matrix={'No Files In Common'}; 
-% else
-%     file_matrix=cell(length(common_files),myhandles.files_per_image);
-%     for match_num=1:length(common_files)
-%         temp=common_files{match_num}(length(get(handles.rootdirectory_edit,'String'))+2:end);
-%         for channel=1:myhandles.files_per_image
-%             file_matrix{match_num,channel}=[temp rexp{channel}];
-%         end
-%     end
-%   myhandles.common_files=file_matrix;
-  setappdata(0,'myhandles',myhandles);
-
-
+setappdata(0,'myhandles',myhandles);
 
 
 function data=getWizardData(handles)
 selectedFolder=get(handles.rootdirTF,'String');
-myhandles=getappdata(0,'myhandles');
-
-if(~isdir(selectedFolder)&& ~myhandles.use_metadata)
-  warndlg('The choosen folder is not a valid directory. Please select a valid directory!');
+if(~isdir(selectedFolder))
+  warndlg(['The choosen folder is not a valid directory.'...
+    ' Please select a valid directory!']);
   return;
 end
 %Get the root directory
@@ -600,17 +534,7 @@ if(length(rx)>0 && length(cx))
   warndlg('You must described all the markers (Name)');
   return;
 end
-%Warn if a color is used twice or more for markers
-% if(length(unique(markersData(selectedMarkerIndex,4)))~=length(selectedMarkerIndex)) 
-%   answer=questdlg(sprintf(['Color should be different for each marker.\n'...
-%     'Are you sure you want to attribute the same color to more than 1 marker?']), ...
-%  'Yes', 'No');
-% % Handle response
-%   switch answer
-%     case 'No'
-%       return;
-%   end
-% end
+
 %Get the choosen Regular Expression
 regExp=getSelectedRegExp(handles);
 if(isempty(regExp))
@@ -627,10 +551,7 @@ for i=1:length(markers)
   markers{i}.isUse=markersData{i,1};
   markers{i}.marker=markersData{i,2};
   markers{i}.name=markersData{i,3};
-  %markers{i}.color=markersData{i,4};
   markers{i}.regExp=regexprep(regExp,'\(\?<Channel>.+?\)',markersData{i,2});
-  %markers{i}.regExp=regexprep(regExp,'\(\?<Channel>.\*\)',markersData{i,2});
-  %markers{i}.regexp=
 end
 data.markers=markers;
 data.nrChannelPerFile=1;
@@ -650,75 +571,15 @@ function testTemplateBT_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in advancedEditBT.
-function advancedEditBT_Callback(hObject, eventdata, handles)
-% hObject    handle to advancedEditBT (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-h=gcf;
-[filename,pathname]=uigetfile('*.txt');
-[filenames,metadata]=ReadData([pathname filesep filename],',');
+ function advancedEditBT_Callback(hObject, eventdata, handles)
+   
 myhandles=getappdata(0,'myhandles');
-myhandles.use_metadata=true;
-enable_regexp_gui('off',handles);
-
-channelNr=length(filenames{1});
-if(channelNr<1)
-  warndlg('Couldn detect the channel. Did you select the template corresponding to your data?');
-  set(handles.markerTable,'Data',cell(0,3));
-  set(handles.markerTable,'Visible','off');
-  return;
-end
-data=cell(channelNr,3);
-for i=1:channelNr
-  data{i,1}=true;
-end
-for i=1:channelNr
-  data{i,2}=num2str(i);
-end
-for i=1:channelNr  
-  data{i,3}=['marker ' num2str(i)];
-end
-% for i=1:channelNr
-%   data{i,4}='';
-% end
-set(handles.markerTable,'Visible','on');
-set(handles.markerTable,'Data',data);
-set(handles.markerTable, 'ColumnWidth', {30 110 220, 90});
-msgbox(['Marker have been detected, please enter the name of each marker'...
-  'and click on Done to use this configuration.']);
-
-file_matrix=cell(length(filenames),length(filenames{1}));
-for i=1:length(filenames)
-    for j=1:length(filenames{1})
-        file_matrix{i,j}=filenames{i}{j};
-        if(~exist(file_matrix{i,j},'file'))
-            errordlg(['File Missing:' file_matrix{i,j}] );
-            return;
-        end
-    end
-end
-myhandles.file_matrix=file_matrix;
-%[myhandles.metadata,matched_files]=extract_regexp_metadata(file_matrix,myhandles.regular_expressions);
-%matched_files=find(matched_files);
-fnames=fieldnames(metadata);
-for i=1:length(filenames)
-    myhandles.metadata{i}.FileNames={file_matrix{i,:}};
-    myhandles.metadata{i}.None=file_matrix{i,1};
-    for j=2:length(fnames)    
-        myhandles.metadata{i}.(fnames{j})=metadata(i).(fnames{j});
-    end
-end
-
-myhandles.files_per_image=length(filenames{1});
-handles=getappdata(0,'handles');
-%fnames=fieldnames(myhandles.metadata{1});
-set(handles.groupSelector,'String',fnames);
-setappdata(0,'handles',handles);
-setappdata(0,'myhandles',myhandles); %Should probably throw in some checks to
-                                     % make sure that myhandles.files_per_image is not being reset
-                                    
-%scroll_panel;
-%delete(h);
+myhandles.wizard_handle=gcf;
+setappdata(0,'myhandles',myhandles);
+ % hObject    handle to advancedEditBT (see GCBO)
+ % eventdata  reserved - to be defined in a future version of MATLAB
+ % handles    structure with handles and user data (see GUIDATA)
+%wizardMetaData;
 
 
 
@@ -734,7 +595,11 @@ answer=questdlg(sprintf('Save this pattern list as the default one?'), ...
   switch answer
     case 'Yes'
       templates=wizardhandles.templates;
-      save('default-templates.mat','templates');
+      if isunix
+        save('default-templates_unix.mat','templates');
+      else        
+        save('default-templates_windows.mat','templates');
+      end
       msgbox(['Default Templates have been saved'],'Saved Template with success');
     case 'No'
       templates=wizardhandles.templates;
@@ -837,6 +702,7 @@ channelList=getMarkersFromDir(selectedFolder,regExp,selectedFolder);
 if(isempty(channelList))
   warndlg('Couldn detect the channel. Did you select the template corresponding to your data?');
   set(handles.markerTable,'Data',cell(0,3));
+  set(handles.ExportMetaDataButton,'Visible','off');
   set(handles.markerTable,'Visible','off');
   return;
 end
@@ -850,11 +716,8 @@ end
 for i=1:length(channelList)
   data{i,3}=['marker ' num2str(i)];
 end
-%for i=1:length(channelList)
-%  data{i,4}='';
-%end
-
 set(handles.markerTable,'Visible','on');
+set(handles.ExportMetaDataButton,'Visible','on');
 set(handles.markerTable,'Data',data);
 set(handles.markerTable, 'ColumnWidth', {30 110 220, 90});
 disp(channelList);
@@ -874,6 +737,7 @@ fileExtension=get(handles.fileExtensionTF,'String');
 channelSep=get(handles.channelSeparatorTF,'String');
 regExp=selectedTemplate.getRegularExpression(fileExtension,channelSep);
 
+
 function regExp=getFullRegExp(handles)
 selectedTemplateNr = get(handles.templateSelector,'Value');
 if(selectedTemplateNr<1)
@@ -884,29 +748,54 @@ wizardhandles=getappdata(0,'wizardhandles');
 selectedTemplate=wizardhandles.templates{selectedTemplateNr};
 regExp=selectedTemplate.Pattern;
 
-function enable_regexp_gui(is_visible,handles)
 
-set(handles.text4,'Visible',is_visible);
-set(handles.text5,'Visible',is_visible);
-set(handles.fileExtensionTF,'Visible',is_visible);
-%set(handles.channelImageText,'Visible',is_visible);
-%set(handles.nrChannelPerImageDB,'Visible',is_visible);
-set(handles.channelSeparatorTF,'Visible',is_visible);
-set(handles.testTemplateBT,'Visible',is_visible);
-%set(handles.selectSingleChannelCB,'Visible',is_visible);
+% function enable_regexp_gui(is_visible,handles)
+% set(handles.text4,'Visible',is_visible);
+% set(handles.text5,'Visible',is_visible);
+% set(handles.fileExtensionTF,'Visible',is_visible);
+% set(handles.channelSeparatorTF,'Visible',is_visible);
+% set(handles.testTemplateBT,'Visible',is_visible);
+% if(strcmp(is_visible,'on'))
+%     set(handles.selectSingleChannelCB,'Enable','off');
+% else    
+%     set(handles.selectSingleChannelCB,'Enable','on');
+% end
+% set(handles.templateSelector,'Visible',is_visible);
+% set(handles.editTemplateBT,'Visible',is_visible);
+% set(handles.saveAllTemplatesBT,'Visible',is_visible);
+% set(handles.removeSelectedTemplateBT,'Visible',is_visible);
+% set(handles.upTemplateBT,'Visible',is_visible);
+% set(handles.downTemplateBT,'Visible',is_visible);
+% set(handles.detectChannelBT,'Visible',is_visible);
+% set(handles.text6,'Visible',is_visible);
 
-if(strcmp(is_visible,'on'))
-    set(handles.selectSingleChannelCB,'Enable','off');
-else    
-    set(handles.selectSingleChannelCB,'Enable','on');
+
+% --- Executes on button press in ExportMetaDataButton.
+function ExportMetaDataButton_Callback(hObject, eventdata, handles)
+% hObject    handle to ExportMetaDataButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+data=getWizardData(handles);
+nrChannelPerImage=get(handles.nrChannelPerImageDB,'Value');
+myhandles.rootDir=data.rootDir;
+myhandles.wizardData=data;
+setappdata(0,'myhandles',myhandles);
+total_number_of_channels=length(myhandles.wizardData.markers);
+myhandles.channels_used=[];
+for i=1:total_number_of_channels
+  if(myhandles.wizardData.markers{i}.isUse)
+     myhandles.channels_used=[myhandles.channels_used;i];
+  end
 end
-set(handles.templateSelector,'Visible',is_visible);
-set(handles.editTemplateBT,'Visible',is_visible);
-set(handles.saveAllTemplatesBT,'Visible',is_visible);
-set(handles.removeSelectedTemplateBT,'Visible',is_visible);
-set(handles.upTemplateBT,'Visible',is_visible);
-set(handles.downTemplateBT,'Visible',is_visible);
-set(handles.detectChannelBT,'Visible',is_visible);
-set(handles.text6,'Visible',is_visible);
-%set(handles.text9,'Visible',is_visible);
-%set(handles.descriptionText,'Visible',is_visible);
+myhandles.allfiles=getAllFiles(myhandles.rootDir);
+%Remove the rootDir from the full path    
+myhandles.allfiles=cellfun(@(x) substring(myhandles.rootDir,x),...
+  myhandles.allfiles,'UniformOutput',false);
+setappdata(0,'myhandles',myhandles);
+%Add the file separator at the end of the root directory if not exist
+if ~strcmp(myhandles.rootDir(1:end-1),'/')
+  myhandles.rootDir=[myhandles.rootDir '/'];
+end
+setappdata(0,'myhandles',myhandles);
+[~,metadata,~]=construct_filetable();
+WriteData('/tmp/testMetadataRegExp.txt', metadata, myhandles.rootDir, nrChannelPerImage, myhandles.wizardData.markers)
