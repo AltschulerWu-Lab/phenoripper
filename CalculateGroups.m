@@ -74,7 +74,7 @@ for group_number=1:number_of_groups
        if(max(G1)<=1)
            grouped_metadata{group_number}.(cell2mat(field_names(field_num)))=GN1(1);
        else
-           grouped_metadata{group_number}.(cell2mat(field_names(field_num)))=NaN;
+           grouped_metadata{group_number}.(cell2mat(field_names(field_num)))='';
        end
    end
    

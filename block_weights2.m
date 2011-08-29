@@ -1,4 +1,4 @@
-function [weights block_ids] =block_weights2(block,centroids,intensity_cutoff)
+function [weights block_ids] =block_weights2(block,centroids,intensity_cutoff,include_bg)
 
 number_of_clusters=size(centroids,4);
 [xsize,ysize,~]=size(block);
@@ -12,8 +12,15 @@ end
 [~,block_ids]=min(distmat,[],3);
 block_ids(bg(:))=0;
 weights=zeros(number_of_clusters+1,1);
-for cluster=0:number_of_clusters
-    weights(cluster+1)=sum(block_ids(:)==cluster)/(xsize*ysize);
+if(include_bg)
+    start_cluster=0;
+else
+    start_cluster=1;
+end
+%for cluster=0:number_of_clusters
+for cluster=start_cluster:number_of_clusters
+    %weights(cluster+1)=sum(block_ids(:)==cluster)/(xsize*ysize);
+    weights(cluster+1)=sum(block_ids(:)==cluster)/(nnz(block_ids>=start_cluster));
 end
 
 end

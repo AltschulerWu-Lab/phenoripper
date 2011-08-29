@@ -1,5 +1,5 @@
 function data=wmd_read_data_simple(filenames,block_size,cutoff_intensity, number_of_RGB_clusters,number_of_block_clusters,...
-    number_of_blocks_per_image,rgb_samples_per_image,number_of_representative_blocks)
+    number_of_blocks_per_image,rgb_samples_per_image,number_of_representative_blocks,marker_scales,include_bg)
 
 data.block_size=block_size;
 data.cutoff_intensity=cutoff_intensity;
@@ -45,17 +45,15 @@ block_counter=0;
 rgb_counter=0;
 
 for image_counter=1:number_of_repeats
-    img=zeros(xres,yres,number_of_channels);
+    
     
     if(channels_per_file>1)
-        img=double(imread(cell2mat(filenames(image_counter))));
+        img=Read_and_Scale_Image(filenames(image_counter),marker_scales); 
     else
-        for channel_counter=1:number_of_channels
-            img(:,:,channel_counter)=double(imread(cell2mat(filenames(image_counter,channel_counter))));
-        end
+        img=Read_and_Scale_Image(filenames(image_counter,:),marker_scales); 
     end
     
-    intensity=sum(img.^2,3);
+    intensity=sqrt(sum(img.^2,3)/number_of_channels);
     foreground_points=zeros(sum(sum(intensity>cutoff_intensity)),number_of_channels);
     for channel_counter=1:number_of_channels
         temp=squeeze(img(:,:,channel_counter));
@@ -73,12 +71,14 @@ for image_counter=1:number_of_repeats
             y_offset:(y_offset+blocks_ny*block_size-1),channel_counter);
     end
     
+        
     temp=intensity(x_offset:(x_offset+blocks_nx*block_size-1),...
         y_offset:(y_offset+blocks_ny*block_size-1));
-    avg_intensity=A1*temp*B1/(block_size^2);
+    %avg_intensity=A1*temp*B1/(block_size^2);
     
-    
-    foreground_blocks=find(avg_intensity>cutoff_intensity);
+    fraction_fg_pixels_in_block=A1*double(temp>cutoff_intensity)*B1/(block_size^2);
+    foreground_blocks=find(fraction_fg_pixels_in_block>0.5);
+    %foreground_blocks=find(avg_intensity>cutoff_intensity);
     sample_size=min(number_of_blocks_per_image,length(foreground_blocks));
     if(sample_size>0)
         good_blocks=randsample(foreground_blocks,sample_size);
@@ -122,7 +122,7 @@ for k=1:block_counter
     %data.block_weights(k,:)=...
      %   block_weights(block_data(:,:,:,k),data.RGB_centroids);
      data.block_weights(k,:)=...
-        block_weights2(block_data(:,:,:,k),centroids_temp,cutoff_intensity);
+        block_weights2(block_data(:,:,:,k),centroids_temp,cutoff_intensity,include_bg);
 
 end
 

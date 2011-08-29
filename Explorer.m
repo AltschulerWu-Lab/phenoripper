@@ -921,8 +921,14 @@ for condition=1:myhandles.number_of_conditions
    
 end
 
-is_numeric=all(cellfun(@(x) isnumeric(x),group_vals));
 
+is_numeric=all(cellfun(@(x) isnumeric(x),group_vals));
+if(~is_numeric)
+    if(all(~isnan(cellfun(@(x) str2double(x),group_vals))))
+        is_numeric=true;
+        group_vals=num2cell(cellfun(@(x) str2double(x),group_vals));
+    end
+end
 
 myhandles.mds_text=cell(size(myhandles.superblock_profiles,1),1);
 myhandles.mds_colors=zeros(size(myhandles.superblock_profiles,1),3);  
@@ -1043,7 +1049,7 @@ setappdata(0,'myhandles',myhandles);
 % end
 
 function mds_positions=Calculate_MDS(raw_profiles,dim)
-max_number_of_points_for_mds=600;
+max_number_of_points_for_mds=1500;
 nan_pos=isnan(raw_profiles);
 raw_profiles(nan_pos)=rand(nnz(nan_pos),1)/100;
 if(size(raw_profiles)<max_number_of_points_for_mds)
@@ -1077,13 +1083,15 @@ function CalcSB_1_Button_Callback(hObject, eventdata, handles)
 myhandles=getappdata(0,'myhandles');
 image_num=myhandles.file_number1;
 filenames=myhandles.grouped_metadata{myhandles.chosen_points(2)}.files_in_group(image_num,:);
-results=SecondOrder(filenames,myhandles.global_data);
+results=SecondOrder(filenames,myhandles.global_data,myhandles.marker_scales,...
+    myhandles.include_background_superblocks);
 myhandles.image1_in_sb_states=results.image_superblock_states;
 myhandles.distance_to_superblock_centroid1=results.distance_to_superblock_centroid;
 
 image_num=myhandles.file_number2;
 filenames=myhandles.grouped_metadata{myhandles.chosen_points(1)}.files_in_group(image_num,:);
-results=SecondOrder(filenames,myhandles.global_data);
+results=SecondOrder(filenames,myhandles.global_data,myhandles.marker_scales,...
+    myhandles.include_background_superblocks);
 myhandles.image2_in_sb_states=results.image_superblock_states;
 myhandles.distance_to_superblock_centroid2=results.distance_to_superblock_centroid;
 number_of_bars=length(myhandles.bar_order);
@@ -1574,10 +1582,10 @@ display_colors=myhandles.display_colors;
 %         sb_marker_profiles(i,j)=mean(temp(:));
 %     end
 % end
-% for i=1:size(sb_marker_profiles,2)
-%    sb_marker_profiles(:,i)= sb_marker_profiles(:,i)/max(sb_marker_profiles(:,i));
-%    sb_marker_profiles(:,i)= sb_marker_profiles(:,i)/myhandles.marker_scales(i,2);
-% end
+for i=1:size(sb_marker_profiles,2)
+   sb_marker_profiles(:,i)= sb_marker_profiles(:,i)/max(sb_marker_profiles(:,i));
+   %sb_marker_profiles(:,i)= sb_marker_profiles(:,i)/myhandles.marker_scales(i,2);
+end
 
 %sb_marker_profiles=sb_marker_profiles(:,find(markers_shown));
 myhandles.cg_sb_ordering_method_type

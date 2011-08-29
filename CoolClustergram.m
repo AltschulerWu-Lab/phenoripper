@@ -74,7 +74,7 @@ for rep_num=1:number_of_representatives
   % set(gca,'Units','normalized');
    positions(rep_num,:)=dsxy2figxy(h,[x_positions(rep_num),y_positions(rep_num),scale_factor*1,scale_factor*number_of_data_points/number_of_representatives]);
    h1=axes('position', positions(rep_num,:),'parent',f);
-   img=double(representatives{perm2(rep_num),2});
+   img=double(representatives{perm2(rep_num),1});
    max_col=max(img(:));
    Display_Image(img,h1,marker_scales,display_colors,[]);axis equal;axis off;
    line([2*block_size,5*block_size],[2*block_size,2*block_size],'Color','w');

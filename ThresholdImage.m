@@ -84,7 +84,7 @@ else
           img(:,:,channel)=imread(filenames{myhandles.image_number,channel});
       end
 end
-myhandles.intensity=sum(img.^2,3);
+myhandles.intensity=CalculateIntensity(img,myhandles.marker_scales);
 myhandles.h=gca;
 myhandles.img=img;
 myhandles.img1=tanh(double(img)/2^myhandles.bit_depth*10);
@@ -317,7 +317,7 @@ else
       end
 end
 myhandles.img=img;
-myhandles.intensity=sum(img.^2,3);
+myhandles.intensity=CalculateIntensity(img,myhandles.marker_scales);
 myhandles.img1=tanh(double(img)/2^myhandles.bit_depth*10);
 setappdata(0,'myhandles',myhandles);
 display_image(handles);
@@ -373,7 +373,7 @@ else
       end
 end
 myhandles.img=img;
-myhandles.intensity=sum(img.^2,3);
+myhandles.intensity=CalculateIntensity(img,myhandles.marker_scales);
 %myhandles.img1=tanh(double(img)/2^myhandles.bit_depth*10);
 setappdata(0,'myhandles',myhandles);
 display_image(handles);
@@ -535,3 +535,12 @@ function show_mask_checkbox_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of show_mask_checkbox
 display_image(handles);
+
+function intensity=CalculateIntensity(img,marker_scales)
+    img=double(img);
+      number_of_channels=size(img,3);
+      for channel=1:number_of_channels
+       img(:,:,channel)=min(max(img(:,:,channel)-marker_scales(channel,1),0)/...
+           (marker_scales(channel,2)-marker_scales(channel,1)),1)*100; 
+      end
+      intensity=sqrt(sum(img.^2,3)/number_of_channels);
