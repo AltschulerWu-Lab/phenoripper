@@ -22,7 +22,7 @@ function varargout = Explorer(varargin)
 
 % Edit the above text to modify the response to help Explorer
 
-% Last Modified by GUIDE v2.5 17-Aug-2011 16:06:52
+% Last Modified by GUIDE v2.5 26-Aug-2011 12:10:38
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -294,7 +294,7 @@ guidata(hObject, handles);
 %   set(handles.NextImage1_pushbotton,'CData',cat(3,zeros(500),zeros(500),zeros(500)));
 %   set(handles.NextImage2_pushbotton,'CData',cat(3,zeros(500),zeros(500),zeros(500)));
 % end
-generateShowGroupingFieldMenu(handles)
+%generateShowGroupingFieldMenu(handles)
 
 
 function generateShowGroupingFieldMenu(handles)
@@ -700,75 +700,75 @@ if(all(myhandles.chosen_points~=0))
    
 end
 
-function Plot_MDS(positions,dim,labels,colors,selected_points,axis_handle,show_text)
-bool_points=false(length(labels),1);
-bool_points(selected_points(selected_points>0))=true;
-
-default_font_size=12;
-selected_font_size=16;
-font_sizes=default_font_size*ones(size(bool_points));
-font_sizes(bool_points)=selected_font_size;
-
-default_point_size=60;
-selected_point_size=200;
-point_sizes=default_point_size*ones(size(bool_points));
-point_sizes(bool_points)=selected_point_size;
-
-if(dim==2)
-    scatter(axis_handle,positions(:,1),positions(:,2),point_sizes,colors,'filled');
-    if(show_text)
-        for i=1:size(positions,1)
-            % text(positions(i,1),positions(i,2),labels{i},...
-            %     'BackgroundColor',colors(i,:),'FontSize',font_sizes(i),...
-            %     'parent',axis_handle);
-            
-            text(positions(i,1),positions(i,2),['  ', cell2mat(labels{i})],...
-                'FontSize',font_sizes(i),...
-                'parent',axis_handle);
-        end
-    end
-else
-  
-    rotate3d off;
-       %rotate3d(axis_handle,'Enable','off');
-%         camPos = get(axis_handle, 'CameraPosition'); % camera position
-%         camTgt = get(axis_handle, 'CameraTarget'); % where the camera is pointing to
-%         camUpVect = get(axis_handle, 'CameraUpVector'); % camera 'up' vector
-        
-           
-    scatter3(axis_handle,positions(:,1),positions(:,2),positions(:,3),point_sizes,colors,'filled');
-    if(show_text)
-        for i=1:size(positions,1)
-            %        text(positions(i,1),positions(i,2),positions(i,3),labels{i},...
-            %            'BackgroundColor',colors(i,:),'parent',axis_handle,...
-            %            'FontSize',font_sizes(i));
-            text(positions(i,1),positions(i,2),positions(i,3),['  ', cell2mat(labels{i})],...
-                'parent',axis_handle,...
-                'FontSize',font_sizes(i));
-        end
-    end
-    set(axis_handle,'XTickLabel','','YTickLabel','','ZTickLabel','');
-  %  set(axis_handle, 'CameraPosition',camPos);
-   % set(axis_handle, 'CameraTarget',camTgt);
-   % set(axis_handle, 'CameraUpVector',camUpVect);
+  function Plot_MDS(positions,dim,labels,colors,selected_points,axis_handle,show_text)
+    bool_points=false(length(labels),1);
+    bool_points(selected_points(selected_points>0))=true;
     
-       
-end
-myhandles=getappdata(0,'myhandles');
-fnames=fieldnames(myhandles.grouped_metadata{1});
-if(myhandles.chosen_grouping_field~=1)
-    grouping_field=fnames{myhandles.chosen_grouping_field};
-else
-    grouping_field='Single Multi-Channel Image';
-end
-label_field=fnames{myhandles.label_field_number+1};
-color_field=fnames{myhandles.color_field_number+1};
-panel_string=['Point:' grouping_field...
-    ', Color:' color_field];
-if(show_text)
-    panel_string =[panel_string ', Label:' label_field];
-end
-set(myhandles.MDS_panel,'Title',panel_string);
+    default_font_size=12;
+    selected_font_size=16;
+    font_sizes=default_font_size*ones(size(bool_points));
+    font_sizes(bool_points)=selected_font_size;
+    
+    default_point_size=60;
+    selected_point_size=200;
+    point_sizes=default_point_size*ones(size(bool_points));
+    point_sizes(bool_points)=selected_point_size;
+    
+    if(dim==2)
+      scatter(axis_handle,positions(:,1),positions(:,2),point_sizes,colors,'filled');
+      if(show_text)
+        for i=1:size(positions,1)
+          % text(positions(i,1),positions(i,2),labels{i},...
+          %     'BackgroundColor',colors(i,:),'FontSize',font_sizes(i),...
+          %     'parent',axis_handle);
+          
+          text(positions(i,1),positions(i,2),['  ', cell2mat(labels{i})],...
+            'FontSize',font_sizes(i),...
+            'parent',axis_handle);
+        end
+      end
+    else
+      
+      rotate3d off;
+      %rotate3d(axis_handle,'Enable','off');
+      %         camPos = get(axis_handle, 'CameraPosition'); % camera position
+      %         camTgt = get(axis_handle, 'CameraTarget'); % where the camera is pointing to
+      %         camUpVect = get(axis_handle, 'CameraUpVector'); % camera 'up' vector
+      
+      
+      scatter3(axis_handle,positions(:,1),positions(:,2),positions(:,3),point_sizes,colors,'filled');
+      if(show_text)
+        for i=1:size(positions,1)
+          %        text(positions(i,1),positions(i,2),positions(i,3),labels{i},...
+          %            'BackgroundColor',colors(i,:),'parent',axis_handle,...
+          %            'FontSize',font_sizes(i));
+          text(positions(i,1),positions(i,2),positions(i,3),['  ', cell2mat(labels{i})],...
+            'parent',axis_handle,...
+            'FontSize',font_sizes(i));
+        end
+      end
+      set(axis_handle,'XTickLabel','','YTickLabel','','ZTickLabel','');
+      %  set(axis_handle, 'CameraPosition',camPos);
+      % set(axis_handle, 'CameraTarget',camTgt);
+      % set(axis_handle, 'CameraUpVector',camUpVect);
+      
+      
+    end
+    myhandles=getappdata(0,'myhandles');
+    fnames=fieldnames(myhandles.grouped_metadata{1});
+    if(myhandles.chosen_grouping_field~=1)
+      grouping_field=fnames{myhandles.chosen_grouping_field};
+    else
+      grouping_field='Single Multi-Channel Image';
+    end
+    label_field=fnames{myhandles.label_field_number+1};
+    color_field=fnames{myhandles.color_field_number+1};
+    panel_string=['Point:' grouping_field...
+      ', Color:' color_field];
+    if(show_text)
+      panel_string =[panel_string ', Label:' label_field];
+    end
+    set(myhandles.MDS_panel,'Title',panel_string);
 
 
 % --- Executes on button press in LegendCheckBox.
@@ -1029,15 +1029,28 @@ function Group_By_Menu_Callback(hObject, eventdata, handles)
 
 
 function group_by_callback(hObject, eventdata, handles,group_num)
+  
 myhandles=getappdata(0,'myhandles');
+  
+
+%Apply filter if exist
+%otherwise will add a zero vector
+if(strcmp(get(handles.Enable_filter,'Checked'),'on'))
+  filterFileList=getFileFilterListed();
+  is_file_blacklistedBK=myhandles.is_file_blacklisted;
+  myhandles.is_file_blacklisted = is_file_blacklistedBK | filterFileList';
+  myhandles.filterFileList = filterFileList;
+  setappdata(0,'myhandles',myhandles);
+end
+  
 myhandles.chosen_grouping_field=group_num;
 MenuList_Checkmark(group_num,myhandles.Group_Points_By_Menu_Handles);
 [myhandles.grouped_metadata,myhandles.superblock_profiles,~,~,...
 myhandles.metadata_file_indices]=CalculateGroups(...
-myhandles.chosen_grouping_field,myhandles.metadata,...
-myhandles.individual_superblock_profiles,...
-myhandles.individual_number_foreground_blocks,myhandles.is_file_blacklisted);
-myhandles.number_of_conditions=length(myhandles.grouped_metadata);
+  myhandles.chosen_grouping_field,myhandles.metadata,...
+  myhandles.individual_superblock_profiles,...
+  myhandles.individual_number_foreground_blocks,myhandles.is_file_blacklisted);
+  myhandles.number_of_conditions=length(myhandles.grouped_metadata);
 ResetAxes(handles);
 if(myhandles.number_of_conditions~=1)
 %     superblock_profiles=myhandles.superblock_profiles;
@@ -1073,6 +1086,12 @@ setappdata(0,'myhandles',myhandles);
 %         set(frame_handle,'Title',class_text);
 %     end
 % end
+%If apply filter is set to on
+if(strcmp(get(handles.Enable_filter,'Checked'),'on'))
+  myhandles=getappdata(0,'myhandles');
+  myhandles.is_file_blacklisted = is_file_blacklistedBK;
+  setappdata(0,'myhandles',myhandles);
+end
 
 function mds_positions=Calculate_MDS(raw_profiles,dim)
 max_number_of_points_for_mds=600;
@@ -1842,3 +1861,118 @@ function Show_Point_Callback(hObject, eventdata, handles)
 % hObject    handle to Show_Point (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function Filter_Callback(hObject, eventdata, handles)
+% hObject    handle to Filter (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function Enable_filter_Callback(hObject, eventdata, handles)
+% hObject    handle to Enable_filter (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+  if(strcmp(get(hObject,'Checked'),'on'))
+    set(hObject,'Checked','off');
+    myhandles=getappdata(0,'myhandles');
+    group_by_callback([], [], handles,myhandles.chosen_grouping_field);
+  else
+    myhandles=getappdata(0,'myhandles');
+    if isfield(myhandles,'filterMatrix')==0
+      warndlg('You need to edit the filter in order to use it');
+      return;
+    else
+      set(hObject,'Checked','on');
+      %applyFilter(handles);
+      group_by_callback([], [], handles,myhandles.chosen_grouping_field);
+    end
+  end
+
+
+% --------------------------------------------------------------------
+function EditFilter_Callback(hObject, eventdata, handles)
+% hObject    handle to EditFilter (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+%Launch the Wizard and wait
+myhandles_BK=getappdata(0,'myhandles');
+filterGUI;
+uiwait;
+drawnow;
+%If wizard has been stopped before the end, 
+% restore the previous myhandle and return
+myhandles=getappdata(0,'myhandles');
+if isfield(myhandles,'filterMatrix')==0
+  setappdata(0,'myhandles',myhandles_BK);
+  return;
+else
+  %applyFilter(handles);
+  set(handles.Enable_filter,'Checked','on');
+  group_by_callback([], [], handles,myhandles.chosen_grouping_field);
+end
+ 
+%Generate the filter on the image set and replot the MDS plot
+%See filter matrix format in useFilterCallBack() from filterGUI.m
+%   function applyFilter(handles)
+%     myhandles=getappdata(0,'myhandles');
+%     
+%     filterFileList=getFileFilterListed();
+%     is_file_blacklistedBK=myhandles.is_file_blacklisted;
+%     myhandles.is_file_blacklisted = is_file_blacklistedBK | filterFileList';
+%     myhandles.filterFileList = filterFileList;
+%     setappdata(0,'myhandles',myhandles);
+%     group_by_callback([], [], handles,myhandles.chosen_grouping_field);
+%     myhandles=getappdata(0,'myhandles');
+%     myhandles.is_file_blacklisted = is_file_blacklistedBK;
+%     setappdata(0,'myhandles',myhandles);
+  
+  function filterFileList=getFileFilterListed()
+    myhandles=getappdata(0,'myhandles');
+    groupList = fieldnames(myhandles.grouped_metadata{1});
+    groupList = groupList(2:end);
+    
+    filterFileList=[];
+    %for each filter
+    if ~isfield(myhandles,'filterMatrix')
+      filterFileList=myhandles.is_file_blacklisted';
+      return;
+    end
+    for i=1:size(myhandles.filterMatrix,1);
+      filterType=myhandles.filterMatrix(i,1);
+      groupField=myhandles.filterMatrix(i,2);
+      groupField=groupList{groupField};
+      
+      groupValueList=cellfun(@(x) cell2mat(getfield(x,groupField)),...
+        myhandles.grouped_metadata,'UniformOutput',false);
+      
+      groupOperator=myhandles.filterMatrix(i,3);
+      groupValue=myhandles.filterMatrix(i,4);
+      groupValue=groupValueList{groupValue};
+      if(isnumeric(groupValue))
+        groupValue=num2str(groupValue);
+      end
+      matchingMetadata = cellfun(@(x) strcmp(x.(groupField),groupValue),myhandles.metadata,'UniformOutput',false);
+      matchingMetadata=cell2mat(matchingMetadata);
+      switch groupOperator
+        case 2   % !=
+          matchingMetadata=~matchingMetadata;
+          %       case 3 % TODO value <
+          %         ;
+          %       case 4 % TODO value >
+          %         ;
+      end
+      if i==1
+        filterFileList=matchingMetadata;
+      else
+        if(strcmp(filterType,'AND'))
+          filterFileList=filterFileList & matchingMetadata;
+        else
+          filterFileList=filterFileList | matchingMetadata;
+        end
+      end
+    end
+      filterFileList=~filterFileList;
+  
