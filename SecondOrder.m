@@ -1,4 +1,4 @@
-function data=SecondOrder(filenames,global_data)
+function data=SecondOrder(filenames,global_data,marker_scales,include_bg)
 %% Preprocessing
 block_size=global_data.block_size;
 cutoff_intensity=global_data.cutoff_intensity;
@@ -57,22 +57,24 @@ tStart1=tic;
 %end
 for image_counter=1:number_of_repeats
    % disp(['Reading Image ' num2str(image_counter) '....']);
-    img=zeros(xres,yres,number_of_channels);
+    %img=zeros(xres,yres,number_of_channels);
     
+      
     if(channels_per_file>1)
-        img=double(imread(cell2mat(filenames(image_counter))));
+        img=Read_and_Scale_Image(filenames(image_counter),marker_scales); 
     else
-        for channel_counter=1:number_of_channels
-            img(:,:,channel_counter)=imread(cell2mat(filenames(image_counter,channel_counter)));
-        end
+        img=Read_and_Scale_Image(filenames(image_counter,:),marker_scales); 
     end
+    
     %toc;
     
     cropped_image=img(x_offset:(x_offset+blocks_nx*block_size-1),...
         y_offset:(y_offset+blocks_ny*block_size-1),1:number_of_channels);
     
     %tic;
-    intensity=sum(double(cropped_image).^2,3);
+    intensity=sqrt(sum(double(cropped_image).^2,3)/number_of_channels);
+    
+
     is.foreground=(intensity>cutoff_intensity);
     number_of_foreground_points=sum(sum(is.foreground));
     RGB_distmat=zeros(number_of_foreground_points,number_of_RGB_clusters);
@@ -95,16 +97,27 @@ for image_counter=1:number_of_repeats
     image_in_discrete_pixel_states(is.foreground)=foreground_pixel_states;
     %toc;
     
-    avg_block_intensities=A1*intensity*B1/(block_size^2);
-    foreground_blocks=find(avg_block_intensities>cutoff_intensity);
+    
+    %avg_block_intensities=A1*intensity*B1/(block_size^2);
+    fraction_fg_pixels_in_block=A1*double(intensity>cutoff_intensity)*B1/(block_size^2);
+    %foreground_blocks=find(avg_block_intensities>cutoff_intensity);
+    foreground_blocks=find(fraction_fg_pixels_in_block>0.5);
     RGBprofiles_of_blocks=zeros(length(foreground_blocks),number_of_RGB_clusters+1);
-    
-    
-    
-    for rgb_cluster=0:number_of_RGB_clusters
+       
+    %for rgb_cluster=0:number_of_RGB_clusters
+    if(include_bg)
+        start_cluster=0;
+    else
+        start_cluster=1;
+    end
+    for rgb_cluster=start_cluster:number_of_RGB_clusters
         temp=A1*(double(image_in_discrete_pixel_states==rgb_cluster))*B1/(block_size^2);
         
         RGBprofiles_of_blocks(:,rgb_cluster+1)=temp(foreground_blocks);
+    end
+    rescale_factor=sum(RGBprofiles_of_blocks,2);
+    for i=1:length(foreground_blocks)
+        RGBprofiles_of_blocks(i,:)=RGBprofiles_of_blocks(i,:)/rescale_factor(i);
     end
     
     block_distmat=zeros(length(foreground_blocks),number_of_block_clusters);
@@ -121,17 +134,20 @@ for image_counter=1:number_of_repeats
 %filtered=imfilter(double(img),h);
     neighbor_profiles_in_image=zeros(length(foreground_blocks),number_of_block_clusters+1);
     
-    for i=0:number_of_block_clusters
+    for i=1:number_of_block_clusters
         temp=imfilter(double(image_in_discrete_block_states==i),h);
         neighbor_profiles_in_image(:,i+1)=temp(foreground_blocks)/9;
        
     end
+    
     sb_image=false(blocks_nx,blocks_ny);
     sb_image(foreground_blocks)=true;
     sb_image(1,:)=false;sb_image(:,1)=false;
     sb_image(end,:)=false;sb_image(:,end)=false;
     is_fg_sb=sb_image(foreground_blocks);
-    %is_fg_sb=neighbor_profiles_in_image(:,1)==0;
+    if(~include_bg)
+        is_fg_sb=(is_fg_sb&neighbor_profiles_in_image(:,1)==0);
+    end
     foreground_superblocks=find(is_fg_sb);
     neighbor_profiles_temp(superblock_counter+1:superblock_counter+length(foreground_superblocks),:)=neighbor_profiles_in_image(foreground_superblocks,:);
     
