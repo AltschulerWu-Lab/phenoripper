@@ -22,7 +22,7 @@ function varargout = gui(varargin)
  
 % Edit the above text to modify the response to help gui
 
-% Last Modified by GUIDE v2.5 11-Aug-2011 11:19:06
+% Last Modified by GUIDE v2.5 30-Aug-2011 14:59:27
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -260,18 +260,50 @@ end
 
 
 % --- Executes on button press in SelectDirectory.
-function SelectDirectory_Callback(hObject, eventdata, handles)
-% hObject    handle to SelectDirectory (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-%Re-initialize myhandles
+% function SelectDirectory_Callback(hObject, eventdata, handles)
+% % hObject    handle to SelectDirectory (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% %Re-initialize myhandles
+% myhandles_BK=getappdata(0,'myhandles');
+% blankMyHandle=struct;
+% setappdata(0,'myhandles',blankMyHandle);
+% initializeMyHandle();
+% addProgressBarToMyHandle(handles.figure1);
+% %Launch the Wizard and wait
+% wizard;
+% uiwait;
+% drawnow;
+% %If wizard has been stopped before the end, 
+% % restore the previous myhandle and return
+% myhandles=getappdata(0,'myhandles');
+% if isfield(myhandles,'grouped_metadata')==0
+%   setappdata(0,'myhandles',myhandles_BK);
+%   return;
+% end
+% myhandles.number_of_conditions=length(myhandles.grouped_metadata);
+% setappdata(0,'myhandles',myhandles);
+% Calculate_Image_Parameters(hObject,handles,false);
+% myhandles=getappdata(0,'myhandles');
+% msgbox('Data Loaded Successfully');
+% myhandles.number_of_files=0;
+% for i=1:myhandles.number_of_conditions
+%     myhandles.number_of_files=myhandles.number_of_files+...
+%         size(myhandles.grouped_metadata{i}.files_in_group,1);
+% end
+% setappdata(0,'myhandles',myhandles);
+% SetButtonState(hObject,handles,true);
+% guidata(hObject, handles);
+
+% --- Executes on button press in useMetadaFileButton.
+function useMetadaFileButton_Callback(hObject, eventdata, handles)  
 myhandles_BK=getappdata(0,'myhandles');
 blankMyHandle=struct;
 setappdata(0,'myhandles',blankMyHandle);
 initializeMyHandle();
 addProgressBarToMyHandle(handles.figure1);
-%Launch the Wizard and wait
-wizard;
+%Launch the WizardMetadata and wait
+wizardMetaData;
 uiwait;
 drawnow;
 %If wizard has been stopped before the end, 
@@ -296,7 +328,6 @@ SetButtonState(hObject,handles,true);
 guidata(hObject, handles);
 
 
-
 % --- Executes on button press in RunBtn.
 function RunBtn_Callback(hObject, eventdata, handles)
 % hObject    handle to RunBtn (see GCBO)
@@ -307,6 +338,8 @@ if(~isfield(myhandles,'files_per_image'))
   warndlg('You must load data first');
   return;
 end
+
+analysistime_handle=tic;
 block_size = str2double(get(handles.blockSize,'String'));
 cutoff_intensity=str2double(get(handles.ThreshodIntensity,'String'));
 number_of_RGB_clusters=str2double(get(handles.ReduceColorNr,'String'));
@@ -317,6 +350,9 @@ number_of_block_representatives=3;
 number_of_superblocks=str2double(get(handles.SuperBlockNr,'String'));
 myhandles.number_of_superblocks=number_of_superblocks;
 files_per_image=myhandles.files_per_image;
+
+myhandles.include_background_superblocks=get(handles.useBackgroundInfoCB,'value');
+
 if(myhandles.number_of_conditions>100)
    chosen_conditions=randsample(myhandles.number_of_conditions,100); 
 else
@@ -339,14 +375,15 @@ myhandles.statusbarHandles=statusbar(hObject,'Generating Global Basis');
 global_data=wmd_read_data_simple(global_filenames,block_size,...
     cutoff_intensity,number_of_RGB_clusters,number_of_block_clusters,...
     number_of_blocks_per_training_image,...
-    rgb_samples_per_training_image,number_of_block_representatives);
-%Generate Neighborhood Statistics
+    rgb_samples_per_training_image,number_of_block_representatives,myhandles.marker_scales,...
+    myhandles.include_background_superblocks);
 set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
 myhandles.statusbarHandles=statusbar(hObject,'Generating Neighborhood Statistics');
 
 warning on;
 %try
-third_order=ThirdOrder_Basis(global_filenames,global_data,number_of_superblocks);
+third_order=ThirdOrder_Basis(global_filenames,global_data,number_of_superblocks,...
+    myhandles.marker_scales,myhandles.include_background_superblocks);
 global_data.superblock_centroids=third_order.superblock_centroids;
 global_data.superblock_representatives=third_order.superblock_representatives;
 myhandles.global_data=global_data;
@@ -366,7 +403,8 @@ for file_num=1:length(myhandles.metadata)
     setappdata(0,'myhandles',myhandles);
     filenames=cellfun(@(x) concatenateString(myhandles.rootDir,x),...
           myhandles.metadata{file_num}.FileNames,'UniformOutput',false);       
-    results=SecondOrder(filenames,global_data);
+    results=SecondOrder(filenames,global_data,myhandles.marker_scales,...
+        myhandles.include_background_superblocks);
     Ripped_Data(file_num).block_profile=results.block_profile;
     individual_block_profiles(file_num,:)=results.block_profile;
     individual_superblock_profiles(file_num,:)=results.superblock_profile;
@@ -391,6 +429,7 @@ myhandles.metadata_file_indices]=CalculateGroups(...
 warning off;
 myhandles.statusbarHandles=statusbar(hObject,'Done... Click on Xplorer to Explore your data!');
 warning on;
+myhandles.analysis_time=toc(analysistime_handle);
 setappdata(0,'myhandles',myhandles);
 set(handles.ExplorerButton,'Visible','on');
 set(handles.uipanel9,'Visible','on');
@@ -454,12 +493,12 @@ for test_num=1:number_of_test_files
   end
   
   for channel=1:number_of_channels
-    intensity= img(:,:,channel);
-    max_intensity=max(intensity(:));
-    min_intensity=min(intensity(:));
-    intensity=(intensity-min_intensity)/(max_intensity-min_intensity);
-    channel_thresholds(channel)=graythresh(intensity)*(max_intensity-min_intensity)+min_intensity;
-  end
+         intensity= img(:,:,channel);
+         max_intensity=max(intensity(:));
+         min_intensity=min(intensity(:));
+         intensity=(intensity-min_intensity)/(max_intensity-min_intensity);
+         channel_thresholds(channel)=graythresh(intensity)*(max_intensity-min_intensity)+min_intensity;
+    end
   thresholds(test_num)=min(channel_thresholds).^2;
   set(myhandles.statusbarHandles.ProgressBar, 'Value',test_num);
 end
@@ -559,11 +598,11 @@ function SetButtonState(hObject,handles,state)
 if(state)
     set(handles.RunBtn,'Enable','on');
     set(handles.TestThreshold,'Enable','on');
-    set(handles.SelectDirectory,'Enable','on');
+%    set(handles.SelectDirectory,'Enable','on');
 else
     set(handles.RunBtn,'Enable','off');
     set(handles.TestThreshold,'Enable','off');
-    set(handles.SelectDirectory,'Enable','off');
+%    set(handles.SelectDirectory,'Enable','off');
 end
 drawnow;
 guidata(hObject, handles); 
@@ -690,54 +729,66 @@ if(~Show_Visualization_Window)
     for channel=1:files_per_image
       selected_files{test_num,channel}=imagenames{file_num,channel};
     end
-  end
-  set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0,...
-    'Maximum',size(selected_files,1), 'Value',0);
-  myhandles.statusbarHandles=statusbar(hObject,'Calculating Image Parameters ...');
-  test=imfinfo(selected_files{1,1});
-  xres=test.Height;
-  yres=test.Width;
-  img=zeros(xres,yres,number_of_channels);
-  amplitudes=zeros(size(selected_files,1),1);
-  thresholds=zeros(size(selected_files,1),1);
-  max_val=0;
-  color_scales=zeros(size(selected_files,1),number_of_channels);
-  for file_num=1:size(selected_files,1)
-    if(number_of_channels~=files_per_image)
-      img=imread(selected_files{file_num,1});
-    else
-      for channel=1:number_of_channels
-        img(:,:,channel)=imread(selected_files{file_num,channel});
-      end
+end 
+    
+    set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximum',size(selected_files,1), 'Value',0);
+    %myhandles.statusbarHandles(hObject, 'Calculating Image Parameters ...');
+    myhandles.statusbarHandles=statusbar(hObject,'Calculating Image Parameters ...');
+    test=imfinfo(selected_files{1,1});
+    xres=test.Height;
+    yres=test.Width;
+    img=zeros(xres,yres,number_of_channels);
+    amplitudes=zeros(size(selected_files,1),1);
+    thresholds=zeros(size(selected_files,1),number_of_channels);
+    max_val=0;
+    color_scales=zeros(size(selected_files,1),number_of_channels);
+    for file_num=1:size(selected_files,1)
+        if(number_of_channels~=files_per_image)
+            img=double(imread(selected_files{file_num,1}));
+        else
+            for channel=1:number_of_channels
+                img(:,:,channel)=double(imread(selected_files{file_num,channel}));
+            end
+        end
+        channel_thresholds=zeros(number_of_channels,1);
+        for channel=1:number_of_channels
+            intensity=img(:,:,channel);
+            color_scales(file_num,channel)=prctile(intensity(:),99.9);
+            max_intensity=max(intensity(:));
+            min_intensity=min(intensity(:));
+            intensity=(intensity-min_intensity)/(max_intensity-min_intensity);
+            channel_thresholds(channel)=graythresh(intensity)*(max_intensity-min_intensity)+min_intensity;
+            thresholds(file_num,channel)=channel_thresholds(channel);
+        end
+        max_val=max(max(img(:)),max_val);
+        amp=sum(double(img).^2,3);
+        amplitudes(file_num)=quantile(amp(:),0.66);
+        %thresholds(file_num)=min(channel_thresholds).^2;
+        set(myhandles.statusbarHandles.ProgressBar, 'Value',file_num);
     end
-    channel_thresholds=zeros(number_of_channels,1);
+   
+    myhandles.marker_scales=zeros(number_of_channels,2);
+    myhandles.marker_scales(:,2)=median(color_scales,1)';
     for channel=1:number_of_channels
-      intensity=img(:,:,channel);
-      color_scales(file_num,channel)=prctile(intensity(:),99.9);
-      max_intensity=max(intensity(:));
-      min_intensity=min(intensity(:));
-      intensity=(intensity-min_intensity)/(max_intensity-min_intensity);
-      channel_thresholds(channel)=graythresh(intensity)*(max_intensity-min_intensity)+min_intensity;
+       thresholds(:,channel)=100*thresholds(:,channel)/myhandles.marker_scales(channel,2); 
     end
-    max_val=max(max(img(:)),max_val);
-    amp=sum(double(img).^2,3);
-    amplitudes(file_num)=quantile(amp(:),0.66);
-    thresholds(file_num)=min(channel_thresholds).^2;
-    set(myhandles.statusbarHandles.ProgressBar, 'Value',file_num);
-  end
-  cutoff_intensity=round(min(thresholds));
-  set(handles.ThreshodIntensity,'String',num2str(cutoff_intensity));
-  myhandles.marker_scales=zeros(number_of_channels,2);
-  myhandles.marker_scales(:,2)=median(color_scales,1)';
-  myhandles.color_order={'Blue','Green','Red','Gray','Yellow','Magenta'};
-  myhandles.display_colors=myhandles.color_order(1:number_of_channels);
-  set(myhandles.statusbarHandles.ProgressBar, 'Visible','off');
-  myhandles.amplitude_range=max(cutoff_intensity,mean(amplitudes));
-  myhandles.bit_depth=bit_depth(double(max_val),[8,12,14,16,32]);
-  myhandles.test_files=selected_files;
-  myhandles.cutoff_intensity=cutoff_intensity;
-  myhandles.block_size=str2double(get(handles.blockSize,'String'));
-  setappdata(0,'myhandles',myhandles);
+    thresholds=min(thresholds,[],2);
+    cutoff_intensity=round(quantile(thresholds(:),0.2));
+    set(handles.ThreshodIntensity,'String',num2str(cutoff_intensity));
+    myhandles.color_order={'Blue','Green','Red','Gray','Yellow','Magenta'};
+    myhandles.display_colors=myhandles.color_order(1:number_of_channels);
+    set(myhandles.statusbarHandles.ProgressBar, 'Visible','off'); 
+    myhandles.amplitude_range=max(cutoff_intensity,30);
+    myhandles.bit_depth=bit_depth(double(max_val),[8,12,14,16,32]);
+    
+    %myhandles=getappdata(0,'myhandles');
+    myhandles.test_files=selected_files;
+    myhandles.cutoff_intensity=cutoff_intensity;
+    myhandles.block_size=str2double(get(handles.blockSize,'String'));
+    %set(handles.ThreshodIntensity,'String',num2str(max(myhandles.cutoff_intensity,myhandles.amplitude_range)));
+    setappdata(0,'myhandles',myhandles);
+    
+    
 else
   myhandles.statusbarHandles=statusbar(hObject,'Testing Image In Other Window');
   try
@@ -784,35 +835,10 @@ warning on;
 setappdata(0,'myhandles',myhandles);
 
 
+% --- Executes on button press in useBackgroundInfoCB.
+function useBackgroundInfoCB_Callback(hObject, eventdata, handles)
+% hObject    handle to useBackgroundInfoCB (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 
-% --- Executes on button press in useMetadaFileButton.
-function useMetadaFileButton_Callback(hObject, eventdata, handles)  
-myhandles_BK=getappdata(0,'myhandles');
-blankMyHandle=struct;
-setappdata(0,'myhandles',blankMyHandle);
-initializeMyHandle();
-addProgressBarToMyHandle(handles.figure1);
-%Launch the WizardMetadata and wait
-wizardMetaData;
-uiwait;
-drawnow;
-%If wizard has been stopped before the end, 
-% restore the previous myhandle and return
-myhandles=getappdata(0,'myhandles');
-if isfield(myhandles,'grouped_metadata')==0
-  setappdata(0,'myhandles',myhandles_BK);
-  return;
-end
-myhandles.number_of_conditions=length(myhandles.grouped_metadata);
-setappdata(0,'myhandles',myhandles);
-Calculate_Image_Parameters(hObject,handles,false);
-myhandles=getappdata(0,'myhandles');
-msgbox('Data Loaded Successfully');
-myhandles.number_of_files=0;
-for i=1:myhandles.number_of_conditions
-    myhandles.number_of_files=myhandles.number_of_files+...
-        size(myhandles.grouped_metadata{i}.files_in_group,1);
-end
-setappdata(0,'myhandles',myhandles);
-SetButtonState(hObject,handles,true);
-guidata(hObject, handles);
+% Hint: get(hObject,'Value') returns toggle state of useBackgroundInfoCB
