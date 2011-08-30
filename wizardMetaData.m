@@ -22,7 +22,7 @@ function varargout = wizardMetaData(varargin)
 
 % Edit the above text to modify the response to help wizardMetaData
 
-% Last Modified by GUIDE v2.5 03-Aug-2011 11:27:15
+% Last Modified by GUIDE v2.5 30-Aug-2011 14:39:31
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -296,7 +296,7 @@ else
     myhandles.matched_files=matched_files;
 end
 %myhandles=getappdata(0,'myhandles');
-myhandles.wizardMetdaData_handle=gcf;
+myhandles.wizardMetaData_handle=gcf;
 setappdata(0,'myhandles',myhandles);
 wizard_accept;
 
@@ -335,3 +335,15 @@ for i=1:length(markers)
 end
 data.markers=markers;
 disp(data);
+
+
+% --- Executes on button press in extractFromFileName.
+function extractFromFileName_Callback(hObject, eventdata, handles)
+% hObject    handle to extractFromFileName (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+myhandles=getappdata(0,'myhandles');
+myhandles.wizardMetaData_handle=handles.figure1;
+setappdata(0,'myhandles',myhandles);
+wizard;
+set(handles.figure1,'Visible','off');

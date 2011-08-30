@@ -176,8 +176,8 @@ myhandles=getappdata(0,'myhandles');
 if isfield(myhandles,'wizard_handle')
   delete(myhandles.wizard_handle);
 end
-if isfield(myhandles,'wizardMetdaData_handle')
-  delete(myhandles.wizardMetdaData_handle);
+if isfield(myhandles,'wizardMetaData_handle')
+  delete(myhandles.wizardMetaData_handle);
 end
 delete(gcf);
 

@@ -22,7 +22,7 @@ function varargout = gui(varargin)
  
 % Edit the above text to modify the response to help gui
 
-% Last Modified by GUIDE v2.5 11-Aug-2011 11:19:06
+% Last Modified by GUIDE v2.5 30-Aug-2011 14:59:27
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -260,18 +260,50 @@ end
 
 
 % --- Executes on button press in SelectDirectory.
-function SelectDirectory_Callback(hObject, eventdata, handles)
-% hObject    handle to SelectDirectory (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-%Re-initialize myhandles
+% function SelectDirectory_Callback(hObject, eventdata, handles)
+% % hObject    handle to SelectDirectory (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% %Re-initialize myhandles
+% myhandles_BK=getappdata(0,'myhandles');
+% blankMyHandle=struct;
+% setappdata(0,'myhandles',blankMyHandle);
+% initializeMyHandle();
+% addProgressBarToMyHandle(handles.figure1);
+% %Launch the Wizard and wait
+% wizard;
+% uiwait;
+% drawnow;
+% %If wizard has been stopped before the end, 
+% % restore the previous myhandle and return
+% myhandles=getappdata(0,'myhandles');
+% if isfield(myhandles,'grouped_metadata')==0
+%   setappdata(0,'myhandles',myhandles_BK);
+%   return;
+% end
+% myhandles.number_of_conditions=length(myhandles.grouped_metadata);
+% setappdata(0,'myhandles',myhandles);
+% Calculate_Image_Parameters(hObject,handles,false);
+% myhandles=getappdata(0,'myhandles');
+% msgbox('Data Loaded Successfully');
+% myhandles.number_of_files=0;
+% for i=1:myhandles.number_of_conditions
+%     myhandles.number_of_files=myhandles.number_of_files+...
+%         size(myhandles.grouped_metadata{i}.files_in_group,1);
+% end
+% setappdata(0,'myhandles',myhandles);
+% SetButtonState(hObject,handles,true);
+% guidata(hObject, handles);
+
+% --- Executes on button press in useMetadaFileButton.
+function useMetadaFileButton_Callback(hObject, eventdata, handles)  
 myhandles_BK=getappdata(0,'myhandles');
 blankMyHandle=struct;
 setappdata(0,'myhandles',blankMyHandle);
 initializeMyHandle();
 addProgressBarToMyHandle(handles.figure1);
-%Launch the Wizard and wait
-wizard;
+%Launch the WizardMetadata and wait
+wizardMetaData;
 uiwait;
 drawnow;
 %If wizard has been stopped before the end, 
@@ -296,7 +328,6 @@ SetButtonState(hObject,handles,true);
 guidata(hObject, handles);
 
 
-
 % --- Executes on button press in RunBtn.
 function RunBtn_Callback(hObject, eventdata, handles)
 % hObject    handle to RunBtn (see GCBO)
@@ -319,7 +350,8 @@ number_of_block_representatives=3;
 number_of_superblocks=str2double(get(handles.SuperBlockNr,'String'));
 myhandles.number_of_superblocks=number_of_superblocks;
 files_per_image=myhandles.files_per_image;
-myhandles.include_background_superblocks=false;
+
+myhandles.include_background_superblocks=get(handles.useBackgroundInfoCB,'value');
 
 if(myhandles.number_of_conditions>100)
    chosen_conditions=randsample(myhandles.number_of_conditions,100); 
@@ -566,11 +598,11 @@ function SetButtonState(hObject,handles,state)
 if(state)
     set(handles.RunBtn,'Enable','on');
     set(handles.TestThreshold,'Enable','on');
-    set(handles.SelectDirectory,'Enable','on');
+%    set(handles.SelectDirectory,'Enable','on');
 else
     set(handles.RunBtn,'Enable','off');
     set(handles.TestThreshold,'Enable','off');
-    set(handles.SelectDirectory,'Enable','off');
+%    set(handles.SelectDirectory,'Enable','off');
 end
 drawnow;
 guidata(hObject, handles); 
@@ -803,35 +835,10 @@ warning on;
 setappdata(0,'myhandles',myhandles);
 
 
+% --- Executes on button press in useBackgroundInfoCB.
+function useBackgroundInfoCB_Callback(hObject, eventdata, handles)
+% hObject    handle to useBackgroundInfoCB (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 
-% --- Executes on button press in useMetadaFileButton.
-function useMetadaFileButton_Callback(hObject, eventdata, handles)  
-myhandles_BK=getappdata(0,'myhandles');
-blankMyHandle=struct;
-setappdata(0,'myhandles',blankMyHandle);
-initializeMyHandle();
-addProgressBarToMyHandle(handles.figure1);
-%Launch the WizardMetadata and wait
-wizardMetaData;
-uiwait;
-drawnow;
-%If wizard has been stopped before the end, 
-% restore the previous myhandle and return
-myhandles=getappdata(0,'myhandles');
-if isfield(myhandles,'grouped_metadata')==0
-  setappdata(0,'myhandles',myhandles_BK);
-  return;
-end
-myhandles.number_of_conditions=length(myhandles.grouped_metadata);
-setappdata(0,'myhandles',myhandles);
-Calculate_Image_Parameters(hObject,handles,false);
-myhandles=getappdata(0,'myhandles');
-msgbox('Data Loaded Successfully');
-myhandles.number_of_files=0;
-for i=1:myhandles.number_of_conditions
-    myhandles.number_of_files=myhandles.number_of_files+...
-        size(myhandles.grouped_metadata{i}.files_in_group,1);
-end
-setappdata(0,'myhandles',myhandles);
-SetButtonState(hObject,handles,true);
-guidata(hObject, handles);
+% Hint: get(hObject,'Value') returns toggle state of useBackgroundInfoCB
