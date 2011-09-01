@@ -222,8 +222,8 @@ locations=cell(number_of_repeats,number_of_superblocks);
 
 position_in_blocks=position_of_block; %change units from pixels to blocks
 position_in_blocks(:,1)=(position_in_blocks(:,1)-x_offset)/block_size+1;
-position_in_blocks(:,2)=(position_in_blocks(:,1)-y_offset)/block_size+1;
-is_not_edge=(position_in_blocks(:,1)>2)&(position_in_blocks(:,2)>2)...
+position_in_blocks(:,2)=(position_in_blocks(:,2)-y_offset)/block_size+1;
+is_not_edge=(position_in_blocks(:,1)>3)&(position_in_blocks(:,2)>3)...
         &(position_in_blocks(:,1)<blocks_nx-3)&(position_in_blocks(:,2)<blocks_ny-3);
 for i=1:number_of_superblocks
     % blocks_of_type=find(superblock_ids==i);
