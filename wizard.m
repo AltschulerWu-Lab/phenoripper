@@ -775,11 +775,13 @@ function ExportMetaDataButton_Callback(hObject, eventdata, handles)
 % hObject    handle to ExportMetaDataButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+[filename,pathname]=uiputfile('*.txt');
+myhandles=getappdata(0,'myhandles');
 data=getWizardData(handles);
 nrChannelPerImage=get(handles.nrChannelPerImageDB,'Value');
 myhandles.rootDir=data.rootDir;
 myhandles.wizardData=data;
-setappdata(0,'myhandles',myhandles);
+%setappdata(0,'myhandles',myhandles);
 total_number_of_channels=length(myhandles.wizardData.markers);
 myhandles.channels_used=[];
 for i=1:total_number_of_channels
@@ -791,11 +793,11 @@ myhandles.allfiles=getAllFiles(myhandles.rootDir);
 %Remove the rootDir from the full path    
 myhandles.allfiles=cellfun(@(x) substring(myhandles.rootDir,x),...
   myhandles.allfiles,'UniformOutput',false);
-setappdata(0,'myhandles',myhandles);
+%setappdata(0,'myhandles',myhandles);
 %Add the file separator at the end of the root directory if not exist
 if ~strcmp(myhandles.rootDir(1:end-1),'/')
   myhandles.rootDir=[myhandles.rootDir '/'];
 end
 setappdata(0,'myhandles',myhandles);
 [~,metadata,~]=construct_filetable();
-WriteData('/tmp/testMetadataRegExp.txt', metadata, myhandles.rootDir, nrChannelPerImage, myhandles.wizardData.markers)
+WriteData([pathname filesep filename], metadata, myhandles.rootDir, nrChannelPerImage, myhandles.wizardData.markers)

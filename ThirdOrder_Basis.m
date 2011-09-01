@@ -220,16 +220,23 @@ locations=cell(number_of_repeats,number_of_superblocks);
 %    end
 % end
 
-
+position_in_blocks=position_of_block; %change units from pixels to blocks
+position_in_blocks(:,1)=(position_in_blocks(:,1)-x_offset)/block_size+1;
+position_in_blocks(:,2)=(position_in_blocks(:,1)-y_offset)/block_size+1;
+is_not_edge=(position_in_blocks(:,1)>2)&(position_in_blocks(:,2)>2)...
+        &(position_in_blocks(:,1)<blocks_nx-3)&(position_in_blocks(:,2)<blocks_ny-3);
 for i=1:number_of_superblocks
     % blocks_of_type=find(superblock_ids==i);
-    distance_cutoffs(i)=max(prctile(superblock_distances(superblock_ids==i,i),10),...
-        max(mink(superblock_distances(:,i),number_of_superblock_representatives)));
-    acceptable_blocks=find((superblock_distances(:,i)<=distance_cutoffs(i))&(superblock_ids==i));
+    
+    
+    distance_cutoffs(i)=max(prctile(superblock_distances((superblock_ids==i)&is_not_edge,i),10),...
+        max(mink(superblock_distances(is_not_edge,i),number_of_superblock_representatives)));
+    acceptable_blocks=find((superblock_distances(:,i)<=distance_cutoffs(i))&(superblock_ids==i)&is_not_edge);
+    
     [~,image_order]=sort(superblock_profiles(:,i),'descend');
     rep_count=0;
     image_count=1;
-    while(rep_count<number_of_superblock_representatives)
+    while((rep_count<number_of_superblock_representatives)&&(image_counter<=number_of_repeats))
         image_number=image_order(image_count);
         selected_blocks=acceptable_blocks(image_number_of_block(acceptable_blocks)==image_number);
         needed_length=min(number_of_superblock_representatives-rep_count,length(selected_blocks));

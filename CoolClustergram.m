@@ -9,7 +9,8 @@ if(size(data,2)~=number_of_representatives)
 end
 figure_handle=figure('Name','PhenoRipper Clustergram');
 %cmap1=colormap(figure_handle,'Bone');%Working only for Mtlab 2011
-cmap1=colormap('Bone');
+cmap1=black_white_colormap(0.5,0.5);
+%cmap1=colormap('Bone');
 cmap2=DisplayColor2Cmap(display_colors);
 cmap=[cmap1;cmap2];
 data(isnan(data))=0;

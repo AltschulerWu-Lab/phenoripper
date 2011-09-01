@@ -1644,10 +1644,10 @@ display_colors=myhandles.display_colors;
 %         sb_marker_profiles(i,j)=mean(temp(:));
 %     end
 % end
-for i=1:size(sb_marker_profiles,2)
-   sb_marker_profiles(:,i)= sb_marker_profiles(:,i)/max(sb_marker_profiles(:,i));
-   %sb_marker_profiles(:,i)= sb_marker_profiles(:,i)/myhandles.marker_scales(i,2);
-end
+% for i=1:size(sb_marker_profiles,2)
+%    sb_marker_profiles(:,i)= sb_marker_profiles(:,i)/max(sb_marker_profiles(:,i));
+%    %sb_marker_profiles(:,i)= sb_marker_profiles(:,i)/myhandles.marker_scales(i,2);
+% end
 
 %sb_marker_profiles=sb_marker_profiles(:,find(markers_shown));
 myhandles.cg_sb_ordering_method_type
