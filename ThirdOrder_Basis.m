@@ -178,6 +178,8 @@ data.mean_superblock_profile=mean_superblock_profile;
 %   neighbor_profiles(i,block_ids(i))=1000;
 %end
 
+%[superblock_ids,data.superblock_centroids,~,superblock_distances]=kmeans(neighbor_profiles,number_of_superblocks...
+    ,'emptyaction','singleton');
 [superblock_ids,data.superblock_centroids,~,superblock_distances]=kmeans(neighbor_profiles,number_of_superblocks...
     ,'emptyaction','singleton','start','cluster');
 data.block_profile=zeros(number_of_block_clusters,1);
@@ -236,7 +238,7 @@ for i=1:number_of_superblocks
     [~,image_order]=sort(superblock_profiles(:,i),'descend');
     rep_count=0;
     image_count=1;
-    while((rep_count<number_of_superblock_representatives)&&(image_counter<=number_of_repeats))
+    while((rep_count<number_of_superblock_representatives)&&(image_count<=number_of_repeats))
         image_number=image_order(image_count);
         selected_blocks=acceptable_blocks(image_number_of_block(acceptable_blocks)==image_number);
         needed_length=min(number_of_superblock_representatives-rep_count,length(selected_blocks));

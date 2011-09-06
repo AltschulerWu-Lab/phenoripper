@@ -713,7 +713,7 @@ end
     selected_point_size=200;
     point_sizes=default_point_size*ones(size(bool_points));
     point_sizes(bool_points)=selected_point_size;
-    
+
     if(dim==2)
       scatter(axis_handle,positions(:,1),positions(:,2),point_sizes,colors,'filled');
       if(show_text)
@@ -727,6 +727,16 @@ end
             'parent',axis_handle);
         end
       end
+%       h = figure;
+%       %scatter(positions(:,1),positions(:,2),point_sizes,colors,'filled');
+%       hold on;
+%       for j=1:size(positions,1)
+%        plot(positions(j,1),positions(j,2),'o','MarkerFaceColor',colors(j,:),'MarkerSize',5,...
+%            'MarkerEdgeColor',colors(j,:));
+%       end
+%       hold off;
+%       axis equal;
+%       axis off;
     else
       
       rotate3d off;
@@ -751,7 +761,7 @@ end
       %  set(axis_handle, 'CameraPosition',camPos);
       % set(axis_handle, 'CameraTarget',camTgt);
       % set(axis_handle, 'CameraUpVector',camUpVect);
-      
+      %set(axis_handle,'XGrid','off','YGrid','off','ZGrid','off'); 
       
     end
     myhandles=getappdata(0,'myhandles');
@@ -1644,10 +1654,10 @@ display_colors=myhandles.display_colors;
 %         sb_marker_profiles(i,j)=mean(temp(:));
 %     end
 % end
-% for i=1:size(sb_marker_profiles,2)
-%    sb_marker_profiles(:,i)= sb_marker_profiles(:,i)/max(sb_marker_profiles(:,i));
-%    %sb_marker_profiles(:,i)= sb_marker_profiles(:,i)/myhandles.marker_scales(i,2);
-% end
+ for i=1:size(sb_marker_profiles,2)
+   sb_marker_profiles(:,i)= sb_marker_profiles(:,i)/max(sb_marker_profiles(:,i));
+   %sb_marker_profiles(:,i)= sb_marker_profiles(:,i)/myhandles.marker_scales(i,2);
+ end
 
 %sb_marker_profiles=sb_marker_profiles(:,find(markers_shown));
 myhandles.cg_sb_ordering_method_type
