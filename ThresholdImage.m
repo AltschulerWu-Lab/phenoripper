@@ -486,17 +486,33 @@ if(get(handles.show_mask_checkbox,'Value'))
 else
     Display_Image(img,myhandles.h,myhandles.marker_scales,myhandles.display_colors,[]);
 end
-axis(myhandles.h);
-axis image;
+%axis(myhandles.h);
+axis(myhandles.h,'image');
 if(get(handles.checkbox1,'Value'));
-    set(gca,'XTick',[0:myhandles.block_size:yres]);
-    set(gca,'XTickLabel',[]);
-    set(gca,'YTick',[0:myhandles.block_size:xres]);
-    set(gca,'YTickLabel',[]);
-    set(gca,'GridLineStyle','-');
-    grid on;
+    set(myhandles.h,'XTick',[0:myhandles.block_size:yres]);
+    set(myhandles.h,'XTickLabel',[]);
+    set(myhandles.h,'YTick',[0:myhandles.block_size:xres]);
+    set(myhandles.h,'YTickLabel',[]);
+    set(myhandles.h,'GridLineStyle','-');
+    set(myhandles.h,'XGrid','on','XColor',[0.7 0.7 0.7]);
+    set(myhandles.h,'YGrid','on','YColor',[0.7 0.7 0.7]);
+    
+%    figure;
+%    h=gca;
+%    Display_Image(img,h,myhandles.marker_scales,myhandles.display_colors,[]);
+%    set(h,'XTick',[0:myhandles.block_size:yres]);
+%    set(h,'XTickLabel',[]);
+%    set(h,'YTick',[0:myhandles.block_size:xres]);
+%    set(h,'YTickLabel',[]);
+%    set(h,'GridLineStyle','-');
+%    set(h,'XGrid','on','XColor','w');
+%    set(h,'YGrid','on','YColor','w');
+    
 else
-    grid off;
+    set(myhandles.h,'XGrid','off');
+    set(myhandles.h,'YGrid','off');
+    set(myhandles.h,'LineWidth',1);
+    %grid off;
 end
 
 
