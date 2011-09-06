@@ -339,6 +339,8 @@ if(~isfield(myhandles,'files_per_image'))
   return;
 end
 
+set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
+myhandles.statusbarHandles=statusbar(hObject,'Calculating File Structure');
 analysistime_handle=tic;
 block_size = str2double(get(handles.blockSize,'String'));
 cutoff_intensity=str2double(get(handles.ThreshodIntensity,'String'));
@@ -813,7 +815,7 @@ function result=concatenateString(string1,string2)
 
 function initializeMyHandle()
 myhandles.block_size=10;
-myhandles.cutoff_intensity=1000;
+myhandles.cutoff_intensity=9;
 myhandles.number_of_RGB_clusters=10;
 myhandles.number_of_block_clusters=10;
 myhandles.number_of_blocks_per_training_image=1000;

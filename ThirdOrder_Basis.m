@@ -179,7 +179,7 @@ data.mean_superblock_profile=mean_superblock_profile;
 %end
 
 %[superblock_ids,data.superblock_centroids,~,superblock_distances]=kmeans(neighbor_profiles,number_of_superblocks...
-    ,'emptyaction','singleton');
+%    ,'emptyaction','singleton');
 [superblock_ids,data.superblock_centroids,~,superblock_distances]=kmeans(neighbor_profiles,number_of_superblocks...
     ,'emptyaction','singleton','start','cluster');
 data.block_profile=zeros(number_of_block_clusters,1);

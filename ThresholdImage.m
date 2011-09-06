@@ -487,6 +487,7 @@ else
     Display_Image(img,myhandles.h,myhandles.marker_scales,myhandles.display_colors,[]);
 end
 %axis(myhandles.h);
+axis(myhandles.h,'image');
 if(get(handles.checkbox1,'Value'));
     set(myhandles.h,'XTick',[0:myhandles.block_size:yres]);
     set(myhandles.h,'XTickLabel',[]);
