@@ -22,7 +22,7 @@ function varargout = wizard(varargin)
 
 % Edit the above text to modify the response to help wizard
 
-% Last Modified by GUIDE v2.5 10-Aug-2011 17:58:00
+% Last Modified by GUIDE v2.5 08-Sep-2011 17:42:01
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -108,7 +108,7 @@ function varargout = wizard_OutputFcn(hObject, eventdata, handles)
 
 % Get default command line output from handles structure
 varargout{1} = handles.output;
-
+addProgressBarToMyHandle(handles);
 
 
 function rootdirTF_Callback(hObject, eventdata, handles)
@@ -150,11 +150,16 @@ if(~exist(char(dir_name),'dir'))
   dir_name='';
   warndlg('Invalid Root Directory');
 else
+  set(myhandles.wizardStatusBarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
+  myhandles.wizardStatusBarHandles=statusbar(hObject,'Scanning Folder for images');
+  drawnow expose update;
   myhandles.all_files=files_in_dir(dir_name);
   %temp=regexp(myhandles.all_files,[dir_name filesep],'split');
   saveLastPath(dir_name,'wizard');
 end
 set(handles.rootdirTF,'String',dir_name);
+set(myhandles.wizardStatusBarHandles.ProgressBar, 'Visible','off','StringPainted','off');
+myhandles.wizardStatusBarHandles=statusbar(hObject,'');
 setappdata(0,'myhandles',myhandles);
 setappdata(0,'handles',handles);
 
@@ -403,8 +408,13 @@ function doneBT_Callback(hObject, eventdata, handles)
 % hObject    handle to doneBT (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-data=getWizardData(handles);
+
 myhandles=getappdata(0,'myhandles');
+set(myhandles.wizardStatusBarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
+myhandles.wizardStatusBarHandles=statusbar(hObject,'Scanning through all images');
+drawnow;
+data=getWizardData(handles);
+% myhandles=getappdata(0,'myhandles');
 myhandles.rootDir=data.rootDir;
 myhandles.wizardData=data;
 setappdata(0,'myhandles',myhandles);
@@ -415,6 +425,8 @@ for i=1:total_number_of_channels
        myhandles.channels_used=[myhandles.channels_used;i];
    end
 end
+data=getWizardData(handles);
+myhandles.markers=data.markers;
 myhandles.allfiles=getAllFiles(myhandles.rootDir);
 %Remove the rootDir from the full path    
 myhandles.allfiles=cellfun(@(x) substring(myhandles.rootDir,x),...
@@ -801,3 +813,16 @@ end
 setappdata(0,'myhandles',myhandles);
 [~,metadata,~]=construct_filetable();
 WriteData([pathname filesep filename], metadata, myhandles.rootDir, nrChannelPerImage, myhandles.wizardData.markers)
+
+
+function addProgressBarToMyHandle(handles)
+myhandles=getappdata(0,'myhandles');
+warning off;
+myhandles.wizardStatusBarHandles=statusbar(handles.figure1,...
+  'PhenoWizard, define your data.');
+set(myhandles.wizardStatusBarHandles.TextPanel, 'Foreground',[1,1,1],...
+  'Background','black', 'ToolTipText','Loading...');
+set(myhandles.wizardStatusBarHandles.ProgressBar, 'Background','white',...
+  'Foreground',[0.4,0,0]);
+warning on;
+setappdata(0,'myhandles',myhandles);

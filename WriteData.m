@@ -48,7 +48,7 @@ function isSucceed = WriteData(fileName, metadata, RootDir, NrChannelPerImage, M
     fieldNames=fieldnames(metadata{i});
     for j=1:length(fieldNames)
       if(~strcmp(fieldNames{j,1},'None')&&~strcmp(fieldNames{j,1},'FileNames'))
-        metdataLine=[metdataLine ',' metadata{1}.(fieldNames{j})];
+        metdataLine=[metdataLine ',' metadata{i}.(fieldNames{j})];
       end
     end
     fprintf(fid, '%s\r\n', metdataLine);

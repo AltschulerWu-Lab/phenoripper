@@ -114,7 +114,8 @@ for rep_num=1:number_of_representatives
     h1=axes('position', positions(rep_num,:),'parent',f);
 
     bhandle=bar(sb_marker_profiles(perm2(rep_num),:),'Parent',h1);
-    max_val= prctile(sb_marker_profiles(:),99);
+    %max_val= prctile(sb_marker_profiles(:),99);
+    max_val= max(sb_marker_profiles(:),99);
     ch = get(bhandle,'Children');
     fvd = get(ch,'Faces');
     fvcd = get(ch,'FaceVertexCData');
@@ -125,7 +126,7 @@ for rep_num=1:number_of_representatives
     end
     %colormap(my_cmap);
     set(ch,'FaceVertexCData',fvcd);axis off;
-    set(gca,'YLim',[0,max_val]);axis off;
+    set(gca,'YLim',[0,1.5*max_val]);axis off;
     
 end
 

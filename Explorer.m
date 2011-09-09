@@ -278,6 +278,8 @@ setappdata(0,'myhandles',myhandles);
 % Update handles structure
 guidata(hObject, handles);
 %set(gcf,'WindowButtonDownFcn',{@MDSPlot_ButtonDownFcn,handles});
+addMarkerLabel(myhandles,handles);
+
 
 % UIWAIT makes Explorer wait for user response (see UIRESUME)
 % uiwait(handles.explorer);
@@ -295,6 +297,40 @@ guidata(hObject, handles);
 %   set(handles.NextImage2_pushbotton,'CData',cat(3,zeros(500),zeros(500),zeros(500)));
 % end
 %generateShowGroupingFieldMenu(handles)
+
+% labelStr = '<html>&#8704;&#946; <b>bold</b> <i><font color="red">label</html>';
+% jLabel = javaObjectEDT('javax.swing.JLabel',labelStr);
+% [hcomponent,hcontainer] = javacomponent(jLabel,[638,365,100,20],handles.explorer);
+
+function addMarkerLabel(myhandles,handles)
+if(isfield(myhandles,'markers'))
+  markerNr=0;
+  blackColor = javaObjectEDT('java.awt.Color', 0);
+  font=javaObjectEDT('java.awt.Font','Dialog', 1, 14);
+  
+  labelStr= '<html><font color="white">Markers : </font> ';
+  
+  for marker_num=1:size(myhandles.markers,2)
+    if(myhandles.markers{marker_num}.isUse)
+      markerNr=markerNr+1;
+      name = myhandles.markers{marker_num}.name;
+      color=myhandles.display_colors{markerNr};
+      colorStr=color;
+      if strcmpi(color,'cyan')
+        colorStr='#00FFFF';
+      elseif strcmpi(color,'magenta')
+        colorStr='#FF00FF';
+      end
+      labelStr= [labelStr '<font color="' colorStr '">' name '</font><font color="white"> / </font>'];
+    end
+  end
+  labelStr=labelStr(1:end-length('<font color="white"> / </font>'));
+  labelStr= [labelStr '</html>'];
+  jLabel = javaObjectEDT('javax.swing.JLabel',labelStr);
+  setFont(jLabel, font);
+  setBackground(jLabel, blackColor);
+  javacomponent(jLabel,[650+(markerNr-1)*80,365,550,20],handles.explorer);
+end
 
 
 function generateShowGroupingFieldMenu(handles)
@@ -496,6 +532,7 @@ end
 
 set(axis_handle,'XTick',[],'YTick',[]);
 box on;
+axis(axis_handle,'image');
 
 
 % --- Executes on button press in PointSelected2.
@@ -842,8 +879,10 @@ myhandles.show_mds_text=~myhandles.show_mds_text;
 setappdata(0,'myhandles',myhandles);
 if strcmp(get(gcbo, 'Checked'),'on')
     set(gcbo, 'Checked', 'off');
+    set(handles.Show_MDS_Label, 'Checked', 'off');
 else 
     set(gcbo, 'Checked', 'on');
+    set(handles.Show_MDS_Label, 'Checked', 'on');
 end
 Plot_MDS(myhandles.mds_data,myhandles.mds_dim,myhandles.mds_text,myhandles.mds_colors,...
             myhandles.chosen_points,handles.MDSPlot,myhandles.show_mds_text);
