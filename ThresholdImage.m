@@ -540,7 +540,7 @@ set(handles.show_mask_checkbox,'Value',0.0);
 Scale_Intensities(myhandles.h,[]);
 uiwait;
 myhandles=getappdata(0,'myhandles');
-display_image(handles);
+display_image(handles);     
 setappdata(0,'myhandles',myhandles);
 
 

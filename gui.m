@@ -303,8 +303,8 @@ setappdata(0,'myhandles',blankMyHandle);
 initializeMyHandle();
 addProgressBarToMyHandle(handles.figure1);
 %Launch the WizardMetadata and wait
-wizardMetaData;
-uiwait;
+h=wizardMetaData;
+uiwait(h);
 drawnow;
 %If wizard has been stopped before the end, 
 % restore the previous myhandle and return
@@ -362,11 +362,12 @@ else
 end
 global_filenames=cell(length(chosen_conditions),files_per_image);
 for condition=1:length(chosen_conditions)
-    filenames=cellfun(@(x) concatenateString(myhandles.rootDir,x),...
-          myhandles.grouped_metadata{condition}.files_in_group,'UniformOutput',false);
-    file_num=randi(size(filenames,1));%Pick Random File
+%     filenames=cellfun(@(x) strcat(myhandles.rootDir,x),...
+%           myhandles.grouped_metadata{condition}.files_in_group,'UniformOutput',false);
+    file_num=randi(size(myhandles.grouped_metadata{condition}.files_in_group,1));%Pick Random File
     for channel=1:files_per_image
-        global_filenames{condition,channel}=filenames{file_num,channel}; 
+        global_filenames{condition,channel}=strcat(myhandles.rootDir,...
+          myhandles.grouped_metadata{condition}.files_in_group{file_num,channel}); 
     end
 end
 setappdata(0,'myhandles',myhandles);
@@ -403,7 +404,7 @@ tStart=tic;
 for file_num=1:length(myhandles.metadata)
     myhandles.tElapsed=toc(tStart); 
     setappdata(0,'myhandles',myhandles);
-    filenames=cellfun(@(x) concatenateString(myhandles.rootDir,x),...
+    filenames=cellfun(@(x) strcat(myhandles.rootDir,x),...
           myhandles.metadata{file_num}.FileNames,'UniformOutput',false);       
     results=SecondOrder(filenames,global_data,myhandles.marker_scales,...
         myhandles.include_background_superblocks);
@@ -723,15 +724,23 @@ if(~Show_Visualization_Window)
   number_of_channels=myhandles.number_of_channels;
   number_of_test_files=10;
   selected_files=cell(number_of_test_files,files_per_image);
+  
+    set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximum',number_of_test_files, 'Value',0);
+  myhandles.statusbarHandles=statusbar(hObject,'Scanning through all images');
+  drawnow;
   for test_num=1:number_of_test_files
     condition=randi(myhandles.number_of_conditions);
-    imagenames=cellfun(@(x) concatenateString(myhandles.rootDir,x),...
+    imagenames=cellfun(@(x) strcat(myhandles.rootDir,x),...
       myhandles.grouped_metadata{condition}.files_in_group,'UniformOutput',false);
     file_num=randi(size(imagenames,1));
     for channel=1:files_per_image
       selected_files{test_num,channel}=imagenames{file_num,channel};
     end
-end 
+    set(myhandles.statusbarHandles.ProgressBar, 'Value',test_num);
+    if(test_num==1)
+      drawnow;
+    end
+  end 
     
     set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximum',size(selected_files,1), 'Value',0);
     %myhandles.statusbarHandles(hObject, 'Calculating Image Parameters ...');

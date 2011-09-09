@@ -283,6 +283,8 @@ for i=1:total_number_of_channels
        myhandles.channels_used=[myhandles.channels_used;i];
    end
 end
+data=getWizardData(handles);
+myhandles.markers=data.markers;
 if(myhandles.use_metadata)
     myhandles.matched_files=true(size(myhandles.file_matrix,1),1);
     myhandles.number_of_channels=length(myhandles.channels_used);
@@ -299,6 +301,14 @@ end
 myhandles.wizardMetaData_handle=gcf;
 setappdata(0,'myhandles',myhandles);
 wizard_accept;
+
+
+
+
+
+
+
+
 
 
 function data=getWizardData(handles)
@@ -346,4 +356,4 @@ myhandles=getappdata(0,'myhandles');
 myhandles.wizardMetaData_handle=handles.figure1;
 setappdata(0,'myhandles',myhandles);
 wizard;
-set(handles.figure1,'Visible','off');
+%set(handles.figure1,'Visible','off');

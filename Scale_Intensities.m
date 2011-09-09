@@ -52,16 +52,29 @@ handles.fig=figure('position',[0,0,gui_width,gui_height],'Color',background_colo
 handles.close_button=uicontrol('Style', 'pushbutton','String','Done','Units','normalized',...
             'position', [done_button_x,done_button_y,done_button_width,done_button_height],...
             'Callback', {@done_callback},'parent',handles.fig);
-        myhandles=getappdata(0,'myhandles');
-Display_Image(myhandles.img,axis_handle,color_scale,colors,[]);
-        
-for marker_num=1:number_of_markers
-    add_marker(marker_num,0.9-1.25*panel_height*(marker_num-1),color_scale(marker_num,1),color_scale(marker_num,2));
+myhandles=getappdata(0,'myhandles');
+Display_Image(myhandles.img,axis_handle,color_scale,colors,[]);  
+axis(myhandles.h,'image');
+
+
+if(isfield(myhandles,'markers'))
+  markerNr=0;
+  for marker_num=1:size(myhandles.markers,2)
+    if(myhandles.markers{marker_num}.isUse)
+      markerNr=markerNr+1;
+      add_marker(markerNr,0.9-1.25*panel_height*(markerNr-1),color_scale(markerNr,1),color_scale(markerNr,2),myhandles.markers{marker_num}.name);
+    end
+  end
+else
+  for marker_num=1:number_of_markers
+      add_marker(marker_num,0.9-1.25*panel_height*(marker_num-1),color_scale(marker_num,1),color_scale(marker_num,2),[]);
+  end
 end
 
    function set_myhandle_values()
         myhandles=getappdata(0,'myhandles');
-        Display_Image(myhandles.img,axis_handle,color_scale,colors,mask);
+        Display_Image(myhandles.img,axis_handle,color_scale,colors,mask);        
+        axis(myhandles.h,'image');
         myhandles.marker_scales=color_scale;
         myhandles.display_colors=colors;
         setappdata(0,'myhandles',myhandles);
@@ -79,12 +92,19 @@ end
 
  
 
-    function marker_handles=add_marker(marker_number,position,default_min,default_max)
+    function marker_handles=add_marker(marker_number,position,default_min,default_max,name)
         
         %Panel
-        marker_handles.marker_panel=uipanel('Title','Marker Number ','BackgroundColor',background_color,...
+        if(~isempty(name))
+          marker_handles.marker_panel=uipanel('Title',name,'BackgroundColor',background_color,...
             'ForegroundColor',foreground_color,'Units','normalized','position',[0.05,position,panel_width,panel_height],...
             'parent',handles.fig);
+          
+        else
+          marker_handles.marker_panel=uipanel('Title','Marker Number ','BackgroundColor',background_color,...
+            'ForegroundColor',foreground_color,'Units','normalized','position',[0.05,position,panel_width,panel_height],...
+            'parent',handles.fig);
+        end
         % Scroll Bars
         marker_handles.min_scroll_bar=uicontrol('Style', 'slider',...
             'Min',min_intensity,'Max',max_intensity,'Value',default_min,'Units','normalized',...
