@@ -122,11 +122,16 @@ for image_counter=1:number_of_repeats
 %filtered=imfilter(double(img),h);
     neighbor_profiles_in_image=zeros(length(foreground_blocks),number_of_block_clusters+1);
     
-    for i=0:number_of_block_clusters
+    for i=start_cluster:number_of_block_clusters
         temp=imfilter(double(image_in_discrete_block_states==i),h);
         neighbor_profiles_in_image(:,i+1)=temp(foreground_blocks)/9;
        
     end
+    neighbor_norm=sum(neighbor_profiles_in_image,2);
+    for i=1:size(neighbor_profiles_in_image,1)
+        neighbor_profiles_in_image(i,:)=neighbor_profiles_in_image(i,:)/neighbor_norm(i);
+    end
+    
     sb_image=false(blocks_nx,blocks_ny);
     sb_image(foreground_blocks)=true;
     sb_image(1,:)=false;sb_image(:,1)=false;

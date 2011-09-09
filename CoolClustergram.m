@@ -9,7 +9,7 @@ if(size(data,2)~=number_of_representatives)
 end
 figure_handle=figure('Name','PhenoRipper Clustergram');
 %cmap1=colormap(figure_handle,'Bone');%Working only for Mtlab 2011
-cmap1=black_white_colormap(0.5,0.5);
+cmap1=black_white_colormap(0.3,0.35);
 %cmap1=colormap('Bone');
 cmap2=DisplayColor2Cmap(display_colors);
 cmap=[cmap1;cmap2];
@@ -110,11 +110,12 @@ set(himg,'CLim', [min_val min_val+(l1+l2)*(max_val-min_val)/(l1-1)]);
 
 for rep_num=1:number_of_representatives
     positions(rep_num,:)=dsxy2figxy(h,[x_positions(rep_num),y_positions1(rep_num),...
-        scale_factor*1,scale_factor*(number_of_data_points+1)/number_of_representatives]);
+        scale_factor*1,0.8*scale_factor*(number_of_data_points+1)/number_of_representatives]);
     h1=axes('position', positions(rep_num,:),'parent',f);
 
     bhandle=bar(sb_marker_profiles(perm2(rep_num),:),'Parent',h1);
-    max_val= prctile(sb_marker_profiles(:),99);
+%    max_val= prctile(sb_marker_profiles(:),99);
+    max_val=max(sb_marker_profiles(:));
     ch = get(bhandle,'Children');
     fvd = get(ch,'Faces');
     fvcd = get(ch,'FaceVertexCData');
@@ -125,7 +126,7 @@ for rep_num=1:number_of_representatives
     end
     %colormap(my_cmap);
     set(ch,'FaceVertexCData',fvcd);axis off;
-    set(gca,'YLim',[0,max_val]);axis off;
+    set(gca,'YLim',[0,1.5*max_val]);axis off;
     
 end
 
