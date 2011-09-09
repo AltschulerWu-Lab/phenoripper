@@ -329,7 +329,7 @@ if(isfield(myhandles,'markers'))
   jLabel = javaObjectEDT('javax.swing.JLabel',labelStr);
   setFont(jLabel, font);
   setBackground(jLabel, blackColor);
-  javacomponent(jLabel,[650+(markerNr-1)*80,365,550,20],handles.explorer);
+  javacomponent(jLabel,[650,365,550,20],handles.explorer);
 end
 
 
