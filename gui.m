@@ -22,7 +22,7 @@ function varargout = gui(varargin)
  
 % Edit the above text to modify the response to help gui
 
-% Last Modified by GUIDE v2.5 30-Aug-2011 14:59:27
+% Last Modified by GUIDE v2.5 17-Sep-2011 18:05:05
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -353,20 +353,61 @@ number_of_superblocks=str2double(get(handles.SuperBlockNr,'String'));
 myhandles.number_of_superblocks=number_of_superblocks;
 files_per_image=myhandles.files_per_image;
 
+% minimum_training_files=min(30,length(myhandles.metadata));
+% maximum_training_files=100;
+minimum_training_files=min(str2double(get(handles.MinImageTraining,'String')),length(myhandles.metadata));
+maximum_training_files=str2double(get(handles.MaxImageTraining,'String'));
+
 myhandles.include_background_superblocks=get(handles.useBackgroundInfoCB,'value');
 
-if(myhandles.number_of_conditions>100)
-   chosen_conditions=randsample(myhandles.number_of_conditions,100); 
+
+if(myhandles.number_of_conditions>maximum_training_files)
+    chosen_files=zeros(maximum_training_files,2);
+    chosen_files(:,1)=randsample(myhandles.number_of_conditions,maximum_training_files)'; 
+    
+    for i=1:maximum_training_files
+        chosen_files(i,2)=randi(size(myhandles.grouped_metadata{chosen_files(i,1)}.files_in_group,1));
+    end
 else
-    chosen_conditions=1:myhandles.number_of_conditions;
+    if(myhandles.number_of_conditions<minimum_training_files)
+        chosen_files=zeros(minimum_training_files,2);
+        rand_condition=randperm(myhandles.number_of_conditions);
+        counter=0;
+        loop_number=1;
+        condition_perm=cell(myhandles.number_of_conditions,1);
+        for i=1:myhandles.number_of_conditions
+            condition_perm{i}=randperm(size(myhandles.grouped_metadata{rand_condition(i)}.files_in_group,1));
+        end
+        
+        while(counter<minimum_training_files)
+            for i=1:myhandles.number_of_conditions
+                if((counter<minimum_training_files)&&(loop_number<=size(myhandles.grouped_metadata{rand_condition(i)}.files_in_group,1)))
+                    counter=counter+1;
+                    chosen_files(counter,1)=rand_condition(i);
+                    chosen_files(counter,2)=condition_perm{rand_condition(i)}(loop_number);
+                end
+               
+            end
+            loop_number=loop_number+1;
+        end
+        
+    else
+        chosen_files=zeros(myhandles.number_of_conditions,2);
+        chosen_files(:,1)=(1:myhandles.number_of_conditions)';
+        
+        for i=1:myhandles.number_of_conditions
+            chosen_files(i,2)=randi(size(myhandles.grouped_metadata{chosen_files(i,1)}.files_in_group,1));
+        end
+    end
 end
-global_filenames=cell(length(chosen_conditions),files_per_image);
-for condition=1:length(chosen_conditions)
+global_filenames=cell(size(chosen_files,1),files_per_image);
+for i=1:size(chosen_files,1)
 %     filenames=cellfun(@(x) strcat(myhandles.rootDir,x),...
 %           myhandles.grouped_metadata{condition}.files_in_group,'UniformOutput',false);
-    file_num=randi(size(myhandles.grouped_metadata{condition}.files_in_group,1));%Pick Random File
+    condition=chosen_files(i,1);
+    file_num=chosen_files(i,2);%randi(size(myhandles.grouped_metadata{condition}.files_in_group,1));%Pick Random File
     for channel=1:files_per_image
-        global_filenames{condition,channel}=strcat(myhandles.rootDir,...
+        global_filenames{i,channel}=strcat(myhandles.rootDir,...
           myhandles.grouped_metadata{condition}.files_in_group{file_num,channel}); 
     end
 end
@@ -523,6 +564,12 @@ if(get(hObject,'Value'))
   set(handles.ReduceColorNr,'Visible','on');
   set(handles.BlockTypeNr,'Visible','on');
   set(handles.SuperBlockNr,'Visible','on');
+  set(handles.text23,'Visible','on');
+  set(handles.text24,'Visible','on');
+  set(handles.text25,'Visible','on');
+  set(handles.MinImageTraining,'Visible','on');
+  set(handles.MaxImageTraining,'Visible','on');
+  
 else
   set(handles.AdvancedOptions,'Visible','off');
   set(handles.text4,'Visible','off');
@@ -531,6 +578,11 @@ else
   set(handles.ReduceColorNr,'Visible','off');
   set(handles.BlockTypeNr,'Visible','off');
   set(handles.SuperBlockNr,'Visible','off');
+  set(handles.text23,'Visible','off');
+  set(handles.text24,'Visible','off');
+  set(handles.text25,'Visible','off');
+  set(handles.MinImageTraining,'Visible','off');
+  set(handles.MaxImageTraining,'Visible','off');
 end
 guidata(hObject, handles);
 
@@ -853,3 +905,49 @@ function useBackgroundInfoCB_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of useBackgroundInfoCB
+
+
+
+function MinImageTraining_Callback(hObject, eventdata, handles)
+% hObject    handle to MinImageTraining (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of MinImageTraining as text
+%        str2double(get(hObject,'String')) returns contents of MinImageTraining as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function MinImageTraining_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to MinImageTraining (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function MaxImageTraining_Callback(hObject, eventdata, handles)
+% hObject    handle to MaxImageTraining (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of MaxImageTraining as text
+%        str2double(get(hObject,'String')) returns contents of MaxImageTraining as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function MaxImageTraining_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to MaxImageTraining (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

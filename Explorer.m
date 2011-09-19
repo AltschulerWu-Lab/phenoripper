@@ -746,13 +746,14 @@ end
     font_sizes=default_font_size*ones(size(bool_points));
     font_sizes(bool_points)=selected_font_size;
     
-    default_point_size=60;
+    default_point_size=30;
     selected_point_size=200;
     point_sizes=default_point_size*ones(size(bool_points));
     point_sizes(bool_points)=selected_point_size;
 
     if(dim==2)
       scatter(axis_handle,positions(:,1),positions(:,2),point_sizes,colors,'filled');
+      axis(axis_handle,'equal');
       if(show_text)
         for i=1:size(positions,1)
           % text(positions(i,1),positions(i,2),labels{i},...
@@ -772,8 +773,8 @@ end
 %            'MarkerEdgeColor',colors(j,:));
 %       end
 %       hold off;
-%       axis equal;
-%       axis off;
+%        axis equal;
+%        axis off;
     else
       
       rotate3d off;
@@ -1717,7 +1718,7 @@ end
 CoolClustergram(superblock_profiles,superblock_representatives,...
     myhandles.mds_text,myhandles.mds_colors...
     ,myhandles.marker_scales,display_colors,sb_marker_profiles,...
-    myhandles.block_size,sb_ordering_score,use_sb_dendrogram);
+    myhandles.global_data.block_size,sb_ordering_score,use_sb_dendrogram);
 
 
 function Clustergram_SB_Displayed_Menu_Handles_Callback(hObject,eventdata,handles,number_chosen)

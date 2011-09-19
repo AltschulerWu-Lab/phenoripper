@@ -110,7 +110,7 @@ set(himg,'CLim', [min_val min_val+(l1+l2)*(max_val-min_val)/(l1-1)]);
 
 for rep_num=1:number_of_representatives
     positions(rep_num,:)=dsxy2figxy(h,[x_positions(rep_num),y_positions1(rep_num),...
-        scale_factor*1,0.8*scale_factor*(number_of_data_points+1)/number_of_representatives]);
+        scale_factor*1,0.7*scale_factor*(number_of_data_points+1)/number_of_representatives]);
     h1=axes('position', positions(rep_num,:),'parent',f);
 
     bhandle=bar(sb_marker_profiles(perm2(rep_num),:),'Parent',h1);
