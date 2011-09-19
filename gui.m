@@ -442,11 +442,15 @@ set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximu
 myhandles.statusbarHandles=statusbar(hObject,'Calculating Block Profiles per Image...');
 tStart=tic; 
  myhandles.files_analyzed=0;
+filenames=cell(1,files_per_image); 
 for file_num=1:length(myhandles.metadata)
     myhandles.tElapsed=toc(tStart); 
     setappdata(0,'myhandles',myhandles);
-    filenames=cellfun(@(x) strcat(myhandles.rootDir,x),...
-          myhandles.metadata{file_num}.FileNames,'UniformOutput',false);       
+    for i=1:files_per_image
+        filenames{1,i}=strcat(myhandles.rootDir,myhandles.metadata{file_num}.FileNames{i});
+    end
+%     filenames=cellfun(@(x) strcat(myhandles.rootDir,x),...
+%           myhandles.metadata{file_num}.FileNames,'UniformOutput',false);       
     results=SecondOrder(filenames,global_data,myhandles.marker_scales,...
         myhandles.include_background_superblocks);
     Ripped_Data(file_num).block_profile=results.block_profile;
@@ -782,11 +786,14 @@ if(~Show_Visualization_Window)
   drawnow;
   for test_num=1:number_of_test_files
     condition=randi(myhandles.number_of_conditions);
-    imagenames=cellfun(@(x) strcat(myhandles.rootDir,x),...
-      myhandles.grouped_metadata{condition}.files_in_group,'UniformOutput',false);
-    file_num=randi(size(imagenames,1));
+%     imagenames=cellfun(@(x) strcat(myhandles.rootDir,x),...
+%       myhandles.grouped_metadata{condition}.files_in_group,'UniformOutput',false);
+    file_num=randi(size(myhandles.grouped_metadata{condition}.files_in_group,1));
     for channel=1:files_per_image
-      selected_files{test_num,channel}=imagenames{file_num,channel};
+      selected_files{test_num,channel}=strcat(myhandles.rootDir,...
+          myhandles.grouped_metadata{condition}.files_in_group{file_num,channel});
+%       
+%       imagenames{file_num,channel};
     end
     set(myhandles.statusbarHandles.ProgressBar, 'Value',test_num);
     if(test_num==1)
