@@ -338,7 +338,7 @@ if(~isfield(myhandles,'files_per_image'))
   warndlg('You must load data first');
   return;
 end
-
+try
 set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
 myhandles.statusbarHandles=statusbar(hObject,'Calculating File Structure');
 analysistime_handle=tic;
@@ -484,6 +484,9 @@ set(handles.uipanel9,'Visible','on');
 set(handles.SaveOutputButton,'Visible','on');
 set(handles.ExplorerButton,'Enable','on');
 set(handles.SaveOutputButton,'Enable','on');
+catch
+  myhandles.statusbarHandles=statusbar(hObject,'Error in the data processing');
+end
 %guidata(hObject, handles);
 
 

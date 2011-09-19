@@ -22,7 +22,7 @@ function varargout = Explorer(varargin)
 
 % Edit the above text to modify the response to help Explorer
 
-% Last Modified by GUIDE v2.5 26-Aug-2011 12:10:38
+% Last Modified by GUIDE v2.5 19-Sep-2011 17:11:47
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -278,7 +278,6 @@ setappdata(0,'myhandles',myhandles);
 % Update handles structure
 guidata(hObject, handles);
 %set(gcf,'WindowButtonDownFcn',{@MDSPlot_ButtonDownFcn,handles});
-addMarkerLabel(myhandles,handles);
 
 
 % UIWAIT makes Explorer wait for user response (see UIRESUME)
@@ -329,7 +328,10 @@ if(isfield(myhandles,'markers'))
   jLabel = javaObjectEDT('javax.swing.JLabel',labelStr);
   setFont(jLabel, font);
   setBackground(jLabel, blackColor);
-  javacomponent(jLabel,[650,365,550,20],handles.explorer);
+  javacomponent(jLabel,[650,380,550,20],handles.explorer);
+  myhandles=getappdata(0,'myhandles');
+  myhandles.jLabel=jLabel;
+  setappdata(0,'myhandles',myhandles);  
 end
 
 
@@ -358,7 +360,12 @@ function varargout = Explorer_OutputFcn(hObject, eventdata, handles)
 
 % Get default command line output from handles structure
 varargout{1} = handles.output;
-
+myhandles=getappdata(0,'myhandles');
+addMarkerLabel(myhandles,handles);
+%addProgressBarToMyHandle(handles.explorer);
+%myhandles=getappdata(0,'myhandles');
+%set(myhandles.jLabel.getParent(), 'Foreground','black');
+%setBackground(myhandles.jLabel, blackColor);
 
 
 
@@ -385,14 +392,17 @@ if((handles.MDSPlot==point)||(handles.MDSPlot==point_parent))
   if(myhandles.mds_dim==2)
       dists=pdist2(myhandles.mds_data,CP(1,1:size(myhandles.mds_data,2)));
       [~,point_number]=min(dists);
-      disp(num2str(point_number));
       if(myhandles.axes_chosen==handles.axes2)
-          myhandles.chosen_points(2)=point_number;
-           UpdateMetadata(handles.Point1Info,point_number,1);
+        UpdateMetadata(handles.Point1Info,point_number,1);
+        myhandles.chosen_points(2)=point_number;
+        myhandles.file_number1=1;
       else
-          myhandles.chosen_points(1)=point_number;
-          UpdateMetadata(handles.Point2Info,point_number,1);
+        UpdateMetadata(handles.Point2Info,point_number,1);
+        myhandles.chosen_points(1)=point_number;
+        myhandles.file_number2=1;
       end
+
+
   %     scatter(myhandles.mds_data(:,1),myhandles.mds_data(:,2),50,myhandles.mds_colors,'parent',myhandles.MDSPlot_handle);
   %     sizes=16*ones(number_of_points,1);
   %     sizes(point_number)=24;
@@ -407,9 +417,6 @@ if((handles.MDSPlot==point)||(handles.MDSPlot==point_parent))
   else
 
       if(~myhandles.mds_rotatable)
-
-
-
           rotate3d off;
           point = get(handles.MDSPlot, 'CurrentPoint'); % mouse click position
           camPos = get(handles.MDSPlot, 'CameraPosition'); % camera position
@@ -436,18 +443,12 @@ if((handles.MDSPlot==point)||(handles.MDSPlot==point_parent))
 
           point_number = dsearchn(rotatedPointCloud(1:2,:)', ...
               rotatedPointFront(1:2));
-          %disp(num2str(point_number));
           if(myhandles.axes_chosen==handles.axes2)
-             UpdateMetadata(handles.Point1Info,point_number,1); 
-             %set(handles.Point1Info,'String',['Point Chosen=' myhandles.mds_text{point_number} ]); 
-          else
-             UpdateMetadata(handles.Point2Info,point_number,1); 
-             %set(handles.Point2Info,'String',['Point Chosen=' myhandles.mds_text{point_number}]);  
-          end
-          if(myhandles.axes_chosen==handles.axes2)
+              UpdateMetadata(handles.Point1Info,point_number,1); 
               myhandles.chosen_points(2)=point_number;
               myhandles.file_number1=1;
           else
+              UpdateMetadata(handles.Point2Info,point_number,1); 
               myhandles.chosen_points(1)=point_number;
               myhandles.file_number2=1;
           end
@@ -1087,7 +1088,8 @@ function Group_By_Menu_Callback(hObject, eventdata, handles)
 function group_by_callback(hObject, eventdata, handles,group_num)
   
 myhandles=getappdata(0,'myhandles');
-  
+% set(myhandles.statusbarHandlesExplorer.ProgressBar, 'Visible','on', 'Indeterminate','on');
+% myhandles.statusbarHandlesExplorer=statusbar(hObject,'Calculating MDS Result');  
 
 %Apply filter if exist
 %otherwise will add a zero vector
@@ -1124,7 +1126,7 @@ setappdata(0,'myhandles',myhandles);
 UpdatePlotColors();
 myhandles=getappdata(0,'myhandles');
 
-Plot_MDS(myhandles.mds_data,3,myhandles.mds_text,myhandles.mds_colors,...
+Plot_MDS(myhandles.mds_data,myhandles.mds_dim,myhandles.mds_text,myhandles.mds_colors,...
     myhandles.chosen_points,handles.MDSPlot,myhandles.show_mds_text);
 setappdata(0,'myhandles',myhandles);
 %set(gcf,'WindowButtonDownFcn',{@MDSPlot_ButtonDownFcn,handles});
@@ -1148,6 +1150,11 @@ if(strcmp(get(handles.Enable_filter,'Checked'),'on'))
   myhandles.is_file_blacklisted = is_file_blacklistedBK;
   setappdata(0,'myhandles',myhandles);
 end
+myhandles=getappdata(0,'myhandles');
+% set(myhandles.statusbarHandlesExplorer.ProgressBar, 'Visible','on', 'Indeterminate','off');
+% set(myhandles.statusbarHandlesExplorer.ProgressBar, 'Visible','off','StringPainted','off');
+% myhandles.statusbarHandlesExplorer=statusbar(hObject,'Done');
+setappdata(0,'myhandles',myhandles);
 
 function mds_positions=Calculate_MDS(raw_profiles,dim)
 max_number_of_points_for_mds=1500;
@@ -2032,3 +2039,12 @@ end
     end
       filterFileList=~filterFileList;
   
+function addProgressBarToMyHandle(mainFigure)
+myhandles=getappdata(0,'myhandles');
+myhandles.statusbarHandlesExplorer=statusbar(mainFigure,...
+  'Explore your data');
+ set(myhandles.statusbarHandlesExplorer.TextPanel, 'Foreground',[1,1,1],...
+   'Background','black', 'ToolTipText','Loading...');
+ set(myhandles.statusbarHandlesExplorer.ProgressBar, 'Background','white',...
+   'Foreground',[0.4,0,0]);
+setappdata(0,'myhandles',myhandles);
