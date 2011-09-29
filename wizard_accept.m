@@ -53,17 +53,30 @@ function wizard_accept_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to wizard_accept (see VARARGIN)
 
 % Choose default command line output for wizard_accept
-handles.output = hObject;
-myhandles=getappdata(0,'myhandles');
-[table_data,field_names]=convert_struct_to_table(myhandles.metadata);
-set(handles.popupmenu1,'String',field_names);
-set(handles.accepted_table,'Data',table_data);
-if(~myhandles.use_metadata)
-  set(handles.rejected_table,'Data',myhandles.all_files(~myhandles.matched_files));
+
+parsingMsgDlg = msgbox('Extracting Metadata information, Please wait...');
+%Trick to show off the OK button
+hc=get(parsingMsgDlg,'Children'); 
+set(hc(2),'Visible','off');
+drawnow;
+pause(0.01);
+
+try
+  handles.output = hObject;
+  myhandles=getappdata(0,'myhandles');
+  [table_data,field_names]=convert_struct_to_table(myhandles.metadata);
+  set(handles.popupmenu1,'String',field_names);
+  set(handles.accepted_table,'Data',table_data);
+  if(~myhandles.use_metadata)
+    set(handles.rejected_table,'Data',myhandles.all_files(~myhandles.matched_files));
+  end
+  popupmenu1_Callback(hObject, eventdata, handles)
+  % Update handles structure
+  guidata(hObject, handles);
+  close(parsingMsgDlg);
+catch
+  close(parsingMsgDlg);
 end
-popupmenu1_Callback(hObject, eventdata, handles)
-% Update handles structure
-guidata(hObject, handles);
 
 
 % UIWAIT makes wizard_accept wait for user response (see UIRESUME)

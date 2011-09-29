@@ -97,9 +97,9 @@ function LoadMetaDataButton_Callback(hObject, eventdata, handles)
 
 lastPath=loadLastPath('metadata');
 if(~exist(char(lastPath),'dir'))
-  [filename,pathname]=uigetfile('*.txt');
+  [filename,pathname]=uigetfile({'*.csv;','Metadata Files';'*.*','All Files'},'Select a Metadata File');
 else
-  [filename,pathname]=uigetfile([lastPath filesep '*.txt']);
+  [filename,pathname]=uigetfile({'*.csv;','Metadata Files';'*.*','All Files'},'Select a Metadata File', [lastPath]);
 end
 if(~exist(pathname,'dir'))
   warndlg('Invalid File');
@@ -108,97 +108,112 @@ else
    saveLastPath(pathname,'metadata');
 end
 
-%filename='MikeMetaData_atub_Selected2.txt';
-%pathname='/home/lab_share/Temp/Ben/PhenoRipper/imageSample';
-[filenames,metadata,RootDir,NrChannelPerImage,Markers,errorMessage]=ReadData([pathname filesep filename],',');
+parsingMsgDlg = msgbox('Parsing Metadata file, Please wait...');
+%Trick to show off the OK button
+hc=get(parsingMsgDlg,'Children'); 
+set(hc(2),'Visible','off');
+drawnow;
+pause(0.01);
 
-if(~strcmp(errorMessage,''))
-  errordlg(errorMessage);  
-  setGUIVisible(handles,'off');
-  return;
-end
+try
+  [filenames,metadata,RootDir,NrChannelPerImage,Markers,errorMessage]=...
+    ReadData([pathname filesep filename],',');
 
-myhandles=getappdata(0,'myhandles');
-myhandles.use_metadata=true;
-myhandles.currentMetadatFile=[pathname filesep filename];
-
-
-if(NrChannelPerImage>1)
-  if(length(filenames{1})>1)    
-    warndlg('Inconsistency between NrChannelPerImage and number of file per image! Please check your MetaData file.');
+  if(~strcmp(errorMessage,''))
+    close(parsingMsgDlg);
+    drawnow;
+    pause(0.01);
+    errordlg(errorMessage);  
+    setGUIVisible(handles,'off');
     return;
+  end
+
+  myhandles=getappdata(0,'myhandles');
+  myhandles.use_metadata=true;
+  myhandles.currentMetadatFile=[pathname filesep filename];
+
+
+  if(NrChannelPerImage>1)
+    if(length(filenames{1})>1)   
+      close(parsingMsgDlg);
+      warndlg(['Inconsistency between NrChannelPerImage and number'...
+        ' of file per image! Please check your MetaData file.']);
+      return;
+    else
+      channelNr=NrChannelPerImage;
+    end
   else
-    channelNr=NrChannelPerImage;
+    channelNr=length(filenames{1});  
   end
-else
-  channelNr=length(filenames{1});  
-end
-if(channelNr<1)
-  warndlg('Couldn detect the channel. Check your Metadata file.');
-  set(handles.markerTable,'Data',cell(0,3));
-  setGUIVisible(handles,'off');
-  return;
-end
-data=cell(channelNr,3);
-for i=1:channelNr
-  data{i,1}=true;
-end
-for i=1:channelNr
-  data{i,2}=num2str(i);
-end
-if(isempty(Markers))
+  if(channelNr<1)
+    close(parsingMsgDlg);
+    warndlg('Couldn detect the channel. Check your Metadata file.');
+    set(handles.markerTable,'Data',cell(0,3));
+    setGUIVisible(handles,'off');
+    return;
+  end
+  data=cell(channelNr,3);
   for i=1:channelNr
-    data{i,3}=['marker ' num2str(i)];
+    data{i,1}=true;
   end
-else  
-  for i=1:size(Markers,2)
-    data{i,3}=Markers{1,i};
+  for i=1:channelNr
+    data{i,2}=num2str(i);
   end
-end
-% for i=1:channelNr
-%   data{i,4}='';
-% end
-if(isempty(Markers))
-  msgbox(['Marker have been detected, please enter the name of each marker'...
-  'and click on Done to use this configuration.']);
-end
-
-setGUIVisible(handles,'on');
-set(handles.RootDirEdit,'String',RootDir);
-
-set(handles.markerTable,'Data',data);
-set(handles.markerTable, 'ColumnWidth', {30 110 220, 90});
-
-file_matrix=cell(length(filenames),length(filenames{1}));
-for i=1:length(filenames)
-    for j=1:length(filenames{1})
-        file_matrix{i,j}=filenames{i}{j};
-        if(~exist([RootDir file_matrix{i,j}],'file'))
-            errordlg(['File Missing:' file_matrix{i,j}] );
-            return;
-        end
+  if(isempty(Markers))
+    for i=1:channelNr
+      data{i,3}=['marker ' num2str(i)];
     end
-end
-myhandles.file_matrix=file_matrix;
-%[myhandles.metadata,matched_files]=extract_regexp_metadata(file_matrix,myhandles.regular_expressions);
-%matched_files=find(matched_files);
-fnames=fieldnames(metadata);
-for i=1:length(filenames)
-    myhandles.metadata{i}.FileNames={file_matrix{i,:}};
-    myhandles.metadata{i}.None=file_matrix{i,1};
-    for j=2:length(fnames)    
-        myhandles.metadata{i}.(fnames{j})=metadata(i).(fnames{j});
+  else  
+    for i=1:size(Markers,2)
+      data{i,3}=Markers{1,i};
     end
-end
-myhandles.NrChannelPerImage=NrChannelPerImage;
-myhandles.files_per_image=length(filenames{1});
-handles=getappdata(0,'handles');
-%fnames=fieldnames(myhandles.metadata{1});
-%set(handles.groupSelector,'String',fnames);
-setappdata(0,'handles',handles);
-setappdata(0,'myhandles',myhandles); %Should probably throw in some checks to
-                                     % make sure that myhandles.files_per_image is not being reset
+  end
+  % for i=1:channelNr
+  %   data{i,4}='';
+  % end
+  if(isempty(Markers))
+    msgbox(['Marker have been detected, please enter the name of each marker'...
+    'and click on Done to use this configuration.']);
+  end
 
+  setGUIVisible(handles,'on');
+  set(handles.RootDirEdit,'String',RootDir);
+
+  set(handles.markerTable,'Data',data);
+  set(handles.markerTable, 'ColumnWidth', {30 110 220, 90});
+
+  file_matrix=cell(length(filenames),length(filenames{1}));
+  for i=1:length(filenames)
+      for j=1:length(filenames{1})
+          file_matrix{i,j}=filenames{i}{j};
+          if(~exist([RootDir file_matrix{i,j}],'file'))
+              close(parsingMsgDlg);
+              errordlg(['File Missing:' file_matrix{i,j}] );
+              return;
+          end
+      end
+  end
+  myhandles.file_matrix=file_matrix;
+  fnames=fieldnames(metadata);
+  for i=1:length(filenames)
+      myhandles.metadata{i}.FileNames={file_matrix{i,:}};
+      myhandles.metadata{i}.None=file_matrix{i,1};
+      for j=2:length(fnames)    
+          myhandles.metadata{i}.(fnames{j})=metadata(i).(fnames{j});
+      end
+  end
+  myhandles.NrChannelPerImage=NrChannelPerImage;
+  myhandles.files_per_image=length(filenames{1});
+  handles=getappdata(0,'handles');
+  %fnames=fieldnames(myhandles.metadata{1});
+  %set(handles.groupSelector,'String',fnames);
+  setappdata(0,'handles',handles);
+  setappdata(0,'myhandles',myhandles); %Should probably throw in some checks to
+                                       % make sure that myhandles.files_per_image is not being reset
+  close(parsingMsgDlg);
+catch
+  close(parsingMsgDlg);
+end
 
                                      
 function setGUIVisible(handles,isVisible)

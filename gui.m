@@ -848,8 +848,9 @@ if(~Show_Visualization_Window)
     thresholds=min(thresholds,[],2);
     cutoff_intensity=round(quantile(thresholds(:),0.2));
     set(handles.ThreshodIntensity,'String',num2str(cutoff_intensity));
-    myhandles.color_order={'Blue','Green','Red','Gray','Yellow','Magenta'};
+    myhandles.color_order={'Blue','Green','Red','Yellow','Magenta','Gray'};
     myhandles.display_colors=myhandles.color_order(1:number_of_channels);
+    myhandles.statusbarHandles=statusbar(hObject,'');
     set(myhandles.statusbarHandles.ProgressBar, 'Visible','off'); 
     myhandles.amplitude_range=max(cutoff_intensity,30);
     myhandles.bit_depth=bit_depth(double(max_val),[8,12,14,16,32]);
@@ -881,8 +882,8 @@ end
 warning on;
 guidata(hObject, handles);
 
-function result=concatenateString(string1,string2)
-  result=[string1 string2];
+% function result=concatenateString(string1,string2)
+%   result=[string1 string2];
 
 function initializeMyHandle()
 myhandles.block_size=10;

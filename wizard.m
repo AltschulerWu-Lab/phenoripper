@@ -68,11 +68,33 @@ myhandles=getappdata(0,'myhandles');
 myhandles.use_metadata=false;
 setappdata(0,'myhandles',myhandles);
 %Load the default template list
-if isunix
-  wizardhandles=load('default-templates_unix.mat','templates');
+
+%Try first if we find some template in the user directory
+if ispc
+  userdir= getenv('USERPROFILE'); 
 else
-  wizardhandles=load('default-templates_windows.mat','templates');  
+  userdir= getenv('HOME');
 end
+if isunix
+  templateFile=[userdir filesep 'default-templates_unix.mat'];
+else
+  templateFile=[userdir filesep 'default-templates_windows.mat'];
+end
+if(~exist(templateFile, 'file'))%Take the default one if the user didn't save new Template
+  if isunix
+    templateFile='default-templates_unix.mat';
+  else
+    templateFile='default-templates_windows.mat';
+  end
+end
+
+wizardhandles=load(templateFile,'templates');  
+% if isunix
+%   wizardhandles=load('default-templates_unix.mat','templates');
+% else
+%   wizardhandles=load('default-templates_windows.mat','templates');  
+% end
+
 setappdata(0,'wizardhandles',wizardhandles);
 populateTemplateSelectorList(handles);
 setappdata(0,'wizardhandles',wizardhandles);
@@ -603,16 +625,33 @@ function saveAllTemplatesBT_Callback(hObject, eventdata, handles)
 wizardhandles=getappdata(0,'wizardhandles');
 answer=questdlg(sprintf('Save this pattern list as the default one?'), ...
  'Yes', 'No');
+
+if ispc
+  userdir= getenv('USERPROFILE'); 
+else
+  userdir= getenv('HOME');
+end
+
 % Handle response
   switch answer
     case 'Yes'
-      templates=wizardhandles.templates;
-      if isunix
-        save('default-templates_unix.mat','templates');
-      else        
-        save('default-templates_windows.mat','templates');
+      try
+        templates=wizardhandles.templates;
+        if isunix
+          save('default-templates_unix.mat','templates');
+        else        
+          save('default-templates_windows.mat','templates');
+        end
+        msgbox(['Default Templates have been saved'],'Saved Template with success');
+      catch
+        templates=wizardhandles.templates;
+        if isunix
+          save([userdir filesep 'default-templates_unix.mat'],'templates');
+        else        
+          save([userdir filesep 'default-templates_windows.mat'],'templates');
+        end
+        msgbox(['Default Templates have been saved'],'Saved Template with success');
       end
-      msgbox(['Default Templates have been saved'],'Saved Template with success');
     case 'No'
       templates=wizardhandles.templates;
       [fileName, pathName]=uiputfile('*.mat','Save as',...
@@ -787,20 +826,31 @@ function ExportMetaDataButton_Callback(hObject, eventdata, handles)
 % hObject    handle to ExportMetaDataButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[filename,pathname]=uiputfile('*.txt');
 myhandles=getappdata(0,'myhandles');
 data=getWizardData(handles);
 nrChannelPerImage=get(handles.nrChannelPerImageDB,'Value');
 myhandles.rootDir=data.rootDir;
 myhandles.wizardData=data;
+
+%Get the last directory name
+dirNames=regexp(myhandles.rootDir,filesep,'split');
+dirName=dirNames{length(dirNames)};
+[filename,pathname]=uiputfile('*.csv','Save Metadata into file',[dirName '_Metadata.csv']);
+
 %setappdata(0,'myhandles',myhandles);
 total_number_of_channels=length(myhandles.wizardData.markers);
 myhandles.channels_used=[];
+markersUsed=[];
+markerUsedNr=1;
 for i=1:total_number_of_channels
   if(myhandles.wizardData.markers{i}.isUse)
      myhandles.channels_used=[myhandles.channels_used;i];
+     %Store the used marker for the metadata
+     markersUsed{markerUsedNr}=myhandles.wizardData.markers{i};
+     markerUsedNr=markerUsedNr+1;
   end
 end
+%nrChannelPerImage=length(myhandles.channels_used);
 myhandles.allfiles=getAllFiles(myhandles.rootDir);
 %Remove the rootDir from the full path    
 myhandles.allfiles=cellfun(@(x) substring(myhandles.rootDir,x),...
@@ -812,7 +862,8 @@ if ~strcmp(myhandles.rootDir(1:end-1),'/')
 end
 setappdata(0,'myhandles',myhandles);
 [~,metadata,~]=construct_filetable();
-WriteData([pathname filesep filename], metadata, myhandles.rootDir, nrChannelPerImage, myhandles.wizardData.markers)
+WriteData([pathname filesep filename], metadata, myhandles.rootDir, nrChannelPerImage, markersUsed)
+msgbox('Metatadata file saved successfully');
 
 
 function addProgressBarToMyHandle(handles)

@@ -37,10 +37,20 @@ function filterGUI()
    
   
   function createFilterPanel(parentPanel, groupList, groupedMetadata,filterNr,selectedGroup)
-    filterHandle.filter{filterNr}.filterType=uicontrol('Parent', parentPanel, 'Style', 'popup',...
+    if(filterNr==1)
+      filterHandle.filter{filterNr}.filterType=uicontrol('Parent', parentPanel, 'Style', 'popup',...
            'String', 'And|Or', ...
            'Units', 'normalized', 'FontWeight', 'bold',...
            'BackgroundColor', [1 1 1], 'Position', [0.02 0 0.1 0.9]);
+      set(filterHandle.filter{filterNr}.filterType,'Visible','off');
+      set(filterHandle.filter{filterNr}.filterType,'Value',2);
+    else
+      filterHandle.filter{filterNr}.filterType=uicontrol('Parent', parentPanel, 'Style', 'popup',...
+           'String', 'And|Or', ...
+           'Units', 'normalized', 'FontWeight', 'bold',...
+           'BackgroundColor', [1 1 1], 'Position', [0.02 0 0.1 0.9]);
+    end
+      
     filterHandle.filter{filterNr}.GroupList=uicontrol('Parent', parentPanel, 'Style', 'popup',...
            'String', groupList, ...
            'Units', 'normalized', 'FontWeight', 'bold',...
@@ -104,6 +114,13 @@ function filterGUI()
       end
     end
     
+    %Hide the boolean button
+    nrOfFilter=size(filterHandle.filter,2);
+    if(nrOfFilter)==1
+      set(filterHandle.filter{1}.filterType,'Visible','off');
+      set(filterHandle.filter{1}.filterType,'Value',2);
+    end
+    
   end
 
   function deleteFilter(filter)
@@ -154,7 +171,8 @@ function filterGUI()
     myhandles.filterMatrix = zeros(NrFilter,4);
     myhandles.filterLogicList=zeros(NrFilter,1);
     for i=1:NrFilter
-      myhandles.filterLogicList(i,1)=get(filterHandle.filter{i}.filterType,'Value');
+      %myhandles.filterLogicList(i,1)=get(filterHandle.filter{i}.filterType,'Value');
+      myhandles.filterMatrix(i,1)=get(filterHandle.filter{i}.filterType,'Value');
       myhandles.filterMatrix(i,2)=get(filterHandle.filter{i}.GroupList,'Value');
       myhandles.filterMatrix(i,3)=get(filterHandle.filter{i}.GroupOperator,'Value');
       myhandles.filterMatrix(i,4)=get(filterHandle.filter{i}.GroupFields,'Value');
