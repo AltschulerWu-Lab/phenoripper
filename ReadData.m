@@ -35,7 +35,7 @@ function [filenames,metadata,RootDir,NrChannelPerImage,Markers,errorMessage]=Rea
     n=1;
     fid =fopen(filename);
     data=textscan(fid,'%s',1,'delimiter','\n');
-    while(~strcmp(data{1,1},''))
+    while(~strcmp(data{1,1},'')&&~strcmp(data{1,1}{1}(1),',') )
       CommonVar(n,1)=data{1,1};
       n=n+1;
       data=textscan(fid,'%s',1,'delimiter','\n');
@@ -56,7 +56,13 @@ function [filenames,metadata,RootDir,NrChannelPerImage,Markers,errorMessage]=Rea
       Markers='';
       return;
     end
+    RootDir=regexprep(RootDir,',*$','');%Remove the comma added by excel
+    
     NrChannelPerImage = getVarValue(CommonVar,'#NrChannelPerImage:');
+    if(~isempty(NrChannelPerImage))
+      %Remove the comma added by excel
+      NrChannelPerImage=regexprep(NrChannelPerImage,',*$','');
+    end
     if(isempty(NrChannelPerImage))
       NrChannelPerImage=1;
     else
@@ -70,16 +76,25 @@ function [filenames,metadata,RootDir,NrChannelPerImage,Markers,errorMessage]=Rea
     Markers = getVarValue(CommonVar,'#Markers:');
     
     if(~isempty(Markers))
+      Markers=regexprep(Markers,',*$','');%Remove the comma added by excel
       Markers=regexp(Markers,';','split');
     end
     
-    %Skip the empty line(s) which separate description of variable from the
-    %metadata per image.
-    while(strcmp(data{1,1},''))
+    %Skip the empty line(s) or the line starting with a comma
+    %(edited with excel and re-saved)which separate description of variable
+    %from the metadata per image.
+    while(strcmp(data{1,1},'')||strcmp(data{1,1}{1}(1),','))
       CommonVar(n,1)=data{1,1};
       n=n+1;
       data=textscan(fid,'%s',1,'delimiter','\n');
     end
+    
+    %Skip the line starting with a comma (edited with excel and re-saved)
+%     while(strcmp(data{1,1},''))
+%       CommonVar(n,1)=data{1,1};
+%       n=n+1;
+%       data=textscan(fid,'%s',1,'delimiter','\n');
+%     end
     
     
     %Read the header Row
@@ -120,6 +135,7 @@ function [filenames,metadata,RootDir,NrChannelPerImage,Markers,errorMessage]=Rea
     else
       value=[];
     end
+    
   end
 end
 

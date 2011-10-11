@@ -22,7 +22,7 @@ function varargout = Explorer(varargin)
 
 % Edit the above text to modify the response to help Explorer
 
-% Last Modified by GUIDE v2.5 19-Sep-2011 17:11:47
+% Last Modified by GUIDE v2.5 05-Oct-2011 14:12:27
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -215,7 +215,7 @@ if(myhandles.mds_dim==2)
 %         
 %     end
 %     
-    Plot_MDS(myhandles.mds_data,2,myhandles.mds_text,myhandles.mds_colors,...
+    Plot_MDS(myhandles.mds_data,myhandles.mds_dim,myhandles.mds_text,myhandles.mds_colors,...
         myhandles.chosen_points,handles.MDSPlot,myhandles.show_mds_text);
 else
 
@@ -227,7 +227,7 @@ else
 %             'FontSize',16);%not always cn
 %     end
     
-    Plot_MDS(myhandles.mds_data,3,myhandles.mds_text,myhandles.mds_colors,...
+    Plot_MDS(myhandles.mds_data,myhandles.mds_dim,myhandles.mds_text,myhandles.mds_colors,...
         myhandles.chosen_points,handles.MDSPlot,myhandles.show_mds_text);
 %     set(handles.MDSPlot, 'XTickLabel','');
 %     set(handles.MDSPlot, 'YTickLabel','');
@@ -412,7 +412,7 @@ if((handles.MDSPlot==point)||(handles.MDSPlot==point_parent))
   %             'FontSize',sizes(i));%not always cn
   %         
   %     end
-   Plot_MDS(myhandles.mds_data,2,myhandles.mds_text,myhandles.mds_colors,...
+   Plot_MDS(myhandles.mds_data,myhandles.mds_dim,myhandles.mds_text,myhandles.mds_colors,...
           myhandles.chosen_points,handles.MDSPlot,myhandles.show_mds_text);
   else
 
@@ -462,7 +462,7 @@ if((handles.MDSPlot==point)||(handles.MDSPlot==point_parent))
   %                 'BackgroundColor',myhandles.mds_colors(i,:),'parent',myhandles.MDSPlot_handle,...
   %                 'FontSize',sizes(i));%not always cn
   %         end
-          Plot_MDS(myhandles.mds_data,3,myhandles.mds_text,myhandles.mds_colors,...
+          Plot_MDS(myhandles.mds_data,myhandles.mds_dim,myhandles.mds_text,myhandles.mds_colors,...
               myhandles.chosen_points,handles.MDSPlot,myhandles.show_mds_text);
           set(handles.MDSPlot,'XTickLabel','','YTickLabel','','ZTickLabel','');
           set(handles.MDSPlot, 'CameraPosition',camPos);
@@ -980,8 +980,10 @@ setappdata(0,'myhandles',myhandles);
 MenuList_Checkmark(group_num,myhandles.Label_Points_By_Menu_Handles);
 UpdatePlotColors();
 myhandles=getappdata(0,'myhandles');
-Plot_MDS(myhandles.mds_data,3,myhandles.mds_text,myhandles.mds_colors,...
-    myhandles.chosen_points,handles.MDSPlot,myhandles.show_mds_text);
+myhandles.mds_dim
+Plot_MDS(myhandles.mds_data, myhandles.mds_dim, myhandles.mds_text,...
+  myhandles.mds_colors, myhandles.chosen_points,...
+  handles.MDSPlot,myhandles.show_mds_text);
 for point_number=1:2
     if(myhandles.chosen_points(point_number)~=0)
         
@@ -1128,6 +1130,7 @@ end
 %otherwise will add a zero vector
 if(strcmp(get(handles.Enable_filter,'Checked'),'on'))
   filterFileList=getFileFilterListed();
+  myhandles=getappdata(0,'myhandles');
   is_file_blacklistedBK=myhandles.is_file_blacklisted;
   myhandles.is_file_blacklisted = is_file_blacklistedBK | filterFileList';
   myhandles.filterFileList = filterFileList;
@@ -1201,7 +1204,7 @@ setappdata(0,'myhandles',myhandles);
 close(WaitingDialog);
 
 function mds_positions=Calculate_MDS(raw_profiles,dim)
-max_number_of_points_for_mds=1500;
+max_number_of_points_for_mds=500;
 nan_pos=isnan(raw_profiles);
 raw_profiles(nan_pos)=rand(nnz(nan_pos),1)/100;
 if(size(raw_profiles)<max_number_of_points_for_mds)
@@ -1603,20 +1606,21 @@ cla(handles.axes3);
 set(handles.axes3,'Color',[0 0 0]);
 set(handles.SB_Num1_popupmenu,'Enable','off');
 
-if(exist('myhandles.bar_legend_axis','var'))
-    cla(myhandles.bar_axes);
-    set(myhandles.bar_axes,'Color',[0 0 0]);
+if isfield(handles,'BarAxes')
+  cla(handles.BarAxes);
+  set(handles.BarAxes,'Color',[0 0 0]);
 end
-if(exist('myhandles.bar_legend_axis','var'))
+
+if isfield(myhandles,'bar_legend_axis')&&ishandle(myhandles.bar_legend_axis)
     cla(myhandles.bar_legend_axis);
     set(myhandles.bar_legend_axis,'Color',[0 0 0]);
 end
-if(exist('myhandles.temp_handles','var'))
-    for i=1:length(myhandles.temp_handles)
-        if(ishandle(myhandles.temp_handles(i)))
-            delete(myhandles.temp_handles(i));
-        end
-    end
+if isfield(myhandles,'temp_handles')
+  for i=1:length(myhandles.temp_handles)
+      if(ishandle(myhandles.temp_handles(i)))
+          delete(myhandles.temp_handles(i));
+      end
+  end
 end
 myhandles.temp_habndles=[];
 setappdata(0,'myhandles',myhandles);
@@ -2014,14 +2018,14 @@ drawnow;
 %If wizard has been stopped before the end, 
 % restore the previous myhandle and return
 myhandles=getappdata(0,'myhandles');
-if isfield(myhandles,'filterMatrix')==0
-  setappdata(0,'myhandles',myhandles_BK);
-  return;
-else
+% if isfield(myhandles,'filterMatrix')==0
+%   setappdata(0,'myhandles',myhandles_BK);
+%   return;
+% else
   %applyFilter(handles);
   set(handles.Enable_filter,'Checked','on');
   group_by_callback([], [], handles,myhandles.chosen_grouping_field);
-end
+% end
  
 %Generate the filter on the image set and replot the MDS plot
 %See filter matrix format in useFilterCallBack() from filterGUI.m
@@ -2044,11 +2048,11 @@ end
     groupList = groupList(2:end);
     
     filterFileList=[];
-    %for each filter
     if ~isfield(myhandles,'filterMatrix')
       filterFileList=myhandles.is_file_blacklisted';
       return;
     end
+    %for each filter
     for i=1:size(myhandles.filterMatrix,1);
       filterType=myhandles.filterMatrix(i,1);
       groupField=myhandles.filterMatrix(i,2);
@@ -2077,14 +2081,25 @@ end
       if i==1
         filterFileList=matchingMetadata;
       else
-        if(filterType==1)%AND
+        if(filterType==2)%AND
           filterFileList=filterFileList & matchingMetadata;
-        else%OR
+        else%OR - By default, it's OR
           filterFileList=filterFileList | matchingMetadata;
         end
       end
     end
+    %Test if everything is filtered
+    %If yes, throw a warning
+    if(sum((filterFileList==0))==length(filterFileList))
+      filterFileList=myhandles.is_file_blacklisted';
+      myhandles=rmfield(myhandles, 'filterMatrix');
+      setappdata(0,'myhandles',myhandles);
+      warndlg({'All the images are going to be dropped due to the filtering conditions.';...
+        'It looks you choosed opposite conditions to filter the images.';...
+        'Please re-apply the filter. Your previous setting has been cleared.'});
+    else
       filterFileList=~filterFileList;
+    end
   
 function addProgressBarToMyHandle(mainFigure)
 myhandles=getappdata(0,'myhandles');
@@ -2095,3 +2110,14 @@ myhandles.statusbarHandlesExplorer=statusbar(mainFigure,...
  set(myhandles.statusbarHandlesExplorer.ProgressBar, 'Background','white',...
    'Foreground',[0.4,0,0]);
 setappdata(0,'myhandles',myhandles);
+
+
+% --------------------------------------------------------------------
+function Clear_Black_List_Callback(hObject, eventdata, handles)
+% hObject    handle to Clear_Black_List (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+myhandles=getappdata(0,'myhandles');
+myhandles.is_file_blacklisted=logical(zeros(size(myhandles.file_matrix,1),1));
+setappdata(0,'myhandles',myhandles);
+group_by_callback(hObject, eventdata, handles,myhandles.chosen_grouping_field);

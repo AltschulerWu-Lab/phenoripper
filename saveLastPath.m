@@ -15,6 +15,8 @@ try
       savePropertyFile([userdir filesep 'lastPath.properties'],['metadataPath=' path]);
     case 'save'
       savePropertyFile([userdir filesep 'lastPath.properties'],['savePath=' path]);
+    case 'result'
+      savePropertyFile([userdir filesep 'lastPath.properties'],['resultPath=' path]);
     otherwise
       ;
   end

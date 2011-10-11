@@ -15,6 +15,8 @@ switch type
     path=getPath('metadataPath');
   case 'save'
     path=getPath('savePath');
+  case 'result'
+    path=getPath('resultPath');
   otherwise
     path='';
 end

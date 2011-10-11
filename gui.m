@@ -306,6 +306,7 @@ addProgressBarToMyHandle(handles.figure1);
 h=wizardMetaData;
 uiwait(h);
 drawnow;
+pause(0.5);
 %If wizard has been stopped before the end, 
 % restore the previous myhandle and return
 myhandles=getappdata(0,'myhandles');
@@ -700,7 +701,13 @@ function LoadResultsButton_Callback(hObject, eventdata, handles)
 % hObject    handle to LoadResultsButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[filename,pathname]=uigetfile;
+%[filename,pathname]=uigetfile;
+lastPath=loadLastPath('result');
+if(~exist(char(lastPath),'dir'))
+  [filename,pathname]=uigetfile({'*.fig;','PhenoRipper Result'},'Select a previous result');
+else
+  [filename,pathname]=uigetfile({'*.fig;','PhenoRipper Result'},'Select a previous result', [lastPath]);
+end
 if(filename==0)
   return;
 end
@@ -710,11 +717,11 @@ hgload([pathname filesep filename]);
 myhandles = getappdata(gcf,'myhandles');
 % Lines below are added since loading the file does not initialize the
 % status bar (it is a java hack, not officially supported by matlab)
-myhandles.statusbarHandles=statusbar(gcf,'Welcome to PhenoRipper ...Prepare to be amazed.');
+myhandles.statusbarHandles=statusbar(gcf,'Welcome to PhenoRipper.');
 set(myhandles.statusbarHandles.TextPanel, 'Foreground',[1,1,1], 'Background','black', 'ToolTipText','Loading...')
 set(myhandles.statusbarHandles.ProgressBar, 'Background','white', 'Foreground',[0.4,0,0]);
 setappdata(0,'myhandles',myhandles);
-
+saveLastPath(pathname,'result');
 
 
 function LoadParameters(loaded_handles,handles,hObject)
