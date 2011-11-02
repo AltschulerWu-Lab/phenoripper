@@ -18,19 +18,46 @@ filenames=cell(0);
 pattern='\(\?<Channel>.*?\)'; 
 channel_pattern=regexptranslate('escape',regexp(expr,pattern,'match'));
 
+
+
+
+
+%BEFORE WAS LIKE THAT - CRASHED IF THE FILE NAME CONTAIN SPACE....
+% %Get a simplify regexp from expr to match the channel from a filename
+% %Step 1 e.g.: Get the regexp that match everything before CHANNEL
+% %    'w(?<Well>[0-9]{1,2})-\S*(?<Separator>-)(?<Channel>[0-9]{1,2})(?<Extension>.png)$'
+% %'(?<=w(?<Well>[0-9]{1,2})-\S*(?<Separator>-))(?<Channel>[0-9]{1,2})(?<Extension>.png)$'
+% expr=regexprep(expr,['\S*(?=' cell2mat(channel_pattern) ')'],'\(\?<=$0\)');
+% %Step 2 e.g.: Get the regexp that match everything before AND after CHANNEL
+% %'(?<=w(?<Well>[0-9]{1,2})-\S*(?<Separator>-))(?<Channel>[0-9]{1,2})(?<Extension>.png)$'
+% %'(?<=w(?<Well>[0-9]{1,2})-\S*(?<Separator>-))(?<Channel>[0-9]{1,2})(?=(?<Extension>.png)$)'
+% expr=regexprep(expr,['(?<=' cell2mat(channel_pattern) ')(\S*)'],'\(\?=$0\)');
+% %Step 3 e.g.: Simplify RegExp so NO groups are return.
+% %'(?<=w(?<Well>[0-9]{1,2})-\S*(?<Separator>-))(?<Channel>[0-9]{1,2})(?<Extension>.png)$'
+% %'(?<=w([0-9]{1,2})-\S*(-))([0-9]{1,2})(?=(.png)$)'
+% expr=regexprep(expr,'\?<\w+?>','');
+
+%NOW
 %Get a simplify regexp from expr to match the channel from a filename
 %Step 1 e.g.: Get the regexp that match everything before CHANNEL
 %    'w(?<Well>[0-9]{1,2})-\S*(?<Separator>-)(?<Channel>[0-9]{1,2})(?<Extension>.png)$'
 %'(?<=w(?<Well>[0-9]{1,2})-\S*(?<Separator>-))(?<Channel>[0-9]{1,2})(?<Extension>.png)$'
-expr=regexprep(expr,['\S*(?=' cell2mat(channel_pattern) ')'],'\(\?<=$0\)');
+expr=regexprep(expr,['.*(?=' cell2mat(channel_pattern) ')'],'\(\?<=$0\)');
 %Step 2 e.g.: Get the regexp that match everything before AND after CHANNEL
 %'(?<=w(?<Well>[0-9]{1,2})-\S*(?<Separator>-))(?<Channel>[0-9]{1,2})(?<Extension>.png)$'
 %'(?<=w(?<Well>[0-9]{1,2})-\S*(?<Separator>-))(?<Channel>[0-9]{1,2})(?=(?<Extension>.png)$)'
-expr=regexprep(expr,['(?<=' cell2mat(channel_pattern) ')(\S*)'],'\(\?=$0\)');
+expr=regexprep(expr,['(?<=' cell2mat(channel_pattern) ')(.*)'],'\(\?=$0\)');
 %Step 3 e.g.: Simplify RegExp so NO groups are return.
 %'(?<=w(?<Well>[0-9]{1,2})-\S*(?<Separator>-))(?<Channel>[0-9]{1,2})(?<Extension>.png)$'
 %'(?<=w([0-9]{1,2})-\S*(-))([0-9]{1,2})(?=(.png)$)'
 expr=regexprep(expr,'\?<\w+?>','');
+
+
+
+
+
+
+
 
 %Generate a filename list using the channel name list from the filename
 %list. It will filter the files that doen't match with the expr.
