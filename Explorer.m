@@ -1059,7 +1059,12 @@ if(~is_numeric)
     end
     
 else
+%     valueArray=unique(cell2mat(group_vals));
+%     for i=1:size(group_vals,2)
+%       myhandles.group_labels{i}=num2str(group_vals{i});
+%     end
     vals=cellfun(@(x) x,group_vals);
+    [colorsGroup,myhandles.group_labels]=grp2idx(vals);%used for the legend
     scaled_vals=(vals-min(vals))/(max(vals)-min(vals));
     if(any(isnan(scaled_vals)))
         scaled_vals(:)=0;
@@ -1069,6 +1074,7 @@ else
     color_num=round(scaled_vals*(size(cmap,1)-1))+1;
     
     myhandles.mds_colors=cmap(color_num,:);
+    myhandles.category_colors=cmap(unique(color_num),:);%used for the legend
     
 end
 undefined_label=false;

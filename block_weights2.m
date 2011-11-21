@@ -1,9 +1,10 @@
 function [weights block_ids] =block_weights2(block,centroids,intensity_cutoff,include_bg)
 
 number_of_clusters=size(centroids,4);
+number_of_channels=size(centroids,3);
 [xsize,ysize,~]=size(block);
 distmat=zeros(xsize,ysize,number_of_clusters);
-bg=sqrt(sum(block.^2,3)/number_of_clusters)<intensity_cutoff;
+bg=sqrt(sum(block.^2,3)/number_of_channels)<intensity_cutoff;
 
 for cluster=1:number_of_clusters
     distmat(:,:,cluster)=sum((block-centroids(:,:,:,cluster)).^2,3);
