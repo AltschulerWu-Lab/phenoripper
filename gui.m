@@ -326,6 +326,11 @@ for i=1:myhandles.number_of_conditions
 end
 setappdata(0,'myhandles',myhandles);
 SetButtonState(hObject,handles,true);
+set(handles.ExplorerButton,'Visible','off');
+set(handles.uipanel9,'Visible','off');
+set(handles.SaveOutputButton,'Visible','off');
+
+
 guidata(hObject, handles);
 
 
