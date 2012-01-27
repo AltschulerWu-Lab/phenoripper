@@ -431,9 +431,24 @@ set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on'
 myhandles.statusbarHandles=statusbar(hObject,'Generating Neighborhood Statistics');
 
 warning on;
-%try
+try
 third_order=ThirdOrder_Basis(global_filenames,global_data,number_of_superblocks,...
     myhandles.marker_scales,myhandles.include_background_superblocks);
+catch exception
+  if(strcmp(exception.identifier,'MATLAB:nomem'))    
+    errordlg(['You are running out of Memory due to :' char(10)... 
+       ' 1) A too small block size value (try to increase it)' char(10)... 
+       ' 2) A too large number of group: try to use a smaller '...
+       'set of image groups used during the training step '...
+       '(e.g. analyse your image by row instead well)']);
+     myhandles.statusbarHandles=statusbar(hObject,'Error in the data processing, Out of Memory');
+     set(myhandles.statusbarHandles.ProgressBar, 'Visible','off', 'Indeterminate','off');
+     rethrow(exception);
+  else
+    errordlg('Error in the data processing');
+    rethrow(exception);
+  end
+end
 global_data.superblock_centroids=third_order.superblock_centroids;
 global_data.superblock_representatives=third_order.superblock_representatives;
 myhandles.global_data=global_data;
