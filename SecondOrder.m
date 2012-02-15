@@ -14,20 +14,20 @@ cutoff_intensity=global_data.cutoff_intensity;
 number_of_RGB_clusters=global_data.number_of_RGB_clusters;
 number_of_block_clusters=global_data.number_of_block_clusters;
 number_of_superblocks=size(global_data.superblock_centroids,1);
-xres=global_data.xres;
-yres=global_data.yres;
+xres_full=global_data.xres_full;
+yres_full=global_data.yres_full;
 channels_per_file=global_data.channels_per_file;
-A1=global_data.A1;
-B1=global_data.B1;
+A1=global_data.A2;
+B1=global_data.B2;
 RGB_centroids=global_data.RGB_centroids;
 
 %Load image parameters
 [number_of_repeats,number_of_channels]=size(filenames);
 number_of_channels=max(number_of_channels,channels_per_file);
-blocks_nx=floor(xres/block_size);
-x_offset=floor(rem(xres,block_size)/2)+1;
-blocks_ny=floor(yres/block_size);
-y_offset=floor(rem(yres,block_size)/2)+1;
+blocks_nx=floor(xres_full/block_size);
+x_offset=floor(rem(xres_full,block_size)/2)+1;
+blocks_ny=floor(yres_full/block_size);
+y_offset=floor(rem(yres_full,block_size)/2)+1;
 
 
 %% Reading Images
@@ -61,9 +61,9 @@ superblock_counter=0;
 for image_counter=1:number_of_repeats 
     %Read and Scale Images 
     if(channels_per_file>1)
-        img=Read_and_Scale_Image(filenames(image_counter),marker_scales,xres,yres,channels_per_file); 
+        img=Read_and_Scale_Image(filenames(image_counter),marker_scales,xres_full,yres_full,channels_per_file,xres_full,yres_full); 
     else
-        img=Read_and_Scale_Image(filenames(image_counter,:),marker_scales,xres,yres,channels_per_file); 
+        img=Read_and_Scale_Image(filenames(image_counter,:),marker_scales,xres_full,yres_full,channels_per_file,xres_full,yres_full); 
     end
     
     % Crop image to have integer number of blocks in each direction
