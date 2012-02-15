@@ -16,14 +16,32 @@ data.number_of_RGB_clusters=number_of_RGB_clusters;
 data.number_of_block_clusters=number_of_block_clusters;
 [number_of_training_images,number_of_channels]=size(filenames);
 
+% Montage Variable
+split_image_res=1000;
+
 %Setting image parameters
 test=imread(cell2mat(filenames(1,1)));
-xres=size(test,1);data.xres=xres;
-yres=size(test,2);data.yres=yres;
-blocks_nx=floor(xres/block_size);
-x_offset=floor(rem(xres,block_size)/2)+1;%because the image may not contain an integer number of blocks
-blocks_ny=floor(yres/block_size);
-y_offset=floor(rem(yres,block_size)/2)+1;%because the image may not contain an integer number of blocks
+xres_full=size(test,1);
+yres_full=size(test,2);
+
+if((xres_full/split_image_res)>=2)
+    xres_crop=split_image_res;
+else
+    xres_crop=xres_full;
+end
+if((yres_full/split_image_res)>=2)
+    xres_crop=split_image_res;
+else
+    yres_crop=yres_full;
+end
+data.xres_full=xres_full;data.xres_crop=xres_crop;
+data.yres_full=yres_full;data.yres_crop=yres_crop;
+
+
+blocks_nx=floor(xres_crop/block_size);
+x_offset=floor(rem(xres_crop,block_size)/2)+1;%because the image may not contain an integer number of blocks
+blocks_ny=floor(yres_crop/block_size);
+y_offset=floor(rem(yres_crop,block_size)/2)+1;%because the image may not contain an integer number of blocks
 %Testing for multi-channel (as opposed to gray=scale) images
 channels_per_file=size(test,3);
 data.channels_per_file=channels_per_file;
@@ -52,6 +70,28 @@ B1=sparse(B);
 data.A1=A1;
 data.B1=B1;
 
+if((xres_full~=xres_crop)||(yres_full~=yres_crop))
+    blocks_nx_full=floor(xres_full/block_size);
+    blocks_ny_full=floor(yres_full/block_size);
+    B_full=repmat(((1:block_size*blocks_ny_full)<=block_size)',1,blocks_ny_full);
+    for i=1:blocks_ny_full
+        B_full(:,i)=circshift(B_full(:,i),(i-1)*block_size);
+    end
+    
+    A_full=repmat(((1:block_size*blocks_nx_full)<=block_size),blocks_nx_full,1);
+    for i=1:blocks_nx_full
+        A_full(i,:)=circshift(A_full(i,:)',(i-1)*block_size)';
+    end
+    data.A2=sparse(A_full);
+    data.B2=sparse(B_full);
+    
+else
+    data.A2=A1;
+    data.B2=B1;
+end
+
+
+
 %% Read and Process Images
 
 %Temporarary variable to store all the training blocks
@@ -67,9 +107,9 @@ rgb_counter=0; % Number of foreground pixels used
 for image_counter=1:number_of_training_images
     %Read and Scale Images 
     if(channels_per_file>1)
-        img=Read_and_Scale_Image(filenames(image_counter),marker_scales,xres,yres,channels_per_file); 
+        img=Read_and_Scale_Image(filenames(image_counter),marker_scales,xres_full,yres_full,channels_per_file,xres_crop,yres_crop); 
     else
-        img=Read_and_Scale_Image(filenames(image_counter,:),marker_scales,xres,yres,channels_per_file); 
+        img=Read_and_Scale_Image(filenames(image_counter,:),marker_scales,xres_full,yres_full,channels_per_file,xres_crop,yres_crop); 
     end
     
     %Identify foreground pixels and store their RBG (i.e., multi-channel intensity) values

@@ -12,8 +12,8 @@ block_size=global_data.block_size;
 cutoff_intensity=global_data.cutoff_intensity;
 number_of_RGB_clusters=global_data.number_of_RGB_clusters;
 number_of_block_clusters=global_data.number_of_block_clusters;
-xres=global_data.xres;
-yres=global_data.yres;
+xres_full=global_data.xres_full;xres_crop=global_data.xres_crop;
+yres_full=global_data.yres_full;yres_crop=global_data.yres_crop;
 A1=global_data.A1;
 B1=global_data.B1;
 
@@ -23,10 +23,10 @@ number_of_superblock_representatives=3; % Number of sample images of superblock 
 [number_of_training_images,number_of_channels]=size(filenames);
 channels_per_file=global_data.channels_per_file;
 number_of_channels=max(number_of_channels,channels_per_file);
-blocks_nx=floor(xres/block_size);
-x_offset=floor(rem(xres,block_size)/2)+1;%because the image may not contain an integer number of blocks
-blocks_ny=floor(yres/block_size);
-y_offset=floor(rem(yres,block_size)/2)+1;%because the image may not contain an integer number of blocks
+blocks_nx=floor(xres_crop/block_size);
+x_offset=floor(rem(xres_crop,block_size)/2)+1;%because the image may not contain an integer number of blocks
+blocks_ny=floor(yres_crop/block_size);
+y_offset=floor(rem(yres_crop,block_size)/2)+1;%because the image may not contain an integer number of blocks
 
 
 
@@ -59,9 +59,9 @@ superblock_counter=0;
 for image_counter=1:number_of_training_images
     %Read and Scale Images    
     if(channels_per_file>1)
-        img=Read_and_Scale_Image(filenames(image_counter),marker_scales,xres,yres,channels_per_file); 
+        img=Read_and_Scale_Image(filenames(image_counter),marker_scales,xres_full,yres_full,channels_per_file,xres_crop,yres_crop); 
     else
-        img=Read_and_Scale_Image(filenames(image_counter,:),marker_scales,xres,yres,channels_per_file); 
+        img=Read_and_Scale_Image(filenames(image_counter,:),marker_scales,xres_full,yres_full,channels_per_file,xres_crop,yres_crop); 
     end
     
     
@@ -353,16 +353,26 @@ superblock_representatives=cell(number_of_superblocks,number_of_superblock_repre
 supr_counter=zeros(number_of_superblocks,1);
 for file_num=1:length(included_files)
     if(any(~cellfun('isempty',locations(file_num,:))))
-        img=zeros(xres,yres,number_of_channels);
-        
+        img=zeros(xres_crop,yres_crop,number_of_channels);
+        if((xres_full~=xres_crop)||(yres_full~=yres_crop))
+            x1=ceil((xres_full-xres_crop)/2);
+            y1=ceil((yres_full-yres_crop)/2);
+            x2=x1+xres_crop-1;
+            y2=y1+yres_crop-1;
+        else
+            x1=1;x2=xres_full;
+            y1=1;y2=yres_full;
+        end
         
         if(channels_per_file>1)
             %img=double(imread(cell2mat(filenames(image_counter))));
-            img=imread(cell2mat(filenames(included_files(file_num),1)));
+            temp=imread(cell2mat(filenames(included_files(file_num),1)));
+            img=temp(x1:x2,y1:y2,:);
         else
             for channel=1:number_of_channels
                 %img(:,:,channel_counter)=imread(cell2mat(filenames(image_counter,channel_counter)));
-                img(:,:,channel)=imread(cell2mat(filenames(included_files(file_num),channel)));
+                temp=imread(cell2mat(filenames(included_files(file_num),channel)));
+                img(:,:,channel)=temp(x1:x2,y1:y2);
             end
         end
         
@@ -377,9 +387,9 @@ for file_num=1:length(included_files)
                 for j=1:min(number_of_matches,number_of_superblock_representatives-supr_counter(i))
                     %rep_img=zeros(3*block_size,3*block_size,number_of_channels);
                     x1=max(location_info(j,1)-3*block_size,1);
-                    x2=min(location_info(j,1)+4*block_size-1,xres);
+                    x2=min(location_info(j,1)+4*block_size-1,xres_crop);
                     y1=max(location_info(j,2)-3*block_size,1);
-                    y2=min(location_info(j,2)+4*block_size-1,yres);
+                    y2=min(location_info(j,2)+4*block_size-1,yres_crop);
                     supr_counter(i)=supr_counter(i)+1;
                     superblock_representatives{i,supr_counter(i)}=img(x1:x2,y1:y2,:);
                     
