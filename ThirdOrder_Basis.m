@@ -251,6 +251,24 @@ neighbor_profiles=neighbor_profiles_temp(1:superblock_counter,:);
 [superblock_ids,data.superblock_centroids,~,superblock_distances]=kmeans(neighbor_profiles,number_of_superblocks...
     ,'emptyaction','singleton','start','cluster');
 
+%Added hack start%%%%%%%%%%%
+% if(size(neighbor_profiles,1)<=10000)
+%   [superblock_ids,data.superblock_centroids,~,superblock_distances]=kmeans(neighbor_profiles,number_of_superblocks...
+%      ,'emptyaction','singleton','start','cluster');
+% else
+%     chosen_superblocks=randsample(size(neighbor_profiles,1),10000);
+%     neighbor_profiles_temp=neighbor_profiles(chosen_superblocks,:);
+%     [~,data.superblock_centroids,~,~]=kmeans(neighbor_profiles_temp,number_of_superblocks...
+%     ,'emptyaction','singleton','start','cluster');
+%     superblock_distmat=zeros(size(neighbor_profiles,1),number_of_superblocks);
+%     for superblock_type_index=1:number_of_superblocks
+%         temp=repmat(data.superblock_centroids(superblock_type_index,:),size(neighbor_profiles,1),1);
+%         superblock_distmat(:,block_type_index) =sum((neighbor_profiles-temp).^2,2);
+%     end
+%     [~,superblock_ids]=min(block_distmat,[],2);
+% end
+%Added hack END %%%%%%%%%%%%
+  
 % Return the fractions of block types in training images
 data.block_profile=zeros(number_of_block_clusters,1);
 for block_cluster=1:number_of_block_clusters

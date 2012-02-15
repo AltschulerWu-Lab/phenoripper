@@ -111,7 +111,14 @@ function populateTemplateSelectorList(handles)
   wizardhandles=getappdata(0,'wizardhandles');
   templateList=cell(1,length(wizardhandles.templates));
   for i=1:length(wizardhandles.templates)
-    templateList{i}=wizardhandles.templates{i}.getName(fileExtension,channelSep);
+    templateName=wizardhandles.templates{i}.getName(fileExtension,channelSep);
+    if(wizardhandles.templates{i}.isMultiChannel)
+      templateName=['<HTML><FONT color="red">' templateName '</Font></html>'];
+    else
+      templateName=['<HTML><FONT color="black">' templateName '</Font></html>'];
+    end
+    templateList{i}=templateName;    
+    %templateList{i}=wizardhandles.templates{i}.getName(fileExtension,channelSep);
   end
   set(handles.templateSelector,'String',templateList);
   setappdata(0,'wizardhandles',wizardhandles);
@@ -191,11 +198,24 @@ function selectSingleChannelCB_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+wizardhandles=getappdata(0','wizardhandles');
+
+selectedTemplateNr=get(handles.templateSelector,'value');
+if(wizardhandles.templates{selectedTemplateNr}.isMultiChannel)
+   msgbox({'You selected a MultiChannel Template :'...
+     'If your image is an RGB (JPEG, RGB TIFF etc...) one,'...
+     'the #Channels/image has to be set to 3 (as Red,Green and Blue)'},...
+     'MultiChannel Template Selected')
+   set(handles.nrChannelPerImageDB,'Value',3);
+end
+
+
+
 % Hint: get(hObject,'Value') returns toggle state of selectSingleChannelCB
 if(get(handles.selectSingleChannelCB,'Value')==0)
   set(handles.nrChannelPerImageDB,'Visible','on');
   set(handles.channelImageText,'Visible','on');
-  set(handles.detectChannelBT,'Visible','off');
+  %set(handles.detectChannelBT,'Visible','off');
 else
   set(handles.nrChannelPerImageDB,'Visible','off');
   set(handles.channelImageText,'Visible','off');  
@@ -213,23 +233,23 @@ function nrChannelPerImageDB_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns nrChannelPerImageDB contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from nrChannelPerImageDB
-channelNr=get(handles.nrChannelPerImageDB,'Value');
-data=cell(channelNr,3);
-for i=1:channelNr
-  data{i,1}=true;
-end
-for i=1:channelNr
-  data{i,2}=num2str(i);
-end
-for i=1:channelNr
-  data{i,3}='';
-end
-set(handles.markerTable,'Visible','on');
-set(handles.ExportMetaDataButton,'Visible','on');
-set(handles.markerTable,'Data',data);
-set(handles.markerTable, 'ColumnWidth', {30 110 240, 90});
-msgbox(['Marker have been detected, please enter the name'...
-  'of each marker and click on Done to use this configuration.']);
+% channelNr=get(handles.nrChannelPerImageDB,'Value');
+% data=cell(channelNr,3);
+% for i=1:channelNr
+%   data{i,1}=true;
+% end
+% for i=1:channelNr
+%   data{i,2}=num2str(i);
+% end
+% for i=1:channelNr
+%   data{i,3}='';
+% end
+% set(handles.markerTable,'Visible','on');
+% set(handles.ExportMetaDataButton,'Visible','on');
+% set(handles.markerTable,'Data',data);
+% set(handles.markerTable, 'ColumnWidth', {30 110 240, 90});
+% msgbox(['Marker have been detected, please enter the name'...
+%   'of each marker and click on Done to use this configuration.']);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -362,12 +382,17 @@ if(wizardhandles.templates{selectedTemplateNr}.isMultiChannel)
   set(handles.channelSeparatorTF,'Visible','off');
   set(handles.text5,'Visible','off');
   set(handles.selectSingleChannelCB,'Value',0);
+  set(handles.templateType,'String','Multi-Channel Template (n channels/image)');
+  set(handles.templateType,'Foreground','red');
 else
   set(handles.channelSeparatorTF,'Visible','on');
   set(handles.text5,'Visible','on');
-  set(handles.selectSingleChannelCB,'Value',1);  
+  set(handles.selectSingleChannelCB,'Value',1);
+  set(handles.templateType,'String','Single-Channel Template (1 channel/image)');
+  set(handles.templateType,'Foreground','white');  
 end
 selectSingleChannelCB_Callback('','',handles);
+
 
 
 % --- Executes during object creation, after setting all properties.
@@ -681,14 +706,18 @@ answer=questdlg(sprintf(['Are you sure you want to delete this Pattern']), ...
 wizardhandles=getappdata(0,'wizardhandles');
 selected = get(handles.templateSelector,'Value');
 templates= cell(1,length(wizardhandles.templates)-1);
-index=1;
-for i=1:length(wizardhandles.templates)
-  if(i~=selected)
-  templates{index}=wizardhandles.templates{i};
-  end
-  index=index+1;
-end
-wizardhandles.templates=templates;
+
+
+wizardhandles.templates=removeFromCellArray(wizardhandles.templates,selected)
+
+% index=1;
+% for i=1:length(wizardhandles.templates)
+%   if(i~=selected)
+%   templates{index}=wizardhandles.templates{i};
+%   end
+%   index=index+1;
+% end
+% wizardhandles.templates=templates;
 setappdata(0,'wizardhandles',wizardhandles);
 populateTemplateSelectorList(handles);
 set(handles.templateSelector,'Value',selected-1);
@@ -739,41 +768,66 @@ function detectChannelBT_Callback(hObject, eventdata, handles)
 % hObject    handle to detectChannelBT (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-selectedFolder=get(handles.rootdirTF,'String');
-if(~isdir(selectedFolder))
-  warndlg('The choosen folder is not a valid directory. Please select a valid directory!');
-  return;
-end
-regExp=getSelectedRegExp(handles);
-if(isempty(regExp))
-  warndlg('No Template have been selected, you must select a template!');
-  return;
-end
-channelList=getMarkersFromDir(selectedFolder,regExp,selectedFolder);
-if(isempty(channelList))
-  warndlg('Couldn detect the channel. Did you select the template corresponding to your data?');
-  set(handles.markerTable,'Data',cell(0,3));
-  set(handles.ExportMetaDataButton,'Visible','off');
-  set(handles.markerTable,'Visible','off');
-  return;
-end
-data=cell(length(channelList),3);
-for i=1:length(channelList)
+
+
+if(get(handles.selectSingleChannelCB,'Value')==1)
+  selectedFolder=get(handles.rootdirTF,'String');
+  if(~isdir(selectedFolder))
+    warndlg('The choosen folder is not a valid directory. Please select a valid directory!');
+    return;
+  end
+  regExp=getSelectedRegExp(handles);
+  if(isempty(regExp))
+    warndlg('No Template have been selected, you must select a template!');
+    return;
+  end
+  channelList=getMarkersFromDir(selectedFolder,regExp,selectedFolder);
+  if(isempty(channelList))
+    warndlg('Couldn detect the channel. Did you select the template corresponding to your data?');
+    set(handles.markerTable,'Data',cell(0,3));
+    set(handles.ExportMetaDataButton,'Visible','off');
+    set(handles.markerTable,'Visible','off');
+    return;
+  end
+  data=cell(length(channelList),3);
+  for i=1:length(channelList)
+    data{i,1}=true;
+  end
+  for i=1:length(channelList)
+    data{i,2}=channelList{i};
+  end
+  for i=1:length(channelList)
+    data{i,3}=['marker ' num2str(i)];
+  end
+  set(handles.markerTable,'Visible','on');
+  set(handles.ExportMetaDataButton,'Visible','on');
+  set(handles.markerTable,'Data',data);
+  set(handles.markerTable, 'ColumnWidth', {30 110 220, 90});
+  disp(channelList);
+  msgbox(['Marker have been detected, please enter the name of each marker'...
+    'and click on Done to use this configuration.']);
+
+
+
+else
+  channelNr=get(handles.nrChannelPerImageDB,'Value');
+data=cell(channelNr,3);
+for i=1:channelNr
   data{i,1}=true;
 end
-for i=1:length(channelList)
-  data{i,2}=channelList{i};
+for i=1:channelNr
+  data{i,2}=num2str(i);
 end
-for i=1:length(channelList)
-  data{i,3}=['marker ' num2str(i)];
+for i=1:channelNr
+  data{i,3}='';
 end
 set(handles.markerTable,'Visible','on');
 set(handles.ExportMetaDataButton,'Visible','on');
 set(handles.markerTable,'Data',data);
-set(handles.markerTable, 'ColumnWidth', {30 110 220, 90});
-disp(channelList);
-msgbox(['Marker have been detected, please enter the name of each marker'...
-  'and click on Done to use this configuration.']);
+set(handles.markerTable, 'ColumnWidth', {30 110 240, 90});
+msgbox(['Marker have been detected, please enter the name'...
+  'of each marker and click on Done to use this configuration.']);
+end
 
 
 function regExp=getSelectedRegExp(handles)
