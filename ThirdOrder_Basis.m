@@ -29,13 +29,13 @@ blocks_ny=floor(yres_crop/block_size);
 y_offset=floor(rem(yres_crop,block_size)/2)+1;%because the image may not contain an integer number of blocks
 
 
-
+max_training_superblocks_per_image=1000;
 
 %% Reading Images
 
 % Store the block types of all the foreground blocks. Since we don't know
 % how many there will be, we-preallocate to the maximum possible number
-block_ids_temp=zeros(blocks_nx*blocks_ny*number_of_training_images,1);
+%block_ids_temp=zeros(blocks_nx*blocks_ny*number_of_training_images,1);
 %Count the number of foreground blocks in each training image
 foreground_blocks_per_image=zeros(number_of_training_images,1);
 %foreground_blocks_temp=zeros(blocks_nx*blocks_ny*number_of_training_images,1);
@@ -45,13 +45,13 @@ foreground_blocks_per_image=zeros(number_of_training_images,1);
 % itensive), we just store image index and its (x,y) position in the image. 
 % Then if a block is chosen as a superblock representative, we can use these variables to extract its image 
 % As before we pre-allocate these to maximum number
-image_number_of_block_temp=zeros(blocks_nx*blocks_ny*number_of_training_images,1);
-position_of_block_temp=zeros(blocks_nx*blocks_ny*number_of_training_images,2);
+image_number_of_block_temp=zeros(max_training_superblocks_per_image*number_of_training_images,1);
+position_of_block_temp=zeros(max_training_superblocks_per_image*number_of_training_images,2);
 
 % For each foreground block the neighbor profile is the fractions of the different
 % block types in its neighborhood (superblock). This is pre-allocated to
 % maximum size
-neighbor_profiles_temp=zeros(blocks_nx*blocks_ny*number_of_training_images,number_of_block_clusters+1);
+neighbor_profiles_temp=zeros(max_training_superblocks_per_image*number_of_training_images,number_of_block_clusters+1);
 
 block_counter=0;
 superblock_counter=0;
@@ -155,7 +155,7 @@ for image_counter=1:number_of_training_images
     end
     [~,block_ids_in_image]=min(block_distmat,[],2);
     % Store the block_type ids of FG blocks in the image
-    block_ids_temp(block_counter+1:block_counter+length(foreground_blocks))=block_ids_in_image;
+    %block_ids_temp(block_counter+1:block_counter+length(foreground_blocks))=block_ids_in_image;
     
     
     % This is an image of dim nx x ny, where nx , and ny are the number of
@@ -202,8 +202,17 @@ for image_counter=1:number_of_training_images
 %     if(~include_bg)
 %         is_foreground_sb=(is_foreground_sb&neighbor_profiles_in_image(:,1)==0);
 %     end
-    foreground_superblocks=find(is_foreground_sb);
+
+
     
+    foreground_superblocks=find(is_foreground_sb);
+    selected_fg_sb=randsample(length(foreground_superblocks),min(max_training_superblocks_per_image,length(foreground_superblocks)));
+    foreground_superblocks=foreground_superblocks(selected_fg_sb);
+    
+    
+    is_selected_fg_sb=false(length(foreground_blocks),1);
+    is_selected_fg_sb(foreground_superblocks)=true;
+    is_foreground_sb=is_foreground_sb& is_selected_fg_sb;
     
     % Count the number of superblocks in the image
     foreground_blocks_per_image(image_counter)=length(foreground_superblocks);
@@ -238,7 +247,7 @@ end
 % Use only the filled part of block ids, image number of block, position 
 % of block in image, and neighbor profiles (since they were pre-allocated 
 % to max possible size)
-block_ids=block_ids_temp(1:block_counter);
+%block_ids=block_ids_temp(1:block_counter);
 image_number_of_block=image_number_of_block_temp(1:superblock_counter);
 position_of_block=position_of_block_temp(1:superblock_counter,:);
 neighbor_profiles=neighbor_profiles_temp(1:superblock_counter,:);
@@ -270,10 +279,10 @@ neighbor_profiles=neighbor_profiles_temp(1:superblock_counter,:);
 %Added hack END %%%%%%%%%%%%
   
 % Return the fractions of block types in training images
-data.block_profile=zeros(number_of_block_clusters,1);
-for block_cluster=1:number_of_block_clusters
-   data.block_profile(block_cluster)=sum(block_ids==block_cluster)/length(block_ids);
-end
+% data.block_profile=zeros(number_of_block_clusters,1);
+% for block_cluster=1:number_of_block_clusters
+%    data.block_profile(block_cluster)=sum(block_ids==block_cluster)/length(block_ids);
+% end
 
 % Find the fractions of superblock types in each image, this information is
 % used in selecting superblock type representatives
