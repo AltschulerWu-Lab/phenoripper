@@ -30,7 +30,7 @@ else
     xres_crop=xres_full;
 end
 if((yres_full/split_image_res)>=2)
-    xres_crop=split_image_res;
+   yres_crop=split_image_res;
 else
     yres_crop=yres_full;
 end
