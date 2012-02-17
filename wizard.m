@@ -198,23 +198,23 @@ function selectSingleChannelCB_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-wizardhandles=getappdata(0','wizardhandles');
+% wizardhandles=getappdata(0','wizardhandles');
 
-selectedTemplateNr=get(handles.templateSelector,'value');
-if(wizardhandles.templates{selectedTemplateNr}.isMultiChannel)
-   msgbox({'You selected a MultiChannel Template :'...
-     'If your image is an RGB (JPEG, RGB TIFF etc...) one,'...
-     'the #Channels/image has to be set to 3 (as Red,Green and Blue)'},...
-     'MultiChannel Template Selected')
-   set(handles.nrChannelPerImageDB,'Value',3);
-end
+% selectedTemplateNr=get(handles.templateSelector,'value');
+% if(wizardhandles.templates{selectedTemplateNr}.isMultiChannel)
+%    msgbox({'You selected a MultiChannel Template :'...
+%      'If your image is an RGB (JPEG, RGB TIFF etc...) one,'...
+%      'the #Channels/image has to be set to 3 (as Red,Green and Blue)'},...
+%      'MultiChannel Template Selected')
+%    set(handles.nrChannelPerImageDB,'Value',3);
+% end
 
 
 
 % Hint: get(hObject,'Value') returns toggle state of selectSingleChannelCB
 if(get(handles.selectSingleChannelCB,'Value')==0)
-  set(handles.nrChannelPerImageDB,'Visible','on');
-  set(handles.channelImageText,'Visible','on');
+  %set(handles.nrChannelPerImageDB,'Visible','on');
+  %set(handles.channelImageText,'Visible','on');
   %set(handles.detectChannelBT,'Visible','off');
 else
   set(handles.nrChannelPerImageDB,'Visible','off');
@@ -810,23 +810,64 @@ if(get(handles.selectSingleChannelCB,'Value')==1)
 
 
 else
+  
+  
+  %Read the first matching file and extract the number of channel from it!
+  %Get the choosen Regular Expression
+  regExp=getSelectedRegExp(handles);
+  if(isempty(regExp))
+    warndlg('No Template have been selected, you must select a template!');
+    return;
+  end
+  %Remove the groups Separator and Extension from the regular expression
+  regExp=regexprep(regExp,'?<Separator>','');
+  rexp=regexprep(regExp,'?<Extension>','');  
+  selectedFolder=get(handles.rootdirTF,'String');
+  myhandles=getappdata(0,'myhandles');
+  myhandles.rootDir=selectedFolder;
+  myhandles.allfiles=getAllFiles(selectedFolder); 
+  root_directoryRegExp=regexptranslate('escape', [selectedFolder filesep]);
+  %Should do the regexp in a loop so at the first match we stop!
+  temp=regexp(myhandles.allfiles, root_directoryRegExp,'split');
+  all_files=cellfun(@(x) x(end),temp);
+  [mat ~]=regexp(all_files,rexp, 'match','names');
+  fileName=[];
+  for i=1:length(mat)
+    if(~isempty(mat{i}))
+      fileName=mat{i}{1};
+      break;
+    end
+  end
+  if isempty(fileName)
+    errordlg('The regular expression does not match with your multichannel Images');
+    return;
+  end
+  image1=imread2([selectedFolder filesep fileName]);  
+  if(length(size(image1))~=3)
+    errordlg('The regular expression does not match with your multichannel Images');
+    return;
+  end
+  numberChannel=size(image1,3);
+  set(handles.nrChannelPerImageDB,'Value',numberChannel);
+  
+  
   channelNr=get(handles.nrChannelPerImageDB,'Value');
-data=cell(channelNr,3);
-for i=1:channelNr
-  data{i,1}=true;
-end
-for i=1:channelNr
-  data{i,2}=num2str(i);
-end
-for i=1:channelNr
-  data{i,3}='';
-end
-set(handles.markerTable,'Visible','on');
-set(handles.ExportMetaDataButton,'Visible','on');
-set(handles.markerTable,'Data',data);
-set(handles.markerTable, 'ColumnWidth', {30 110 240, 90});
-msgbox(['Marker have been detected, please enter the name'...
-  'of each marker and click on Done to use this configuration.']);
+  data=cell(channelNr,3);
+  for i=1:channelNr
+    data{i,1}=true;
+  end
+  for i=1:channelNr
+    data{i,2}=num2str(i);
+  end
+  for i=1:channelNr
+    data{i,3}='';
+  end
+  set(handles.markerTable,'Visible','on');
+  set(handles.ExportMetaDataButton,'Visible','on');
+  set(handles.markerTable,'Data',data);
+  set(handles.markerTable, 'ColumnWidth', {30 110 240, 90});
+  msgbox(['Marker have been detected, please enter the name'...
+    'of each marker and click on Done to use this configuration.']);
 end
 
 

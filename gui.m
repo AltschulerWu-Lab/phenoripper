@@ -387,10 +387,11 @@ else
         
         while(counter<minimum_training_files)
             for i=1:myhandles.number_of_conditions
-                if((counter<minimum_training_files)&&(loop_number<=size(myhandles.grouped_metadata{rand_condition(i)}.files_in_group,1)))
+                selectedCondition=rand_condition(i);
+                if((counter<minimum_training_files)&&(loop_number<=size(myhandles.grouped_metadata{selectedCondition}.files_in_group,1)))
                     counter=counter+1;
-                    chosen_files(counter,1)=rand_condition(i);
-                    chosen_files(counter,2)=condition_perm{rand_condition(i)}(loop_number);
+                    chosen_files(counter,1)=selectedCondition;
+                    chosen_files(counter,2)=condition_perm{i}(loop_number);
                 end
                
             end
@@ -557,11 +558,11 @@ for test_num=1:number_of_test_files
   if(number_of_channels==files_per_image)
     for channel=1:number_of_channels
       filename=imagenames{file_num,channel};
-      img(:,:,channel)=imread(filename);
+      img(:,:,channel)=imread2(filename);
     end
   else
     filename=imagenames{file_num,1};
-    img=imread(filename);
+    img=imread2(filename);
   end
   
   for channel=1:number_of_channels
@@ -844,10 +845,10 @@ if(~Show_Visualization_Window)
     color_scales=zeros(size(selected_files,1),number_of_channels);
     for file_num=1:size(selected_files,1)
         if(number_of_channels~=files_per_image)
-            img=double(imread(selected_files{file_num,1}));
+            img=double(imread2(selected_files{file_num,1}));
         else
             for channel=1:number_of_channels
-                img(:,:,channel)=double(imread(selected_files{file_num,channel}));
+                img(:,:,channel)=double(imread2(selected_files{file_num,channel}));
             end
         end
         channel_thresholds=zeros(number_of_channels,1);

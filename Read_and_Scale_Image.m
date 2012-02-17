@@ -21,7 +21,7 @@ dont_split_image=((xres_full==xres_cropped)&&(yres_full==yres_cropped));
 if(dont_split_image)
     
     if(channels_per_file>1)
-        img=double(imread(filenames{1}));
+        img=double(imread2(filenames{1}));
         for channel=1:number_of_channels
             img(:,:,channel)=min(max(img(:,:,channel)-marker_scales(channel,1),0)/...
                 (marker_scales(channel,2)-marker_scales(channel,1)),1)*100;
@@ -34,7 +34,7 @@ if(dont_split_image)
         end
     else
         for channel_counter=1:number_of_channels
-            img(:,:,channel_counter)=100*min(max((double(imread(filenames{channel_counter}))-marker_scales(channel_counter,1))/...
+            img(:,:,channel_counter)=100*min(max((double(imread2(filenames{channel_counter}))-marker_scales(channel_counter,1))/...
                 (marker_scales(channel_counter,2)-marker_scales(channel_counter,1)),0),1);
         end
     end
@@ -45,7 +45,7 @@ else
     y2=y1+yres_cropped-1;
     
     if(channels_per_file>1)
-        temp=double(imread(filenames{1}));
+        temp=double(imread2(filenames{1}));
         for channel=1:number_of_channels
             img=temp(x1:x2,y1:y2,:);
             img(:,:,channel)=min(max(img(:,:,channel)-marker_scales(channel,1),0)/...
@@ -60,7 +60,7 @@ else
         end
     else
         for channel_counter=1:number_of_channels
-            temp=imread(filenames{channel_counter});
+            temp=imread2(filenames{channel_counter});
             temp=temp(x1:x2,y1:y2);
             img(:,:,channel_counter)=100*min(max((double(temp)-marker_scales(channel_counter,1))/...
                 (marker_scales(channel_counter,2)-marker_scales(channel_counter,1)),0),1);

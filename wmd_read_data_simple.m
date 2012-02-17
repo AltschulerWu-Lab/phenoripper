@@ -20,7 +20,7 @@ data.number_of_block_clusters=number_of_block_clusters;
 split_image_res=1000;
 
 %Setting image parameters
-test=imread(cell2mat(filenames(1,1)));
+test=imread2(cell2mat(filenames(1,1)));
 xres_full=size(test,1);
 yres_full=size(test,2);
 

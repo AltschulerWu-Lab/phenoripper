@@ -517,10 +517,10 @@ xres=test.Height;
 yres=test.Width;
 img=zeros(xres,yres,myhandles.number_of_channels);
 if(myhandles.files_per_image~=myhandles.number_of_channels)
-    img=imread(filenames{file_number,1});
+    img=imread2(filenames{file_number,1});
 else
     for channel=1:myhandles.number_of_channels
-        img(:,:,channel)=imread(filenames{file_number,channel});
+        img(:,:,channel)=imread2(filenames{file_number,channel});
     end
 end
 

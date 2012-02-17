@@ -77,11 +77,11 @@ jhSpinner.setEditor(jEditor);
 
 
 if(number_of_channels~=files_per_image)
-img=imread(filenames{myhandles.image_number,1});
+img=imread2(filenames{myhandles.image_number,1});
 
 else
       for channel=1:myhandles.number_of_channels
-          img(:,:,channel)=imread(filenames{myhandles.image_number,channel});
+          img(:,:,channel)=imread2(filenames{myhandles.image_number,channel});
       end
 end
 myhandles.intensity=CalculateIntensity(img,myhandles.marker_scales);
@@ -309,11 +309,11 @@ SetFileLabel(filenames{myhandles.image_number,1},handles);
 guidata(hObject, handles);
 img=zeros(myhandles.xres,myhandles.yres,myhandles.number_of_channels);
 if(myhandles.number_of_channels~=myhandles.files_per_image)
-img=imread(filenames{myhandles.image_number,1});
+img=imread2(filenames{myhandles.image_number,1});
 
 else
       for channel=1:myhandles.number_of_channels
-          img(:,:,channel)=imread(filenames{myhandles.image_number,channel});
+          img(:,:,channel)=imread2(filenames{myhandles.image_number,channel});
       end
 end
 myhandles.img=img;
@@ -365,11 +365,11 @@ SetFileLabel(filenames{myhandles.image_number,1},handles);
 guidata(hObject, handles);
 img=zeros(myhandles.xres,myhandles.yres,myhandles.number_of_channels);
 if(myhandles.number_of_channels~=myhandles.files_per_image)
-img=imread(filenames{myhandles.image_number,1});
+img=imread2(filenames{myhandles.image_number,1});
 
 else
       for channel=1:myhandles.number_of_channels
-          img(:,:,channel)=imread(filenames{myhandles.image_number,channel});
+          img(:,:,channel)=imread2(filenames{myhandles.image_number,channel});
       end
 end
 myhandles.img=img;

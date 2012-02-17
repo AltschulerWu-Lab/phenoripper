@@ -374,19 +374,19 @@ for file_num=1:length(included_files)
         end
         
         if(channels_per_file>1)
-            %img=double(imread(cell2mat(filenames(image_counter))));
-            temp=imread(cell2mat(filenames(included_files(file_num),1)));
+            %img=double(imread2(cell2mat(filenames(image_counter))));
+            temp=imread2(cell2mat(filenames(included_files(file_num),1)));
             img=temp(x1:x2,y1:y2,:);
         else
             for channel=1:number_of_channels
-                %img(:,:,channel_counter)=imread(cell2mat(filenames(image_counter,channel_counter)));
-                temp=imread(cell2mat(filenames(included_files(file_num),channel)));
+                %img(:,:,channel_counter)=imread2(cell2mat(filenames(image_counter,channel_counter)));
+                temp=imread2(cell2mat(filenames(included_files(file_num),channel)));
                 img(:,:,channel)=temp(x1:x2,y1:y2);
             end
         end
         
         %     for channel=1:number_of_channels
-        %        img(:,:,channel)=imread(cell2mat(filenames(included_files(file_num),channel)));
+        %        img(:,:,channel)=imread2(cell2mat(filenames(included_files(file_num),channel)));
         %
         %     end
         for i=1:number_of_superblocks
