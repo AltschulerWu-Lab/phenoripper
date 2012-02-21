@@ -1,0 +1,9 @@
+#PhenoRipperRegularExpressionBEGIN
+#RegularExpression:(?<Row>[A-Z]*)(?<Column>[0-9]{1,2})\/\S*(?<Separator>__SEPARATOR__)(?<Channel>\S*)(?<Extension>.__EXTENSION__)$
+#RegularExpressionExample:A3/xxxxxxxx__SEPARATOR__1.__EXTENSION__
+#RegularExpressionIsMultiChannel:0
+#RegularExpressionDescription:Well Based Single Channel Template
+#PhenoRipperRegularExpressionEND
+
+
+

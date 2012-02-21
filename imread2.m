@@ -28,7 +28,7 @@ function A = imread2(filename)
     tmp=tiffread2(filename);    
     if (~isImagesSameSize(tmp))
       %errordlg('This format is NOT supported');
-      error('Format Nor Supported! All Images in the TIFF stack MUST have the same size');
+      error('Format Not Supported! All Images in the TIFF stack MUST have the same size');
     end    
     A=zeros(tmp(1).height,tmp(1).width,length(tmp));
     for i=1:length(tmp)

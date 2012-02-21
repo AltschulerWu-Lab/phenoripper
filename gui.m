@@ -524,63 +524,63 @@ Calculate_Image_Parameters(hObject,handles,true);
 
 
 
-function AutoThreshold_Callback(hObject, eventdata, handles)
-% hObject    handle to SelectDirectory (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-myhandles=getappdata(0,'myhandles');
-% if(~myhandles.is_directory_usable)
-%     warndlg('Change Root Directory');
-%     return;
+% function AutoThreshold_Callback(hObject, eventdata, handles)
+% % hObject    handle to SelectDirectory (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% myhandles=getappdata(0,'myhandles');
+% % if(~myhandles.is_directory_usable)
+% %     warndlg('Change Root Directory');
+% %     return;
+% % end
+% %cutoff_intensity=str2double(get(handles.ThreshodIntensity,'String'));
+% if(~isfield(myhandles,'files_per_image'))
+%   warndlg('You must load data or result first');
+%   return;
 % end
-%cutoff_intensity=str2double(get(handles.ThreshodIntensity,'String'));
-if(~isfield(myhandles,'files_per_image'))
-  warndlg('You must load data or result first');
-  return;
-end
-files_per_image=myhandles.files_per_image;
-number_of_channels=myhandles.number_of_channels;
-number_of_test_files=10;
-thresholds=zeros(number_of_test_files,1);
-set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0,...
-  'Maximum',number_of_test_files, 'Value',0);
-myhandles.statusbarHandles=statusbar(hObject,'Calculating Best Threshold ...');
-for test_num=1:number_of_test_files
-  condition=randi(myhandles.number_of_conditions);
-  imagenames=myhandles.grouped_metadata{condition}.files_in_group;
-  file_num=randi(size(imagenames,1));
-  filename=imagenames{1};
-  test=imfinfo(filename);
-  xres=test.Height;
-  yres=test.Width;
-  img=zeros(xres,yres,number_of_channels);
-  channel_thresholds=zeros(number_of_channels,1);
-  if(number_of_channels==files_per_image)
-    for channel=1:number_of_channels
-      filename=imagenames{file_num,channel};
-      img(:,:,channel)=imread2(filename);
-    end
-  else
-    filename=imagenames{file_num,1};
-    img=imread2(filename);
-  end
-  
-  for channel=1:number_of_channels
-         intensity= img(:,:,channel);
-         max_intensity=max(intensity(:));
-         min_intensity=min(intensity(:));
-         intensity=(intensity-min_intensity)/(max_intensity-min_intensity);
-         channel_thresholds(channel)=graythresh(intensity)*(max_intensity-min_intensity)+min_intensity;
-    end
-  thresholds(test_num)=min(channel_thresholds).^2;
-  set(myhandles.statusbarHandles.ProgressBar, 'Value',test_num);
-end
-myhandles.statusbarHandles=statusbar(hObject,'');
-set(myhandles.statusbarHandles.ProgressBar, 'Visible','off');
-set(handles.ThreshodIntensity,'String',num2str(round(quantile(thresholds,0.25))));
-SetButtonState(hObject,handles,true);
-guidata(hObject, handles);
-setappdata(0,'myhandles',myhandles);
+% files_per_image=myhandles.files_per_image;
+% number_of_channels=myhandles.number_of_channels;
+% number_of_test_files=10;
+% thresholds=zeros(number_of_test_files,1);
+% set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0,...
+%   'Maximum',number_of_test_files, 'Value',0);
+% myhandles.statusbarHandles=statusbar(hObject,'Calculating Best Threshold ...');
+% for test_num=1:number_of_test_files
+%   condition=randi(myhandles.number_of_conditions);
+%   imagenames=myhandles.grouped_metadata{condition}.files_in_group;
+%   file_num=randi(size(imagenames,1));
+%   filename=imagenames{1};
+%   test=imfinfo(filename);
+%   xres=test.Height;
+%   yres=test.Width;
+%   img=zeros(xres,yres,number_of_channels);
+%   channel_thresholds=zeros(number_of_channels,1);
+%   if(number_of_channels==files_per_image)
+%     for channel=1:number_of_channels
+%       filename=imagenames{file_num,channel};
+%       img(:,:,channel)=imread2(filename);
+%     end
+%   else
+%     filename=imagenames{file_num,1};
+%     img=imread2(filename);
+%   end
+%   
+%   for channel=1:number_of_channels
+%          intensity= img(:,:,channel);
+%          max_intensity=max(intensity(:));
+%          min_intensity=min(intensity(:));
+%          intensity=(intensity-min_intensity)/(max_intensity-min_intensity);
+%          channel_thresholds(channel)=graythresh(intensity)*(max_intensity-min_intensity)+min_intensity;
+%     end
+%   thresholds(test_num)=min(channel_thresholds).^2;
+%   set(myhandles.statusbarHandles.ProgressBar, 'Value',test_num);
+% end
+% myhandles.statusbarHandles=statusbar(hObject,'');
+% set(myhandles.statusbarHandles.ProgressBar, 'Visible','off');
+% set(handles.ThreshodIntensity,'String',num2str(round(quantile(thresholds,0.25))));
+% SetButtonState(hObject,handles,true);
+% guidata(hObject, handles);
+% setappdata(0,'myhandles',myhandles);
 
 
 
@@ -848,7 +848,8 @@ if(~Show_Visualization_Window)
             img=double(imread2(selected_files{file_num,1}));
         else
             for channel=1:number_of_channels
-                img(:,:,channel)=double(imread2(selected_files{file_num,channel}));
+                %USE IMREAD FOR SINGLE CHANNEL ALWAYS
+                img(:,:,channel)=double(imread(selected_files{file_num,channel}));
             end
         end
         channel_thresholds=zeros(number_of_channels,1);

@@ -20,7 +20,7 @@ img=zeros(xres_cropped,yres_cropped,number_of_channels);
 dont_split_image=((xres_full==xres_cropped)&&(yres_full==yres_cropped));
 if(dont_split_image)
     
-    if(channels_per_file>1)
+    if(channels_per_file>1)%If MultiChannel
         img=double(imread2(filenames{1}));
         for channel=1:number_of_channels
             img(:,:,channel)=min(max(img(:,:,channel)-marker_scales(channel,1),0)/...
@@ -32,9 +32,10 @@ if(dont_split_image)
             %        temp=min(max(temp,0),100);
             %        img(:,:,channel)=temp;
         end
-    else
+    else%If Single Channel Image File
         for channel_counter=1:number_of_channels
-            img(:,:,channel_counter)=100*min(max((double(imread2(filenames{channel_counter}))-marker_scales(channel_counter,1))/...
+          %USE IMREAD FOR SINGLE CHANNEL ALWAYS
+          img(:,:,channel_counter)=100*min(max((double(imread(filenames{channel_counter}))-marker_scales(channel_counter,1))/...
                 (marker_scales(channel_counter,2)-marker_scales(channel_counter,1)),0),1);
         end
     end
@@ -44,7 +45,7 @@ else
     x2=x1+xres_cropped-1;
     y2=y1+yres_cropped-1;
     
-    if(channels_per_file>1)
+    if(channels_per_file>1)%If MultiChannel
         temp=double(imread2(filenames{1}));
         for channel=1:number_of_channels
             img=temp(x1:x2,y1:y2,:);
@@ -58,12 +59,13 @@ else
             %        temp=min(max(temp,0),100);
             %        img(:,:,channel)=temp;
         end
-    else
+    else%If Single Channel Image File
         for channel_counter=1:number_of_channels
-            temp=imread2(filenames{channel_counter});
-            temp=temp(x1:x2,y1:y2);
-            img(:,:,channel_counter)=100*min(max((double(temp)-marker_scales(channel_counter,1))/...
-                (marker_scales(channel_counter,2)-marker_scales(channel_counter,1)),0),1);
+          %USE IMREAD FOR SINGLE CHANNEL ALWAYS
+          temp=imread(filenames{channel_counter});
+          temp=temp(x1:x2,y1:y2);
+          img(:,:,channel_counter)=100*min(max((double(temp)-marker_scales(channel_counter,1))/...
+              (marker_scales(channel_counter,2)-marker_scales(channel_counter,1)),0),1);
         end
     end
     

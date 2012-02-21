@@ -17,6 +17,8 @@ switch type
     path=getPath('savePath');
   case 'result'
     path=getPath('resultPath');
+  case 'importtemplate'
+    path=getPath('importtemplatePath');
   otherwise
     path='';
 end

@@ -22,7 +22,7 @@ function varargout = wizard(varargin)
 
 % Edit the above text to modify the response to help wizard
 
-% Last Modified by GUIDE v2.5 08-Sep-2011 17:42:01
+% Last Modified by GUIDE v2.5 21-Feb-2012 11:21:35
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -649,8 +649,8 @@ function saveAllTemplatesBT_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 wizardhandles=getappdata(0,'wizardhandles');
 answer=questdlg(sprintf('Save this pattern list as the default one?'), ...
- 'Yes', 'No');
-
+'Yes', 'No');
+%answer='No';%Always save for the specific user only...
 if ispc
   userdir= getenv('USERPROFILE'); 
 else
@@ -660,15 +660,15 @@ end
 % Handle response
   switch answer
     case 'Yes'
-      try
-        templates=wizardhandles.templates;
-        if isunix
-          save('default-templates_unix.mat','templates');
-        else        
-          save('default-templates_windows.mat','templates');
-        end
-        msgbox(['Default Templates have been saved'],'Saved Template with success');
-      catch
+%       try
+%         templates=wizardhandles.templates;
+%         if isunix
+%           save('default-templates_unix.mat','templates');
+%         else        
+%           save('default-templates_windows.mat','templates');
+%         end
+%         msgbox(['Default Templates have been saved'],'Saved Template with success');
+%       catch
         templates=wizardhandles.templates;
         if isunix
           save([userdir filesep 'default-templates_unix.mat'],'templates');
@@ -676,7 +676,7 @@ end
           save([userdir filesep 'default-templates_windows.mat'],'templates');
         end
         msgbox(['Default Templates have been saved'],'Saved Template with success');
-      end
+%       end
     case 'No'
       templates=wizardhandles.templates;
       [fileName, pathName]=uiputfile('*.mat','Save as',...
@@ -972,3 +972,137 @@ set(myhandles.wizardStatusBarHandles.ProgressBar, 'Background','white',...
   'Foreground',[0.4,0,0]);
 warning on;
 setappdata(0,'myhandles',myhandles);
+
+
+% --- Executes on button press in importTemplatesBT.
+function importTemplatesBT_Callback(hObject, eventdata, handles)
+% hObject    handle to importTemplatesBT (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+lastPath=loadLastPath('importtemplate');
+if(~exist(char(lastPath),'dir'))
+  [filename,pathname]=uigetfile({'*.txt;','PhenoRipper Regular Expression';'*.*','All Files'},'Select a Metadata File');
+else
+  [filename,pathname]=uigetfile({'*.txt;','PhenoRipper Regular Expression';'*.*','All Files'},'Select a Metadata File', lastPath);
+end
+if(isnumeric(pathname))%If user pressed cancle button
+  return;
+end
+if(~exist(pathname,'dir'))
+  warndlg('Invalid File');
+  return;
+else
+   saveLastPath(pathname,'importtemplate');
+end
+parsingMsgDlg = msgbox('Parsing Regular Expression file, Please wait...');
+%Trick to show off the OK button
+hc=get(parsingMsgDlg,'Children'); 
+set(hc(2),'Visible','off');
+drawnow;
+pause(0.01);
+try
+  [pattern,description,example,isMultiChannel,errorMessag]=...
+    readRegularExpressionFile([pathname filesep filename]);
+  wizardhandles=getappdata(0,'wizardhandles');
+  [existAlready,position] = isExampleExist(example,wizardhandles.templates);
+  if(existAlready)  
+    answer=questdlg(sprintf(['The Template Example exist already.'...
+      'Using the same will erase the previous template.\n'...
+      'Are you sure you want to do that?']), ...
+   'Yes', 'No');
+  % Handle response
+    switch answer
+      case 'No'
+        return;
+    end
+  else
+    position=length(wizardhandles.templates)+1;
+  end
+  %Add the new template
+  wizardhandles.newTemplate=MyTemplate(example,pattern,isMultiChannel);
+  wizardhandles.newTemplate.Description=description;
+  wizardhandles.templates{position}=wizardhandles.newTemplate.setPattern(pattern);
+  setappdata(0,'wizardhandles',wizardhandles);
+  close(parsingMsgDlg);
+  populateTemplateSelectorList(handles);
+catch
+  close(parsingMsgDlg);
+end
+
+%TODO MAKE THIS FUNCTION A FILE ?
+function [regularExpression,description,example,isMultiChannel,...
+    errorMessage]=readRegularExpressionFile(filename)
+  CommonVar=cell(1,1);
+  n=1;
+  fid =fopen(filename);
+  data=textscan(fid,'%s',1,'delimiter','\n');
+  while(~strcmp(data{1,1},'')&&~strcmp(data{1,1}{1}(1),',') )
+    CommonVar(n,1)=data{1,1};
+    n=n+1;
+    data=textscan(fid,'%s',1,'delimiter','\n');
+  end
+  %Extract the variables(RegularExpression, RegularExpressionExample,
+  %RegularExpressionIsMultiChannel and RegularExpressionDescription)
+  %Only RegularExpression,RegularExpressionIsMultiChannel and
+  %RegularExpressionExample is required,
+  %RegularExpressionDescription will be empty per default
+  errorMessage='';
+  regularExpression = getVarValue(CommonVar,'#RegularExpression:');
+  if(isempty(regularExpression))
+    errorMessage=['Regular Expression has not been specified. You should'...
+    ' have a line like : #RegularExpression:Your Regular Expression'];
+    isMultiChannel='';
+    regularExpression='';
+    description='';
+    example='';
+    return;
+  end    
+  example = getVarValue(CommonVar,'#RegularExpressionExample:');
+  if(isempty(example))
+    errorMessage=['Regular Expression Example has not been specified.'...
+      'You should have a line like:'...
+      ' #RegularExpressionExample:Your Regular Expression Example'];
+    isMultiChannel='';
+    regularExpression='';
+    description='';
+    example='';
+    return;
+  end    
+  isMultiChannel = getVarValue(CommonVar,'#RegularExpressionIsMultiChannel:');
+  if(~isempty(isMultiChannel))
+    isMultiChannel=str2num(isMultiChannel);
+  end
+  if(isempty(isMultiChannel))
+    errorMessage=['Regular Expression Is Multi Channel has not been specified.'...
+      'You should have a line like:'...
+      ' #RegularExpressionIsMultiChannel:0'];
+    isMultiChannel='';
+    regularExpression='';
+    description='';
+    example='';
+    return;
+  end    
+  description = getVarValue(CommonVar,'#RegularExpressionDescription:');
+    
+%TODO USED ALSO IN ReadData.m, SHOUDL BE EXTERNALIZED  
+%Internal function to extract the value of the Common Variable present
+%in the header of the Metadata file.
+function value=getVarValue(varCell,var)
+  [startIndex, ~, ~, ~, ~, ~, valueCell]=regexp(varCell,var);
+  index = find(~cellfun('isempty',startIndex));
+  if(~isempty(index))
+    valueCell=valueCell{index};
+    value=valueCell{1,2};
+  else
+    value=[];
+  end
+  
+%TODO USED ALSO IN editTemplate.m, SHOUDL BE EXTERNALIZED  
+function [exist,i]=isExampleExist(example,templates)
+  exist=0;
+  for i=1:length(templates)
+    if(strcmp(templates{i}.Example,example))
+      exist=1;
+      break;
+    end
+  end

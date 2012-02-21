@@ -380,7 +380,8 @@ for file_num=1:length(included_files)
         else
             for channel=1:number_of_channels
                 %img(:,:,channel_counter)=imread2(cell2mat(filenames(image_counter,channel_counter)));
-                temp=imread2(cell2mat(filenames(included_files(file_num),channel)));
+                %USE IMREAD FOR SINGLE CHANNEL ALWAYS
+                temp=imread(cell2mat(filenames(included_files(file_num),channel)));
                 img(:,:,channel)=temp(x1:x2,y1:y2);
             end
         end

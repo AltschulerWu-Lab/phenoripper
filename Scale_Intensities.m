@@ -55,6 +55,7 @@ handles.close_button=uicontrol('Style', 'pushbutton','String','Done','Units','no
 myhandles=getappdata(0,'myhandles');
 Display_Image(myhandles.img,axis_handle,color_scale,colors,[]);  
 axis(myhandles.h,'image');
+set(handles.fig,'Name','PhenoRipper:Intensity Scaling','NumberTitle','off');
 
 
 if(isfield(myhandles,'markers'))
@@ -62,14 +63,31 @@ if(isfield(myhandles,'markers'))
   for marker_num=1:size(myhandles.markers,2)
     if(myhandles.markers{marker_num}.isUse)
       markerNr=markerNr+1;
-      add_marker(markerNr,0.9-1.25*panel_height*(markerNr-1),color_scale(markerNr,1),color_scale(markerNr,2),myhandles.markers{marker_num}.name);
+      ischecked=1;
+      markerValue=marker_num;
+      try
+        ischecked=~isempty(myhandles.display_colors{marker_num});
+        [~, markerValue] = ismember(myhandles.display_colors{marker_num}, myhandles.color_order);
+        markerValue=markerValue(1,1);
+        if(markerValue==0)
+          markerValue=marker_num;
+        end
+      catch
+      end
+      add_marker(markerNr,0.9-1.25*panel_height*(markerNr-1),color_scale(markerNr,1),color_scale(markerNr,2),myhandles.markers{marker_num}.name,ischecked,markerValue);
     end
   end
 else
-  for marker_num=1:number_of_markers
-      add_marker(marker_num,0.9-1.25*panel_height*(marker_num-1),color_scale(marker_num,1),color_scale(marker_num,2),[]);
+  for marker_num=1:number_of_markers    
+      ischecked=1;
+      try
+        ischecked=~isempty(myhandles.display_colors{marker_num});
+      catch
+      end
+      add_marker(marker_num,0.9-1.25*panel_height*(marker_num-1),color_scale(marker_num,1),color_scale(marker_num,2),[],ischecked,markerValue);
   end
 end
+
 
    function set_myhandle_values()
         myhandles=getappdata(0,'myhandles');
@@ -92,7 +110,7 @@ end
 
  
 
-    function marker_handles=add_marker(marker_number,position,default_min,default_max,name)
+    function marker_handles=add_marker(marker_number,position,default_min,default_max,name,ischecked,markerValue)
         
         %Panel
         if(~isempty(name))
@@ -127,13 +145,24 @@ end
         marker_handles.color_popupmenu=uicontrol('Style', 'popupmenu',...
             'String',color_order,'Units','normalized',...
             'position', [color_popupmenu_x,color_popupmenu_y,color_popupmenu_width,color_popupmenu_height],...
-            'Callback', {@color_popupmenu_callback,marker_number},'parent',marker_handles.marker_panel,'Value',marker_number);
+            'Callback', {@color_popupmenu_callback,marker_number},'parent',marker_handles.marker_panel,'Value',markerValue);
         % Show marker checkbox
         marker_handles.show_marker_checkbox=uicontrol('Style', 'checkbox',...
-            'String','Use Marker','Units','normalized','Value',1,...
+            'String','Use Marker','Units','normalized','Value',ischecked,...
             'position', [show_marker_checkbox_x,show_marker_checkbox_y,show_marker_checkbox_width,show_marker_checkbox_height],...
             'Callback', {@checkbox_callback,marker_number},'parent',marker_handles.marker_panel,...
             'BackgroundColor',[0 0 0],'ForegroundColor',[1 1 1]);
+        if(~ischecked)
+          set(marker_handles.min_scroll_bar ,'Enable','off');
+          set(marker_handles.max_scroll_bar ,'Enable','off');
+          set(marker_handles.min_edit ,'Enable','off');
+          set(marker_handles.max_edit ,'Enable','off');
+          set(marker_handles.color_popupmenu ,'Enable','off');
+        end
+          
+          
+          
+          
         function min_scroll_callback(hObject,eventdata,marker_number)
             value=get(hObject,'Value');
             set(marker_handles.min_edit,'String',num2str(value));

@@ -14,7 +14,7 @@
    height="1052.3622047"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.0 r9654"
+   inkscape:version="0.48.2 r9819"
    sodipodi:docname="wizard.svg">
   <defs
      id="defs4">
@@ -125,7 +125,7 @@
        x2="270.93542"
        y1="32.851772"
        x1="271.00128"
-       gradientTransform="matrix(1.3647452,0,0,1,-9.1190939,-319.99997)"
+       gradientTransform="matrix(1.4727027,0,0,0.99378854,-11.818168,-319.45894)"
        gradientUnits="userSpaceOnUse"
        id="linearGradient3363"
        xlink:href="#linearGradient3963-8-4-1"
@@ -145,9 +145,9 @@
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1280"
-     inkscape:window-height="971"
+     inkscape:window-height="976"
      inkscape:window-x="0"
-     inkscape:window-y="24"
+     inkscape:window-y="26"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -157,7 +157,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -168,10 +168,10 @@
     <rect
        style="fill:url(#linearGradient3363);fill-opacity:1;stroke:none"
        id="rect3893-2-3-5"
-       width="670"
-       height="80.500023"
+       width="723"
+       height="80"
        x="25.001274"
-       y="-313.39822"
+       y="-312.89819"
        inkscape:export-filename="/home/bpavie/Documents/code/Matlab/PhenoRipper/wizard.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />

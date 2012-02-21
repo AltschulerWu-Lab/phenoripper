@@ -17,6 +17,8 @@ try
       savePropertyFile([userdir filesep 'lastPath.properties'],['savePath=' path]);
     case 'result'
       savePropertyFile([userdir filesep 'lastPath.properties'],['resultPath=' path]);
+    case 'importtemplate'
+      savePropertyFile([userdir filesep 'lastPath.properties'],['importtemplatePath=' path]);
     otherwise
       ;
   end
