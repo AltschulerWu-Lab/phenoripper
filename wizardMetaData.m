@@ -315,7 +315,8 @@ end
 %myhandles=getappdata(0,'myhandles');
 myhandles.wizardMetaData_handle=gcf;
 setappdata(0,'myhandles',myhandles);
-wizard_accept;
+%wizard_accept;
+wizardAccept;
 
 
 

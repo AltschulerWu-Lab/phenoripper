@@ -347,16 +347,20 @@ function templateSelector_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns templateSelector contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from templateSelector
-[~, groupbyList]=getGroups(handles);
+[~, groupbyList,description]=getGroups(handles);
 %Display group and the corresponding matching with the example
 set(handles.groupSelector,'String',groupbyList);
+description=strrep(description, '%s', char(10));
+set(handles.descriptionText,'String',description);
+
+%set(handles.descriptionText,'String',description);
 set(handles.groupSelector,'Visible','on');
 set(handles.text8,'Visible','on');
 viewChannelSeparator(handles);
 set(handles.markerTable,'Visible','off');
 set(handles.ExportMetaDataButton,'Visible','off');
 
-function [groups, groupExample]=getGroups(handles)
+function [groups, groupExample,description]=getGroups(handles)
 selectedTemplateNr = get(handles.templateSelector,'Value');
 if(selectedTemplateNr<1)
   groups=[];
@@ -370,6 +374,7 @@ if(isempty(regExp))
   return;
 end
 groupExample=wizardhandles.templates{selectedTemplateNr}.getGroupExampleList();
+description=wizardhandles.templates{selectedTemplateNr}.Description;
 
 
 function viewChannelSeparator(handles)
@@ -492,7 +497,8 @@ myhandles.metadata=metadata;
 myhandles.matched_files=matched_files;
 myhandles.wizard_handle=gcf;
 setappdata(0,'myhandles',myhandles);
-wizard_accept;
+%wizard_accept;
+wizardAccept;
 
 
 function result=substring(removeString,original)
