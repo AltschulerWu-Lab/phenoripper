@@ -987,9 +987,9 @@ function importTemplatesBT_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 lastPath=loadLastPath('importtemplate');
 if(~exist(char(lastPath),'dir'))
-  [filename,pathname]=uigetfile({'*.txt;','PhenoRipper Regular Expression';'*.*','All Files'},'Select a Metadata File');
+  [filename,pathname]=uigetfile({'*.csv;','PhenoRipper Regular Expression';'*.*','All Files'},'Select a Metadata File');
 else
-  [filename,pathname]=uigetfile({'*.txt;','PhenoRipper Regular Expression';'*.*','All Files'},'Select a Metadata File', lastPath);
+  [filename,pathname]=uigetfile({'*.csv;','PhenoRipper Regular Expression';'*.*','All Files'},'Select a Metadata File', lastPath);
 end
 if(isnumeric(pathname))%If user pressed cancle button
   return;

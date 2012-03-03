@@ -76,7 +76,7 @@ try
   myhandles=getappdata(0,'myhandles');
   [table_data,field_names]=convert_struct_to_table(myhandles.metadata);
   groupNameList=field_names;
-  groupNameList{1}='Random Grouping';
+  groupNameList{1}=['Random (don''','t know)'];
   set(handles.grouppopupmenu1,'String',groupNameList);
   
   
@@ -91,9 +91,12 @@ try
   grouppopupmenu1_Callback(hObject, eventdata, handles)
   
   
-  description=get(handles.description,'String');
+  description=['Choose a strategy for sampling a representative subset '... 
+    'of your data.%sIf you expect groups of images to be similar '...
+    '(e.g. images from same wells, replicate experiments, similar perturbations),'...
+    ' please select this group. Otherwise PhenoRipper will sample randomly.'];
   description=strrep(description, '%s', char(10));
-  description=strrep(description, '%x', num2str(length(groupNameList)));
+  %description=strrep(description, '%x', num2str(length(groupNameList)));
   set(handles.description,'String',description);
   
   

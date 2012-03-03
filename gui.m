@@ -56,7 +56,7 @@ splash('logo','png');
 % Choose default command line output for gui
 handles.output = hObject;
 set(handles.ExplorerButton,'Visible','off');
-set(handles.uipanel9,'Visible','off');
+% set(handles.uipanel9,'Visible','off');
 set(handles.SaveOutputButton,'Visible','off');
 % Update handles structure
 guidata(hObject, handles);
@@ -327,7 +327,7 @@ end
 setappdata(0,'myhandles',myhandles);
 SetButtonState(hObject,handles,true);
 set(handles.ExplorerButton,'Visible','off');
-set(handles.uipanel9,'Visible','off');
+% set(handles.uipanel9,'Visible','off');
 set(handles.SaveOutputButton,'Visible','off');
 
 
@@ -348,23 +348,21 @@ end
 set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
 myhandles.statusbarHandles=statusbar(hObject,'Calculating File Structure');
 analysistime_handle=tic;
-block_size = str2double(get(handles.blockSize,'String'));
-cutoff_intensity=str2double(get(handles.ThreshodIntensity,'String'));
-number_of_RGB_clusters=str2double(get(handles.ReduceColorNr,'String'));
-number_of_block_clusters=str2double(get(handles.BlockTypeNr,'String'));
+
+
+block_size = myhandles.block_size;
+cutoff_intensity=myhandles.cutoff_intensity;
+number_of_RGB_clusters=myhandles.number_of_RGB_clusters;
+number_of_block_clusters=myhandles.number_of_block_clusters;
+number_of_superblocks=myhandles.number_of_superblocks;
+minimum_training_files=myhandles.minimum_training_files;
+maximum_training_files=myhandles.maximum_training_files;
 number_of_blocks_per_training_image=1000;
 rgb_samples_per_training_image=3000;
 number_of_block_representatives=3;
-number_of_superblocks=str2double(get(handles.SuperBlockNr,'String'));
 myhandles.number_of_superblocks=number_of_superblocks;
 files_per_image=myhandles.files_per_image;
 
-% minimum_training_files=min(30,length(myhandles.metadata));
-% maximum_training_files=100;
-minimum_training_files=min(str2double(get(handles.MinImageTraining,'String')),length(myhandles.metadata));
-maximum_training_files=str2double(get(handles.MaxImageTraining,'String'));
-
-myhandles.include_background_superblocks=get(handles.useBackgroundInfoCB,'value');
 
 
 if(myhandles.number_of_conditions>maximum_training_files)
@@ -422,14 +420,14 @@ setappdata(0,'myhandles',myhandles);
 %Generate Global Basis
 warning off;
 set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
-myhandles.statusbarHandles=statusbar(hObject,'Generating Global Basis');
+myhandles.statusbarHandles=statusbar(hObject,'Learning Block Types (1/3)');
 global_data=wmd_read_data_simple(global_filenames,block_size,...
     cutoff_intensity,number_of_RGB_clusters,number_of_block_clusters,...
     number_of_blocks_per_training_image,...
     rgb_samples_per_training_image,number_of_block_representatives,myhandles.marker_scales,...
     myhandles.include_background_superblocks);
 set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
-myhandles.statusbarHandles=statusbar(hObject,'Generating Neighborhood Statistics');
+myhandles.statusbarHandles=statusbar(hObject,'Learning Superblock Types (2/3)');
 
 warning on;
 try
@@ -461,7 +459,7 @@ individual_number_foreground_blocks=zeros(myhandles.number_of_files,1);
 warning off;
 set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','off');
 set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximum',myhandles.number_of_files, 'Value',0);
-myhandles.statusbarHandles=statusbar(hObject,'Calculating Block Profiles per Image...');
+myhandles.statusbarHandles=statusbar(hObject,'Analysing Images (3/3)');
 tStart=tic; 
  myhandles.files_analyzed=0;
 filenames=cell(1,files_per_image); 
@@ -502,7 +500,6 @@ warning on;
 myhandles.analysis_time=toc(analysistime_handle);
 setappdata(0,'myhandles',myhandles);
 set(handles.ExplorerButton,'Visible','on');
-set(handles.uipanel9,'Visible','on');
 set(handles.SaveOutputButton,'Visible','on');
 set(handles.ExplorerButton,'Enable','on');
 set(handles.SaveOutputButton,'Enable','on');
@@ -711,9 +708,20 @@ function SaveOutputButton_Callback(hObject, eventdata, handles)
 %uisave;
 %uiremember(findobj(gcf,'-depth',inf));
 myhandles=getappdata(0,'myhandles');
-[filename,pathname]=uiputfile;
+lastPath=loadLastPath('result');
+if(~exist(char(lastPath),'dir'))
+  [filename,pathname]=uiputfile('*.mat','Save PhenoRipped Data','result.mat');
+else
+  [filename,pathname]=uiputfile('*.mat','Save PhenoRipped Data',[lastPath filesep 'result.mat']);
+end
+if(filename==0)
+  return;
+end
 setappdata(gcf,'myhandles', myhandles);
 hgsave(gcf,[pathname filesep filename]);
+saveLastPath(pathname,'result');
+h=msgbox('Data Saved Successfully');
+% set(h, 'Position', [20 40 120 50]);
 
 
 
@@ -725,9 +733,9 @@ function LoadResultsButton_Callback(hObject, eventdata, handles)
 %[filename,pathname]=uigetfile;
 lastPath=loadLastPath('result');
 if(~exist(char(lastPath),'dir'))
-  [filename,pathname]=uigetfile({'*.fig;','PhenoRipper Result'},'Select a previous result');
+  [filename,pathname]=uigetfile({'*.mat;','PhenoRipper Result (*.mat)'},'Select a previous result');
 else
-  [filename,pathname]=uigetfile({'*.fig;','PhenoRipper Result'},'Select a previous result', [lastPath]);
+  [filename,pathname]=uigetfile({'*.mat;','PhenoRipper Result (*.mat)'},'Select a previous result', [lastPath]);
 end
 if(filename==0)
   return;
@@ -743,6 +751,7 @@ set(myhandles.statusbarHandles.TextPanel, 'Foreground',[1,1,1], 'Background','bl
 set(myhandles.statusbarHandles.ProgressBar, 'Background','white', 'Foreground',[0.4,0,0]);
 setappdata(0,'myhandles',myhandles);
 saveLastPath(pathname,'result');
+h=msgbox('Data Load Successfully','modal');
 
 
 function LoadParameters(loaded_handles,handles,hObject)
@@ -876,7 +885,8 @@ if(~Show_Visualization_Window)
     end
     thresholds=min(thresholds,[],2);
     cutoff_intensity=round(quantile(thresholds(:),0.2));
-    set(handles.ThreshodIntensity,'String',num2str(cutoff_intensity));
+    myhandles.cutoff_intensity=cutoff_intensity;
+%     set(handles.ThreshodIntensity,'String',num2str(cutoff_intensity));
     myhandles.color_order={'Blue','Green','Red','Yellow','Magenta','Gray'};
     myhandles.display_colors=myhandles.color_order(1:number_of_channels);
     myhandles.statusbarHandles=statusbar(hObject,'');
@@ -887,7 +897,8 @@ if(~Show_Visualization_Window)
     %myhandles=getappdata(0,'myhandles');
     myhandles.test_files=selected_files;
     myhandles.cutoff_intensity=cutoff_intensity;
-    myhandles.block_size=str2double(get(handles.blockSize,'String'));
+%     myhandles.block_size=str2double(get(handles.blockSize,'String'));
+    myhandles.block_size=10;
     %set(handles.ThreshodIntensity,'String',num2str(max(myhandles.cutoff_intensity,myhandles.amplitude_range)));
     setappdata(0,'myhandles',myhandles);
     
@@ -904,8 +915,8 @@ else
   myhandles.statusbarHandles=statusbar(hObject,'');
   handles=guidata(hObject);
   myhandles=getappdata(0,'myhandles');
-  set(handles.ThreshodIntensity,'String',num2str(myhandles.cutoff_intensity));
-  set(handles.blockSize,'String',num2str(myhandles.block_size));
+%   set(handles.ThreshodIntensity,'String',num2str(myhandles.cutoff_intensity));
+%   set(handles.blockSize,'String',num2str(myhandles.block_size));
   SetButtonState(hObject,handles,true);
 end
 warning on;
@@ -923,6 +934,14 @@ myhandles.number_of_blocks_per_training_image=1000;
 myhandles.rgb_samples_per_training_image=3000;
 myhandles.number_of_block_representatives=3;
 myhandles.is_directory_usable=false;
+%Added by default
+myhandles.number_of_superblocks=30;
+myhandles.minimum_training_files=50;
+myhandles.maximum_training_files=100;
+myhandles.include_background_superblocks=1;
+
+
+
 setappdata(0,'myhandles',myhandles);
 
 function addProgressBarToMyHandle(mainFigure)
