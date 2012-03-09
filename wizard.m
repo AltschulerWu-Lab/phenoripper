@@ -180,9 +180,19 @@ if(~exist(char(dir_name),'dir'))
   warndlg('Invalid Root Directory');
 else
   set(myhandles.wizardStatusBarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
+  
   myhandles.wizardStatusBarHandles=statusbar(hObject,'Scanning Folder for images');
   drawnow expose update;
+  set(handles.rootDirSelectBT,'Enable','off');
+  set(handles.doneBT,'Enable','off');
+  try
   myhandles.all_files=files_in_dir(dir_name);
+  set(handles.rootDirSelectBT,'Enable','on');
+  set(handles.doneBT,'Enable','on');
+  catch
+    set(handles.rootDirSelectBT,'Enable','on'); 
+    set(handles.doneBT,'Enable','on');   
+  end
   %temp=regexp(myhandles.all_files,[dir_name filesep],'split');
   saveLastPath(dir_name,'wizard');
 end
@@ -774,8 +784,6 @@ function detectChannelBT_Callback(hObject, eventdata, handles)
 % hObject    handle to detectChannelBT (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-
 if(get(handles.selectSingleChannelCB,'Value')==1)
   selectedFolder=get(handles.rootdirTF,'String');
   if(~isdir(selectedFolder))
@@ -787,7 +795,16 @@ if(get(handles.selectSingleChannelCB,'Value')==1)
     warndlg('No Template have been selected, you must select a template!');
     return;
   end
-  channelList=getMarkersFromDir(selectedFolder,regExp,selectedFolder);
+  try    
+    set(handles.rootDirSelectBT,'Enable','off');
+    set(handles.doneBT,'Enable','off');
+    channelList=getMarkersFromDir(selectedFolder,regExp,selectedFolder);
+    set(handles.rootDirSelectBT,'Enable','on');
+    set(handles.doneBT,'Enable','on');
+  catch
+    set(handles.rootDirSelectBT,'Enable','on');
+    set(handles.doneBT,'Enable','on');
+  end
   if(isempty(channelList))
     warndlg('Couldn detect the channel. Did you select the template corresponding to your data?');
     set(handles.markerTable,'Data',cell(0,3));
@@ -811,13 +828,8 @@ if(get(handles.selectSingleChannelCB,'Value')==1)
   set(handles.markerTable, 'ColumnWidth', {30 110 220, 90});
   disp(channelList);
   msgbox(['Marker have been detected, please enter the name of each marker'...
-    'and click on Done to use this configuration.']);
-
-
-
-else
-  
-  
+    ' and click on Done to use this configuration.']);
+else  
   %Read the first matching file and extract the number of channel from it!
   %Get the choosen Regular Expression
   regExp=getSelectedRegExp(handles);
@@ -831,18 +843,28 @@ else
   selectedFolder=get(handles.rootdirTF,'String');
   myhandles=getappdata(0,'myhandles');
   myhandles.rootDir=selectedFolder;
-  myhandles.allfiles=getAllFiles(selectedFolder); 
-  root_directoryRegExp=regexptranslate('escape', [selectedFolder filesep]);
-  %Should do the regexp in a loop so at the first match we stop!
-  temp=regexp(myhandles.allfiles, root_directoryRegExp,'split');
-  all_files=cellfun(@(x) x(end),temp);
-  [mat ~]=regexp(all_files,rexp, 'match','names');
-  fileName=[];
-  for i=1:length(mat)
-    if(~isempty(mat{i}))
-      fileName=mat{i}{1};
-      break;
+  
+  try    
+    set(handles.rootDirSelectBT,'Enable','off');
+    set(handles.doneBT,'Enable','off');
+    myhandles.allfiles=getAllFiles(selectedFolder); 
+    root_directoryRegExp=regexptranslate('escape', [selectedFolder filesep]);
+    %Should do the regexp in a loop so at the first match we stop!
+    temp=regexp(myhandles.allfiles, root_directoryRegExp,'split');
+    all_files=cellfun(@(x) x(end),temp);
+    [mat ~]=regexp(all_files,rexp, 'match','names');
+    fileName=[];
+    for i=1:length(mat)
+      if(~isempty(mat{i}))
+        fileName=mat{i}{1};
+        break;
+      end
     end
+    set(handles.rootDirSelectBT,'Enable','on');
+    set(handles.doneBT,'Enable','on');
+  catch
+    set(handles.rootDirSelectBT,'Enable','on');
+    set(handles.doneBT,'Enable','on');    
   end
   if isempty(fileName)
     errordlg('The regular expression does not match with your multichannel Images');
@@ -855,8 +877,6 @@ else
   end
   numberChannel=size(image1,3);
   set(handles.nrChannelPerImageDB,'Value',numberChannel);
-  
-  
   channelNr=get(handles.nrChannelPerImageDB,'Value');
   data=cell(channelNr,3);
   for i=1:channelNr
