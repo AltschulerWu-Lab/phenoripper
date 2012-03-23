@@ -235,8 +235,13 @@ for image_counter=1:number_of_training_images
     y_pos=y_pos(is_foreground_sb); %drop edge superblocks
     % Save the block positions in pixel coords (conversion from block
     % coords)
+    try
     position_of_block_temp(superblock_counter+1:superblock_counter+length(foreground_superblocks),:)=...
         [(x_pos'-1)*block_size+x_offset;(y_pos'-1)*block_size+y_offset]'; 
+    catch err
+      disp(err.message);
+      %error('problem');
+    end
     
     %count number of blocks and superblocks
     block_counter=block_counter+length(foreground_blocks);
@@ -295,7 +300,7 @@ for image_number=1:number_of_training_images
     superblock_profiles(image_number,:)=superblock_profiles(image_number,:)/...
         sum(superblock_profiles(image_number,:));
 end
-
+superblock_profiles(isnan(superblock_profiles))=eps;
 %Picking representatives
 % 1) For each block store filenumber and (x,y) location (remember cropping)
 % 
@@ -331,7 +336,7 @@ is_not_edge=(position_of_block_in_block_coords(:,1)>3)&(position_of_block_in_blo
         &(position_of_block_in_block_coords(:,1)<blocks_nx-3)&(position_of_block_in_block_coords(:,2)<blocks_ny-3);
 for i=1:number_of_superblocks
     % blocks_of_type=find(superblock_ids==i);
-    ten_percentile_dist=prctile(superblock_distances((superblock_ids==i)&is_not_edge,i),10);
+    ten_percentile_dist=prctile(superblock_distances((superblock_ids==i)&is_not_edge,i),1);
     nth_closest_distance=max(mink(superblock_distances(is_not_edge,i),number_of_superblock_representatives));
     distance_cutoffs(i)=max(ten_percentile_dist,nth_closest_distance);
     
@@ -343,14 +348,16 @@ for i=1:number_of_superblocks
     while((rep_count<number_of_superblock_representatives)&&(image_count<=number_of_training_images))
         image_number=image_order(image_count);
         selected_blocks=acceptable_blocks(image_number_of_block(acceptable_blocks)==image_number);
+        selected_block_distances=superblock_distances(selected_blocks,i);
+        [~,block_order]=sort(selected_block_distances,'ascend');
         needed_length=min(number_of_superblock_representatives-rep_count,length(selected_blocks));
-        selected_blocks=selected_blocks(1:needed_length);
-        for j=1:length(selected_blocks)
-            block_num=selected_blocks(j);
+        %selected_blocks=selected_blocks(1:needed_length);
+        for j=1:needed_length
+            block_num=selected_blocks(block_order(j));
             locations{image_number,i}=[locations{image_number,i};...
                 position_of_block(block_num,:)];
         end
-        rep_count=rep_count+length(selected_blocks);
+        rep_count=rep_count+needed_length;
         image_count=image_count+1;
     end
 end
@@ -405,7 +412,7 @@ for file_num=1:length(included_files)
                     
                 end
             end
-            %disp('meow');
+           
         end
     end
 end
