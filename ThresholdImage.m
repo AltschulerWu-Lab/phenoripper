@@ -232,6 +232,14 @@ myhandles.number_of_superblocks=str2double(get(handles.SuperBlockNr,'String'));
 myhandles.minimum_training_files=min(str2double(get(handles.MinImageTraining,'String')),length(myhandles.metadata));
 myhandles.maximum_training_files=str2double(get(handles.MaxImageTraining,'String'));
 myhandles.include_background_superblocks=get(handles.useBackgroundInfoCB,'value');
+
+if(isfield(myhandles,'scale_figure'))
+  if(ishandle(myhandles.scale_figure))
+    delete(myhandles.scale_figure);
+  end
+  myhandles=rmfield(myhandles, 'scale_figure');
+end
+
 setappdata(0,'myhandles',myhandles);
 %Close the main figure
 delete(gcf);

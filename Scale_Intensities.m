@@ -53,6 +53,8 @@ handles.close_button=uicontrol('Style', 'pushbutton','String','Done','Units','no
             'position', [done_button_x,done_button_y,done_button_width,done_button_height],...
             'Callback', {@done_callback},'parent',handles.fig);
 myhandles=getappdata(0,'myhandles');
+myhandles.scale_figure=handles.fig;
+setappdata(0,'myhandles',myhandles);
 Display_Image(myhandles.img,axis_handle,color_scale,colors,[]);  
 axis(myhandles.h,'image');
 set(handles.fig,'Name','PhenoRipper:Intensity Scaling','NumberTitle','off');
@@ -167,8 +169,9 @@ end
             value=get(hObject,'Value');
             set(marker_handles.min_edit,'String',num2str(value));
             color_scale(marker_number,1)=value;
-            myhandles=getappdata(0,'myhandles');
-            Display_Image(myhandles.img,axis_handle,color_scale,colors,mask);
+            set_myhandle_values();
+%             myhandles=getappdata(0,'myhandles');
+%             Display_Image(myhandles.img,axis_handle,color_scale,colors,mask);
         end
         function max_scroll_callback(hObject,eventdata,marker_number)
             value=get(hObject,'Value');
