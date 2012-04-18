@@ -451,6 +451,8 @@ end
 global_data.superblock_centroids=third_order.superblock_centroids;
 global_data.superblock_representatives=third_order.superblock_representatives;
 myhandles.global_data=global_data;
+%third_order=ThirdOrder_Basis(global_filenames,global_data,number_of_superblocks,...
+%    myhandles.marker_scales,myhandles.include_background_superblocks);
 Ripped_Data=struct;
 individual_block_profiles=zeros(myhandles.number_of_files,number_of_block_clusters);
 individual_superblock_profiles=zeros(myhandles.number_of_files,number_of_superblocks);

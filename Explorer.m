@@ -22,7 +22,7 @@ function varargout = Explorer(varargin)
 
 % Edit the above text to modify the response to help Explorer
 
-% Last Modified by GUIDE v2.5 05-Oct-2011 14:12:27
+% Last Modified by GUIDE v2.5 09-Apr-2012 10:35:15
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -2128,3 +2128,184 @@ myhandles=getappdata(0,'myhandles');
 myhandles.is_file_blacklisted=logical(zeros(size(myhandles.file_matrix,1),1));
 setappdata(0,'myhandles',myhandles);
 group_by_callback(hObject, eventdata, handles,myhandles.chosen_grouping_field);
+
+
+% --------------------------------------------------------------------
+function Metadata_Menu_Callback(hObject, eventdata, handles)
+% hObject    handle to Metadata_Menu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function View_Metadata_Menu_Callback(hObject, eventdata, handles)
+% hObject    handle to View_Metadata_Menu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+myhandles=getappdata(0,'myhandles');
+[myhandles.grouped_metadata,~,order,groups,~]=...
+    CalculateGroups(myhandles.chosen_grouping_field,myhandles.metadata,[],[],[]);
+[raw_table_data,colnames]=convert_struct_to_table(myhandles.metadata(order));
+accepted_files=color_table(raw_table_data,groups);
+rejected_files={};
+% Do something about rejected files?
+wizardAcceptView(accepted_files,...
+  rejected_files,colnames);
+
+
+
+
+% --------------------------------------------------------------------
+function Add_Metadata_Menu_Callback(hObject, eventdata, handles)
+% hObject    handle to Add_Metadata_Menu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+[filename,path]=uigetfile('*.csv','Pick Additional Metadata File');
+fid=fopen([path filesep filename]);
+%fid=fopen('Test/test_metadata.csv');
+delim=',';
+myhandles=getappdata(0,'myhandles');
+metadata=myhandles.metadata;
+new_metadata=metadata;
+[metadata_table,colnames]=convert_struct_to_table(myhandles.metadata);
+grouping_fields=[{'File Name'} myhandles.grouping_fields{:}];
+
+header_row=textscan(fid,'%s',1,'delimiter','\n');
+header_fields=regexp(header_row{1}{1},delim,'split');
+%Check if first column of header is existing field
+if(~ismember(header_fields{1},grouping_fields))
+   error('First Column Header Not Valid Metadata Field.');
+else
+   chosen_field_number=find(strcmp(header_fields{1},grouping_fields));
+end
+% Check that other columns of header don't already exist
+for i=2:length(header_fields)
+   if(any(strcmp(header_fields{i},grouping_fields)))
+      error(['There is already a field called '  header_fields{i}]);
+   end
+end
+ismember(header_fields(2:end),grouping_fields)
+
+field_vals=metadata_table(:,chosen_field_number);
+[G,GN]=grp2idx(field_vals);
+
+line_counter=1;
+data=textscan(fid,'%s',1,'delimiter','\n');
+additional_metadata_table=cell(1,length(header_fields));
+while (~feof(fid))
+    tokens=regexp(data{1},delim,'split');
+    tokens=tokens{1};
+
+    for field_num=1:length(header_fields)
+        additional_metadata_table{line_counter,field_num}=tokens{field_num};
+    end
+    line_counter=line_counter+1;
+    data=textscan(fid,'%s',1,'delimiter','\n');
+end
+
+% Check if values in first column are valid
+if(any(~ismember(additional_metadata_table(:,1),GN)))
+   bad_vals=any(~ismember(additional_metadata_table(:,1),GN));
+   error_message='Unrecognized field values in Column 1. ';
+   for i=1:length(bad_vals)
+       error_message=[error_message additional_metadata_table{bad_vals(i),1}];
+       if(i<length(bad_vals))
+           error_message=[error_message ','];
+       end
+   end
+   if(length(bad_vals)>1)
+    error_message=[error_message ' are not recognized values for ' grouping_fields{chosen_field_number}];
+   else
+    error_message=[error_message ' is not a recognized value for ' grouping_fields{chosen_field_number}];   
+   end
+   error(error_message);
+end
+% Check to see if values in first column are all different
+[g1,gn1]=grp2idx(additional_metadata_table(:,1));
+error_message='Field values in column 1 must be unique. ';
+throw_error=false;
+for i=1:length(gn1)
+    if(nnz(g1==i)>1)
+       error_message=[error_message gn1{i} ' '];
+       throw_error=true;
+    end
+end
+error_message=[error_message ' present more than once'];
+if(throw_error)
+   error(error_message); 
+end
+% Fill data for matches
+match_list=false(length(G),1);
+for i=1:size(additional_metadata_table,1)
+    group_num=find(strcmp(additional_metadata_table(i,1),GN));
+    
+    matched_files=find(G==group_num);
+    match_list(matched_files)=true;
+    for file_num=1:length(matched_files)
+        for new_field_num=2:length(header_fields)
+            new_field_name=header_fields{new_field_num};
+            new_metadata{matched_files(file_num)}.(new_field_name)=additional_metadata_table{i,new_field_num};
+        end
+    end
+end
+% Fill unmatched file metadata with []
+unmatched_files=find(~match_list);
+for file_num=1:length(unmatched_files)
+    for new_field_num=2:length(header_fields)
+        new_field_name=header_fields{new_field_num};
+        new_metadata{unmatched_files(file_num)}.(new_field_name)='';
+    end
+end
+
+
+myhandles.grouping_fields=[myhandles.grouping_fields{:} header_fields(2:end)];
+myhandles.metadata=new_metadata;
+setappdata(0,'myhandles',myhandles);
+group_by_callback(hObject, eventdata, handles,myhandles.chosen_grouping_field);
+
+myhandles=getappdata(0,'myhandles');
+grouping_fields=myhandles.grouping_fields;
+
+% Update menus
+
+% First delete old menus
+for i=1:length(myhandles.Color_Points_By_Menu_Handles)
+    delete(myhandles.Color_Points_By_Menu_Handles(i))
+end
+for i=1:length(myhandles.Label_Points_By_Menu_Handles)
+    delete(myhandles.Label_Points_By_Menu_Handles(i))
+end
+
+for i=2:length(myhandles.Group_Points_By_Menu_Handles)
+    delete(myhandles.Group_Points_By_Menu_Handles(i))
+end
+
+% Create New menu items
+myhandles.Color_Points_By_Menu_Handles=zeros(length(grouping_fields),1);
+myhandles.Label_Points_By_Menu_Handles=zeros(length(grouping_fields),1);
+for i=1:length(grouping_fields)
+    myhandles.Color_Points_By_Menu_Handles(i)=...
+    uimenu(handles.Color_Points_By_Menu,'Label',grouping_fields{i}, ...
+        'Callback', {@color_by_callback,handles,i});
+    myhandles.Label_Points_By_Menu_Handles(i)=...
+        uimenu(handles.Label_Points_By_Menu,'Label',grouping_fields{i}, ...
+        'Callback', {@label_by_callback,handles,i});
+    
+end
+
+% For group by, we create and destroy simultaneuously
+for i=1:length(grouping_fields)
+   
+    myhandles.Group_Points_By_Menu_Handles(i+1)=...
+    uimenu(handles.Group_By_Menu,'Label',myhandles.grouping_fields{i}, ...
+        'Callback', {@group_by_callback,handles,i+1});
+end
+setappdata(0,'myhandles',myhandles);
+
+
+
+
+
+
+
+
