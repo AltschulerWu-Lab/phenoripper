@@ -1908,7 +1908,8 @@ function Export_data_Callback(hObject, eventdata, handles)
   %For each group, write the metadata and the superblock values
   for i=1:nrGroup
     %Write the group label
-    fprintf(fid, '%s\t', myhandles.group_labels{i});
+    fprintf(fid, '%s\t', myhandles.grouped_metadata{i}.(...
+      fieldNames{myhandles.chosen_grouping_field}){1} );
     %Write the metadata values
     for j=2:size(fieldNames,1)
       if(j<size(fieldNames,1))
