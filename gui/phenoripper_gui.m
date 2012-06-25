@@ -1,35 +1,35 @@
-function varargout = gui(varargin)
-% GUI M-file for gui.fig
-%      GUI, by itself, creates a new GUI or raises the existing
+function varargout = phenoripper_gui(varargin)
+% PHENORIPPER_GUI M-file for phenoripper_gui.fig
+%      PHENORIPPER_GUI, by itself, creates a new PHENORIPPER_GUI or raises the existing
 %      singleton*.
 %
-%      H = GUI returns the handle to a new GUI or the handle to
+%      H = PHENORIPPER_GUI returns the handle to a new PHENORIPPER_GUI or the handle to
 %      the existing singleton*.
 %
-%      GUI('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in GUI.M with the given input arguments.
+%      PHENORIPPER_GUI('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in PHENORIPPER_GUI.M with the given input arguments.
 %
-%      GUI('Property','Value',...) creates a new GUI or raises the
+%      PHENORIPPER_GUI('Property','Value',...) creates a new PHENORIPPER_GUI or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before gui_OpeningFcn gets called.  An
+%      applied to the PHENORIPPER_GUI before phenoripper_gui_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to gui_OpeningFcn via varargin.
+%      stop.  All inputs are passed to phenoripper_gui_OpeningFcn via varargin.
 %
-%      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
+%      *See PHENORIPPER_GUI Options on GUIDE's Tools menu.  Choose "PHENORIPPER_GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES 
  
-% Edit the above text to modify the response to help gui
+% Edit the above text to modify the response to help phenoripper_gui
 
-% Last Modified by GUIDE v2.5 17-Sep-2011 18:05:05
+% Last Modified by GUIDE v2.5 25-Jun-2012 10:48:17
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @gui_OpeningFcn, ...
-                   'gui_OutputFcn',  @gui_OutputFcn, ...
+                   'phenoripper_gui_OpeningFcn', @phenoripper_gui_OpeningFcn, ...
+                   'phenoripper_gui_OutputFcn',  @phenoripper_gui_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -44,16 +44,16 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before gui is made visible.
-function gui_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before phenoripper_gui is made visible.
+function phenoripper_gui_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to gui (see VARARGIN)
+% varargin   command line arguments to phenoripper_gui (see VARARGIN)
 initializeMyHandle();
 splash('logo','png');
-% Choose default command line output for gui
+% Choose default command line output for phenoripper_gui
 handles.output = hObject;
 set(handles.ExplorerButton,'Visible','off');
 % set(handles.uipanel9,'Visible','off');
@@ -74,7 +74,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = gui_OutputFcn(hObject, eventdata, handles) 
+function varargout = phenoripper_gui_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB

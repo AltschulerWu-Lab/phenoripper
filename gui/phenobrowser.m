@@ -1,35 +1,35 @@
-function varargout = Explorer(varargin)
-% EXPLORER M-file for Explorer.fig
-%      EXPLORER, by itself, creates a new EXPLORER or raises the existing
+function varargout = phenobrowser(varargin)
+% PHENOBROWSER M-file for phenobrowser.fig
+%      PHENOBROWSER, by itself, creates a new PHENOBROWSER or raises the existing
 %      singleton*.
 %
-%      H = EXPLORER returns the handle to a new EXPLORER or the handle to
+%      H = PHENOBROWSER returns the handle to a new PHENOBROWSER or the handle to
 %      the existing singleton*.
 %
-%      EXPLORER('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in EXPLORER.M with the given input arguments.
+%      PHENOBROWSER('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in PHENOBROWSER.M with the given input arguments.
 %
-%      EXPLORER('Property','Value',...) creates a new EXPLORER or raises the
+%      PHENOBROWSER('Property','Value',...) creates a new PHENOBROWSER or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before Explorer_OpeningFcn gets called.  An
+%      applied to the GUI before phenobrowser_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to Explorer_OpeningFcn via varargin.
+%      stop.  All inputs are passed to phenobrowser_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help Explorer
+% Edit the above text to modify the response to help phenobrowser
 
-% Last Modified by GUIDE v2.5 09-Apr-2012 10:35:15
+% Last Modified by GUIDE v2.5 25-Jun-2012 17:39:48
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @Explorer_OpeningFcn, ...
-                   'gui_OutputFcn',  @Explorer_OutputFcn, ...
+                   'gui_OpeningFcn', @phenobrowser_OpeningFcn, ...
+                   'gui_OutputFcn',  @phenobrowser_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -44,15 +44,15 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before Explorer is made visible.
-function Explorer_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before phenobrowser is made visible.
+function phenobrowser_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to Explorer (see VARARGIN)
+% varargin   command line arguments to phenobrowser (see VARARGIN)
 
-% Choose default command line output for Explorer
+% Choose default command line output for phenobrowser
 myhandles=getappdata(0,'myhandles');
 %myhandles.MDS_gca=gca;
 myhandles.MDS_gcf=handles.explorer;
@@ -280,8 +280,8 @@ guidata(hObject, handles);
 %set(gcf,'WindowButtonDownFcn',{@MDSPlot_ButtonDownFcn,handles});
 
 
-% UIWAIT makes Explorer wait for user response (see UIRESUME)
-% uiwait(handles.explorer);
+% UIWAIT makes phenobrowser wait for user response (see UIRESUME)
+% uiwait(handles.phenobrowser);
 
 %Change the button color to black for Mac because of a Matlab Bug
 % if ismac
@@ -299,7 +299,7 @@ guidata(hObject, handles);
 
 % labelStr = '<html>&#8704;&#946; <b>bold</b> <i><font color="red">label</html>';
 % jLabel = javaObjectEDT('javax.swing.JLabel',labelStr);
-% [hcomponent,hcontainer] = javacomponent(jLabel,[638,365,100,20],handles.explorer);
+% [hcomponent,hcontainer] = javacomponent(jLabel,[638,365,100,20],handles.phenobrowser);
 
 function addMarkerLabel(myhandles,handles)
 if(isfield(myhandles,'markers'))
@@ -352,7 +352,7 @@ myhandles=getappdata(0,'myhandles');
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = Explorer_OutputFcn(hObject, eventdata, handles) 
+function varargout = phenobrowser_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -362,7 +362,7 @@ function varargout = Explorer_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 myhandles=getappdata(0,'myhandles');
 addMarkerLabel(myhandles,handles);
-%addProgressBarToMyHandle(handles.explorer);
+%addProgressBarToMyHandle(handles.phenobrowser);
 %myhandles=getappdata(0,'myhandles');
 %set(myhandles.jLabel.getParent(), 'Foreground','black');
 %setBackground(myhandles.jLabel, blackColor);
@@ -475,7 +475,7 @@ if((handles.MDSPlot==point)||(handles.MDSPlot==point_parent))
 
   end
   %myhandles.MDS_gca=gca;
-  %myhandles.MDS_gcf=handles.explorer;
+  %myhandles.MDS_gcf=handles.phenobrowser;
   if(exist('point_number','var'))
       myhandles.selected_point=point_number;
 
@@ -527,9 +527,9 @@ end
 
 %image(img./max(img(:)),'parent',axis_handle);
 if exist('boundary_mask','var')
-    Display_Image_With_Boundaries(img,axis_handle,myhandles.marker_scales,myhandles.display_colors,[],boundary_mask);
+    display_image_with_boundaries(img,axis_handle,myhandles.marker_scales,myhandles.display_colors,[],boundary_mask);
 else
-    Display_Image(img,axis_handle,myhandles.marker_scales,myhandles.display_colors,[]);
+    display_image(img,axis_handle,myhandles.marker_scales,myhandles.display_colors,[]);
 end
 
 set(axis_handle,'XTick',[],'YTick',[]);
@@ -723,7 +723,7 @@ if(all(myhandles.chosen_points~=0))
        %max_col=max(img(:));
        %image(img/max_col);axis equal;axis off;
        block_size=myhandles.global_data.block_size;
-       Display_Image(img,myhandles.temp_handles(rep_num),myhandles.marker_scales,myhandles.display_colors,[]);
+       display_image(img,myhandles.temp_handles(rep_num),myhandles.marker_scales,myhandles.display_colors,[]);
        line([2*block_size,5*block_size],[2*block_size,2*block_size],'Color','y');
        line([2*block_size,2*block_size],[5*block_size,2*block_size],'Color','y');
        line([2*block_size,5*block_size],[5*block_size,5*block_size],'Color','y');
@@ -1051,7 +1051,7 @@ myhandles.mds_colors=zeros(size(myhandles.superblock_profiles,1),3);
 if(~is_numeric)
     [colorsGroup,myhandles.group_labels]=grp2idx(group_vals);
     %colors=colormap(jet(max(colorsGroup)));
-    colors=ColorBrewer(max(colorsGroup));
+    colors=phenoripper_colormap(max(colorsGroup));
     myhandles.category_colors=colors;
   
     for i=1:myhandles.number_of_conditions
@@ -1154,7 +1154,7 @@ set(WaitingDialog,'Units','Pixels','Position',...
   'Visible','on');
 
 [myhandles.grouped_metadata,myhandles.superblock_profiles,~,~,...
-myhandles.metadata_file_indices]=CalculateGroups(...
+myhandles.metadata_file_indices]=calculate_groups(...
   myhandles.chosen_grouping_field,myhandles.metadata,...
   myhandles.individual_superblock_profiles,...
   myhandles.individual_number_foreground_blocks,myhandles.is_file_blacklisted);
@@ -1779,7 +1779,7 @@ end
 
 
 
-CoolClustergram(superblock_profiles,superblock_representatives,...
+pheno_cluster(superblock_profiles,superblock_representatives,...
     myhandles.mds_text,myhandles.mds_colors...
     ,myhandles.marker_scales,display_colors,sb_marker_profiles,...
     myhandles.global_data.block_size,sb_ordering_score,use_sb_dendrogram);
@@ -1869,7 +1869,7 @@ function Export_figures_Callback(hObject, eventdata, handles)
 % --------------------------------------------------------------------
 function Export_data_Callback(hObject, eventdata, handles)
   %fileName='/tmp/test.txt';
-  lastPath=loadLastPath('save');
+  lastPath=load_last_path('save');
   if(~exist(char(lastPath),'dir'))
     [filename,pathname]=uiputfile();
   else
@@ -1879,7 +1879,7 @@ function Export_data_Callback(hObject, eventdata, handles)
     filename='';
     warndlg('Invalid Root Directory');
   else
-    saveLastPath(pathname,'save');
+    save_last_path(pathname,'save');
   end
   myhandles=getappdata(0,'myhandles');
   nrGroup=size(myhandles.grouped_metadata,2);
@@ -1953,7 +1953,7 @@ function Export_histogram_Callback(hObject, eventdata, handles)
   exportAxes('Save the Histogram into PNG',handles.BarAxes);
 
 function exportAxes(title,axis)
-  lastPath=loadLastPath('save');
+  lastPath=load_last_path('save');
   if(~exist(char(lastPath),'dir'))
     [filename,pathname]=uiputfile();
   else
@@ -1963,7 +1963,7 @@ function exportAxes(title,axis)
     filename='';
     warndlg('Invalid Root Directory');
   else
-    saveLastPath(pathname,'save');
+    save_last_path(pathname,'save');
   end
   fig2 = figure('visible','off');
   % copy axes into the new figure
@@ -2145,12 +2145,12 @@ function View_Metadata_Menu_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 myhandles=getappdata(0,'myhandles');
 [myhandles.grouped_metadata,~,order,groups,~]=...
-    CalculateGroups(myhandles.chosen_grouping_field,myhandles.metadata,[],[],[]);
+    calculate_groups(myhandles.chosen_grouping_field,myhandles.metadata,[],[],[]);
 [raw_table_data,colnames]=convert_struct_to_table(myhandles.metadata(order));
 accepted_files=color_table(raw_table_data,groups);
 rejected_files={};
 % Do something about rejected files?
-wizardAcceptView(accepted_files,...
+wizard_sampling_viewer(accepted_files,...
   rejected_files,colnames);
 
 
@@ -2302,11 +2302,3 @@ for i=1:length(grouping_fields)
         'Callback', {@group_by_callback,handles,i+1});
 end
 setappdata(0,'myhandles',myhandles);
-
-
-
-
-
-
-
-

@@ -1,35 +1,35 @@
-function varargout = wizard(varargin)
-% WIZARD M-file for wizard.fig
-%      WIZARD, by itself, creates a new WIZARD or raises the existing
+function varargout = wizard_template(varargin)
+% WIZARD_TEMPLATE M-file for wizard_template.fig
+%      WIZARD_TEMPLATE, by itself, creates a new WIZARD_TEMPLATE or raises the existing
 %      singleton*.
 %
-%      H = WIZARD returns the handle to a new WIZARD or the handle to
+%      H = WIZARD_TEMPLATE returns the handle to a new WIZARD_TEMPLATE or the handle to
 %      the existing singleton*.
 %
-%      WIZARD('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in WIZARD.M with the given input arguments.
+%      WIZARD_TEMPLATE('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in WIZARD_TEMPLATE.M with the given input arguments.
 %
-%      WIZARD('Property','Value',...) creates a new WIZARD or raises the
+%      WIZARD_TEMPLATE('Property','Value',...) creates a new WIZARD_TEMPLATE or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before wizard_OpeningFcn gets called.  An
+%      applied to the GUI before wizard_template_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to wizard_OpeningFcn via varargin.
+%      stop.  All inputs are passed to wizard_template_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help wizard
+% Edit the above text to modify the response to help wizard_template
 
-% Last Modified by GUIDE v2.5 21-Feb-2012 11:21:35
+% Last Modified by GUIDE v2.5 25-Jun-2012 11:40:56
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @wizard_OpeningFcn, ...
-                   'gui_OutputFcn',  @wizard_OutputFcn, ...
+                   'gui_OpeningFcn', @wizard_template_OpeningFcn, ...
+                   'gui_OutputFcn',  @wizard_template_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -44,15 +44,15 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before wizard is made visible.
-function wizard_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before wizard_template is made visible.
+function wizard_template_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to wizard (see VARARGIN)
+% varargin   command line arguments to wizard_template (see VARARGIN)
 
-% Choose default command line output for wizard
+% Choose default command line output for wizard_template
 handles.output = hObject;
 
 % Update handles structure
@@ -124,12 +124,12 @@ function populateTemplateSelectorList(handles)
   setappdata(0,'wizardhandles',wizardhandles);
 
 
-% UIWAIT makes wizard wait for user response (see UIRESUME)
+% UIWAIT makes wizard_template wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = wizard_OutputFcn(hObject, eventdata, handles) 
+function varargout = wizard_template_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -489,7 +489,7 @@ for i=1:total_number_of_channels
 end
 data=getWizardData(handles);
 myhandles.markers=data.markers;
-myhandles.allfiles=getAllFiles(myhandles.rootDir);
+myhandles.allfiles=get_all_files_in_dir(myhandles.rootDir);
 %Remove the rootDir from the full path    
 myhandles.allfiles=cellfun(@(x) substring(myhandles.rootDir,x),...
   myhandles.allfiles,'UniformOutput',false);
@@ -508,7 +508,7 @@ myhandles.matched_files=matched_files;
 myhandles.wizard_handle=gcf;
 setappdata(0,'myhandles',myhandles);
 %wizard_accept;
-wizardAccept;
+wizard_sampling;
 
 
 function result=substring(removeString,original)
@@ -847,7 +847,7 @@ else
   try    
     set(handles.rootDirSelectBT,'Enable','off');
     set(handles.doneBT,'Enable','off');
-    myhandles.allfiles=getAllFiles(selectedFolder); 
+    myhandles.allfiles=get_all_files_in_dir(selectedFolder); 
     root_directoryRegExp=regexptranslate('escape', [selectedFolder filesep]);
     %Should do the regexp in a loop so at the first match we stop!
     temp=regexp(myhandles.allfiles, root_directoryRegExp,'split');
@@ -972,7 +972,7 @@ for i=1:total_number_of_channels
   end
 end
 %nrChannelPerImage=length(myhandles.channels_used);
-myhandles.allfiles=getAllFiles(myhandles.rootDir);
+myhandles.allfiles=get_all_files_in_dir(myhandles.rootDir);
 %Remove the rootDir from the full path    
 myhandles.allfiles=cellfun(@(x) substring(myhandles.rootDir,x),...
   myhandles.allfiles,'UniformOutput',false);

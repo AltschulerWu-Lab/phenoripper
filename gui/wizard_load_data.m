@@ -1,35 +1,35 @@
-function varargout = wizardMetaData(varargin)
-% WIZARDMETADATA MATLAB code for wizardMetaData.fig
-%      WIZARDMETADATA, by itself, creates a new WIZARDMETADATA or raises the existing
+function varargout = wizard_load_data(varargin)
+% WIZARD_LOAD_DATA MATLAB code for wizard_load_data.fig
+%      WIZARD_LOAD_DATA, by itself, creates a new WIZARD_LOAD_DATA or raises the existing
 %      singleton*.
 %
-%      H = WIZARDMETADATA returns the handle to a new WIZARDMETADATA or the handle to
+%      H = WIZARD_LOAD_DATA returns the handle to a new WIZARD_LOAD_DATA or the handle to
 %      the existing singleton*.
 %
-%      WIZARDMETADATA('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in WIZARDMETADATA.M with the given input arguments.
+%      WIZARD_LOAD_DATA('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in WIZARD_LOAD_DATA.M with the given input arguments.
 %
-%      WIZARDMETADATA('Property','Value',...) creates a new WIZARDMETADATA or raises the
+%      WIZARD_LOAD_DATA('Property','Value',...) creates a new WIZARD_LOAD_DATA or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before wizardMetaData_OpeningFcn gets called.  An
+%      applied to the GUI before wizard_load_data_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to wizardMetaData_OpeningFcn via varargin.
+%      stop.  All inputs are passed to wizard_load_data_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help wizardMetaData
+% Edit the above text to modify the response to help wizard_load_data
 
-% Last Modified by GUIDE v2.5 30-Aug-2011 14:39:31
+% Last Modified by GUIDE v2.5 25-Jun-2012 11:33:01
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @wizardMetaData_OpeningFcn, ...
-                   'gui_OutputFcn',  @wizardMetaData_OutputFcn, ...
+                   'gui_OpeningFcn', @wizard_load_data_OpeningFcn, ...
+                   'gui_OutputFcn',  @wizard_load_data_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -44,15 +44,15 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before wizardMetaData is made visible.
-function wizardMetaData_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before wizard_load_data is made visible.
+function wizard_load_data_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to wizardMetaData (see VARARGIN)
+% varargin   command line arguments to wizard_load_data (see VARARGIN)
 
-% Choose default command line output for wizardMetaData
+% Choose default command line output for wizard_load_data
 handles.output = hObject;
 
 % Update handles structure
@@ -68,7 +68,7 @@ myhandles=getappdata(0,'myhandles');
 myhandles.use_metadata=true;
 setappdata(0,'myhandles',myhandles);
 
-% UIWAIT makes wizardMetaData wait for user response (see UIRESUME)
+% UIWAIT makes wizard_load_data wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 % if ismac
 %   set(handles.LoadMetaDataButton,'CData',cat(3,zeros(500),zeros(500),zeros(500)));
@@ -79,7 +79,7 @@ setappdata(0,'myhandles',myhandles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = wizardMetaData_OutputFcn(hObject, eventdata, handles) 
+function varargout = wizard_load_data_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB

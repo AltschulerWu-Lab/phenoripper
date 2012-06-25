@@ -1,35 +1,35 @@
-function varargout = wizardAccept(varargin)
-% WIZARDACCEPT MATLAB code for wizardAccept.fig
-%      WIZARDACCEPT, by itself, creates a new WIZARDACCEPT or raises the existing
+function varargout = wizard_sampling(varargin)
+% WIZARD_SAMPLING MATLAB code for wizard_sampling.fig
+%      WIZARD_SAMPLING, by itself, creates a new WIZARD_SAMPLING or raises the existing
 %      singleton*.
 %
-%      H = WIZARDACCEPT returns the handle to a new WIZARDACCEPT or the handle to
+%      H = WIZARD_SAMPLING returns the handle to a new WIZARD_SAMPLING or the handle to
 %      the existing singleton*.
 %
-%      WIZARDACCEPT('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in WIZARDACCEPT.M with the given input arguments.
+%      WIZARD_SAMPLING('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in WIZARD_SAMPLING.M with the given input arguments.
 %
-%      WIZARDACCEPT('Property','Value',...) creates a new WIZARDACCEPT or raises the
+%      WIZARD_SAMPLING('Property','Value',...) creates a new WIZARD_SAMPLING or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before wizardAccept_OpeningFcn gets called.  An
+%      applied to the GUI before wizard_sampling_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to wizardAccept_OpeningFcn via varargin.
+%      stop.  All inputs are passed to wizard_sampling_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help wizardAccept
+% Edit the above text to modify the response to help wizard_sampling
 
-% Last Modified by GUIDE v2.5 28-Feb-2012 15:20:45
+% Last Modified by GUIDE v2.5 25-Jun-2012 12:11:01
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @wizardAccept_OpeningFcn, ...
-                   'gui_OutputFcn',  @wizardAccept_OutputFcn, ...
+                   'gui_OpeningFcn', @wizard_sampling_OpeningFcn, ...
+                   'gui_OutputFcn',  @wizard_sampling_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -44,15 +44,15 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before wizardAccept is made visible.
-function wizardAccept_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before wizard_sampling is made visible.
+function wizard_sampling_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to wizardAccept (see VARARGIN)
+% varargin   command line arguments to wizard_sampling (see VARARGIN)
 
-% Choose default command line output for wizardAccept
+% Choose default command line output for wizard_sampling
 parsingMsgDlg = msgbox('Extracting Metadata information, Please wait...');
 %Trick to show off the OK button
 hc=get(parsingMsgDlg,'Children'); 
@@ -113,7 +113,7 @@ end
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = wizardAccept_OutputFcn(hObject, eventdata, handles) 
+function varargout = wizard_sampling_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -189,4 +189,3 @@ if isfield(myhandles,'wizardMetaData_handle')
   delete(myhandles.wizardMetaData_handle);
 end
 delete(gcf);
-

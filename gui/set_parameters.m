@@ -1,35 +1,35 @@
-function varargout = ThresholdImage(varargin)
-% THRESHOLDIMAGE M-file for ThresholdImage.fig
-%      THRESHOLDIMAGE, by itself, creates a new THRESHOLDIMAGE or raises the existing
+function varargout = set_parameters(varargin)
+% SET_PARAMETERS M-file for set_parameters.fig
+%      SET_PARAMETERS, by itself, creates a new SET_PARAMETERS or raises the existing
 %      singleton*.
 %
-%      H = THRESHOLDIMAGE returns the handle to a new THRESHOLDIMAGE or the handle to
+%      H = SET_PARAMETERS returns the handle to a new SET_PARAMETERS or the handle to
 %      the existing singleton*.
 %
-%      THRESHOLDIMAGE('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in THRESHOLDIMAGE.M with the given input arguments.
+%      SET_PARAMETERS('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in SET_PARAMETERS.M with the given input arguments.
 %
-%      THRESHOLDIMAGE('Property','Value',...) creates a new THRESHOLDIMAGE or raises the
+%      SET_PARAMETERS('Property','Value',...) creates a new SET_PARAMETERS or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before ThresholdImage_OpeningFcn gets called.  An
+%      applied to the GUI before set_parameters_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to ThresholdImage_OpeningFcn via varargin.
+%      stop.  All inputs are passed to set_parameters_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help ThresholdImage
+% Edit the above text to modify the response to help set_parameters
 
-% Last Modified by GUIDE v2.5 02-Mar-2012 13:33:19
+% Last Modified by GUIDE v2.5 25-Jun-2012 17:09:12
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @ThresholdImage_OpeningFcn, ...
-                   'gui_OutputFcn',  @ThresholdImage_OutputFcn, ...
+                   'gui_OpeningFcn', @set_parameters_OpeningFcn, ...
+                   'gui_OutputFcn',  @set_parameters_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -44,13 +44,13 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before ThresholdImage is made visible.
-function ThresholdImage_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before set_parameters is made visible.
+function set_parameters_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to ThresholdImage (see VARARGIN)
+% varargin   command line arguments to set_parameters (see VARARGIN)
 myhandles=getappdata(0,'myhandles');
 myhandles.show_blocks=false;
 number_of_channels=myhandles.number_of_channels;
@@ -84,7 +84,7 @@ display_image(handles);
 setappdata(0,'myhandles',myhandles);
 hListener=handle.listener(handles.slider1,'ActionEvent',@update_threshold);
 setappdata(handles.slider1,'myListener',hListener);
-% Choose default command line output for ThresholdImage
+% Choose default command line output for set_parameters
 handles.output = hObject;
 set(handles.slider1,'Value',myhandles.cutoff_intensity/myhandles.amplitude_range);
 set(handles.PreviousButton,'Enable','off');
@@ -111,7 +111,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = ThresholdImage_OutputFcn(hObject, eventdata, handles) 
+function varargout = set_parameters_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -499,4 +499,3 @@ else
   end
   warndlg(['Value has to be set between ' num2str(minVal) ' and ' num2str(maxVal) '!']);
 end
-

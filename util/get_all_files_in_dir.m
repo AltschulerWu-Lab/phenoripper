@@ -1,4 +1,4 @@
-function fileList = getAllFiles(dirName)
+function fileList = get_all_files_in_dir(dirName)
 
   dirData = dir(dirName);      %# Get the data for the current directory
   dirIndex = [dirData.isdir];  %# Find the index for directories
