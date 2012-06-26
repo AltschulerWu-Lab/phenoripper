@@ -12,7 +12,7 @@ function fileList = get_all_files_in_dir(dirName)
                                                %#   that are not '.' or '..'
   for iDir = find(validIndex)                  %# Loop over valid subdirectories
     nextDir = fullfile(dirName,subDirs{iDir});    %# Get the subdirectory path
-    fileList = [fileList; getAllFiles(nextDir)];  %# Recursively call getAllFiles
+    fileList = [fileList; get_all_files_in_dir(nextDir)];  %# Recursively call getAllFiles
   end
 
 end
