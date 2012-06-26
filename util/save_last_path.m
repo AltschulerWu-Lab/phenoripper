@@ -1,4 +1,4 @@
-function save_last_path(path,type)
+function saveLastPath(path,type)
 
 try
   if ispc
@@ -10,15 +10,15 @@ try
 
   switch type
     case 'wizard'
-      save_property_file([userdir filesep 'lastPath.properties'],['wizardPath=' path]);
+      savePropertyFile([userdir filesep 'lastPath.properties'],['wizardPath=' path]);
     case 'metadata'
-      save_property_file([userdir filesep 'lastPath.properties'],['metadataPath=' path]);
+      savePropertyFile([userdir filesep 'lastPath.properties'],['metadataPath=' path]);
     case 'save'
-      save_property_file([userdir filesep 'lastPath.properties'],['savePath=' path]);
+      savePropertyFile([userdir filesep 'lastPath.properties'],['savePath=' path]);
     case 'result'
-      save_property_file([userdir filesep 'lastPath.properties'],['resultPath=' path]);
+      savePropertyFile([userdir filesep 'lastPath.properties'],['resultPath=' path]);
     case 'importtemplate'
-      save_property_file([userdir filesep 'lastPath.properties'],['importtemplatePath=' path]);
+      savePropertyFile([userdir filesep 'lastPath.properties'],['importtemplatePath=' path]);
     otherwise
       ;
   end
