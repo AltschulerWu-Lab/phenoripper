@@ -59,6 +59,8 @@ set(handles.ExplorerButton,'Visible','off');
 % set(handles.uipanel9,'Visible','off');
 set(handles.SaveOutputButton,'Visible','off');
 % Update handles structure
+version=fileread('version.txt');
+set(handles.figure1,'name', ['PhenoRipper v' version]);
 guidata(hObject, handles);
 
 %Change the button color to black for Mac because of a Matlab Bug
@@ -497,7 +499,7 @@ myhandles.metadata_file_indices]=calculate_groups(...
   myhandles.chosen_grouping_field,myhandles.metadata,...
   individual_superblock_profiles,individual_number_foreground_blocks,myhandles.is_file_blacklisted);
 warning off;
-myhandles.statusbarHandles=statusbar(hObject,'Done... Click on Xplorer to Explore your data!');
+myhandles.statusbarHandles=statusbar(hObject,'Done... Click on PhenoBrowser to Explore your data!');
 warning on;
 myhandles.analysis_time=toc(analysistime_handle);
 setappdata(0,'myhandles',myhandles);

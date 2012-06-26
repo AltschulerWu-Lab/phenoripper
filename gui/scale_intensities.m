@@ -55,9 +55,19 @@ handles.close_button=uicontrol('Style', 'pushbutton','String','Done','Units','no
 myhandles=getappdata(0,'myhandles');
 myhandles.scale_figure=handles.fig;
 setappdata(0,'myhandles',myhandles);
-display_image(myhandles.img,axis_handle,color_scale,colors,[]);  
-axis(myhandles.h,'image');
-set(handles.fig,'Name','PhenoRipper:Intensity Scaling','NumberTitle','off');
+set_myhandle_values();
+
+% display_image(myhandles.img,axis_handle,color_scale,colors,[]);  
+% myhandles=getappdata(0,'myhandles');
+% axis(myhandles.h,'image');
+% axis off
+% set(myhandles.h,'XTickLabel',[]);
+% set(myhandles.h,'YTickLabel',[]);
+% set(myhandles.h,'XGrid','off');
+% set(myhandles.h,'YGrid','off');
+% set(myhandles.h,'LineWidth',1);
+% set(handles.fig,'Name','PhenoRipper:Intensity Scaling','NumberTitle','off');
+% setappdata(0,'myhandles',myhandles);
 
 
 if(isfield(myhandles,'markers'))
@@ -93,8 +103,16 @@ end
 
    function set_myhandle_values()
         myhandles=getappdata(0,'myhandles');
-        display_image(myhandles.img,axis_handle,color_scale,colors,mask);        
+        display_image(myhandles.img,myhandles.h,color_scale,colors,mask);        
         axis(myhandles.h,'image');
+        
+        axis off
+        set(myhandles.h,'XTickLabel',[]);
+        set(myhandles.h,'YTickLabel',[]);
+        set(myhandles.h,'XGrid','off');
+        set(myhandles.h,'YGrid','off');
+        set(myhandles.h,'LineWidth',1);
+       
         myhandles.marker_scales=color_scale;
         myhandles.display_colors=colors;
         setappdata(0,'myhandles',myhandles);

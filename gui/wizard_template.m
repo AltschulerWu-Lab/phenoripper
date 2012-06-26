@@ -724,7 +724,7 @@ selected = get(handles.templateSelector,'Value');
 templates= cell(1,length(wizardhandles.templates)-1);
 
 
-wizardhandles.templates=removeFromCellArray(wizardhandles.templates,selected)
+wizardhandles.templates=remove_from_cell_array(wizardhandles.templates,selected);
 
 % index=1;
 % for i=1:length(wizardhandles.templates)

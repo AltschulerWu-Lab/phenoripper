@@ -77,6 +77,7 @@ else
 end
 myhandles.intensity=CalculateIntensity(img,myhandles.marker_scales);
 myhandles.h=gca;
+set(myhandles.h,'Interruptible','on');
 myhandles.img=img;
 myhandles.img1=tanh(double(img)/2^myhandles.bit_depth*10);
 setappdata(0,'myhandles',myhandles);

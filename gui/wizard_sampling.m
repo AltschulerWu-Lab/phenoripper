@@ -84,7 +84,7 @@ try
   wizard_samplingHandles.acceptedFiles=table_data;
   %set(handles.accepted_table,'Data',table_data);
   if(~myhandles.use_metadata)
-    wizard_samplingHandles.rejectedFiles=myhandles.all_files(~myhandles.matched_files);
+    wizard_samplingHandles.rejectedFiles=myhandles.allfiles(~myhandles.matched_files);
     %set(handles.rejected_table,'Data',myhandles.all_files(~myhandles.matched_files));
   end  
   setappdata(0,'wizard_samplingHandles',wizard_samplingHandles);
@@ -104,6 +104,10 @@ try
  % Update handles structure
   guidata(hObject, handles);
   close(parsingMsgDlg);
+  
+  
+
+  
 catch
   close(parsingMsgDlg);
 end
