@@ -1,3 +1,4 @@
+function [filenames,metadata,RootDir,NrChannelPerImage,Markers,errorMessage]=read_data(filename,delim)
 % Parse the Metadata file which describe for each image the different group
 % Parameters :
 % @filename     : the full patch to the medatada file - Required
@@ -20,10 +21,27 @@
 % B16/HeLa9515-2.png;B16/HeLa9515-3.png;B16/HeLa9515-1.png,Aldosterone, Glucocorticoid receptor
 % B16/HeLa9504-2.png;B16/HeLa9504-3.png;B16/HeLa9504-1.png,Aldosterone, Glucocorticoid receptor
 %
-%  Copyright (C) B. Pavie and S. Rajaram for Altschuler and Wu Lab, 2011
-% -------------------------------------------------------------------------
+% ------------------------------------------------------------------------------
+% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% Authors:
+% Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
+% For latest updates, check: < http://www.PhenoRipper.org >.
+%
+% All rights reserved.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, version 3 of the License.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details:
+% < http://www.gnu.org/licenses/ >.
+%
+% ------------------------------------------------------------------------------
+%%
 
-function [filenames,metadata,RootDir,NrChannelPerImage,Markers,errorMessage]=read_data(filename,delim)
+
 %     fid0 = fopen(filename,'rt');
 %     nLines = 0;
 %     while (fgets(fid0) ~= -1),

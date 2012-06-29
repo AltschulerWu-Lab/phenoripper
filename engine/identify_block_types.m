@@ -1,15 +1,45 @@
 function data=identify_block_types(filenames,block_size,cutoff_intensity, number_of_RGB_clusters,number_of_block_clusters,...
     number_of_blocks_per_image,rgb_samples_per_image,number_of_representative_blocks,marker_scales,include_bg)
-% This is the function to train PhenoRipper to fix the reduced colorset and
-% block types
-% filenames is a cell array with rows corresponding to different images; the
-% columns correspond to different channels
-% marker_scales ([number of channels x 2]): The first column is the min
-% value of each channel, and the second the max value
-%include_bg: a bool which determines if background pixels are used
-% all other parameters are integers, with (hopefully) self-descriptive name
+% IDENTIFY_BLOCK_TYPES Identify PhenoRipper block types 
+%   IDENTIFY_BLOCK_TYPES takes a set of images as input and identifies the
+%   optimal reduced set of colors and block types for PhenoRipper
+%
+%   Parameters: 
+%   FILENAMES - cell array with rows corresponding to different images; the
+%   columns correspond to different channels
+%   BLOCK_SIZE - size, in pixels, of each block in grid that PhenoRipper
+%   divided imgaes into
+%   CUTOFF_INTENSITY - pixels above this intensity are considered
+%   foreground pixel
+%   MARKER_SCALES - An array of size [number of channels x 2]. The first column is the min
+%   value of each channel, and the second the max value
+%   INCLUDE_BG - a bool which determines if background pixels are used
+%   all other parameters are integers, with (hopefully) self-descriptive name
+%
+% ------------------------------------------------------------------------------
+% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% Authors:
+% Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
+% For latest updates, check: < http://www.PhenoRipper.org >.
+%
+% All rights reserved.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, version 3 of the License.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details:
+% < http://www.gnu.org/licenses/ >.
+%
+% ------------------------------------------------------------------------------
+%%
 
-% Setting up variables
+
+
+
+%Setting up variables
 data.block_size=block_size;
 data.cutoff_intensity=cutoff_intensity;
 data.number_of_RGB_clusters=number_of_RGB_clusters;

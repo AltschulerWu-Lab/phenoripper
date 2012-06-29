@@ -1,4 +1,27 @@
 function formatted_data=color_table(raw_data,groups)
+%
+% ------------------------------------------------------------------------------
+% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% Authors:
+% Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
+% For latest updates, check: < http://www.PhenoRipper.org >.
+%
+% All rights reserved.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, version 3 of the License.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details:
+% < http://www.gnu.org/licenses/ >.
+%
+% ------------------------------------------------------------------------------
+%%
+
+
+
 bg_colors=cell(size(raw_data));
 fg_colors=cell(size(raw_data));
 colors={'#A6CEE3', '#1F78B4','#B2DF8A','#33A02C','#FB9A99','#3E31A1C',...

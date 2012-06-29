@@ -12,7 +12,29 @@ function x = black_white_colormap(n,r)
 % plot(sum(black_white_colormap(0.3,0.2),2)/3,'g')
 % plot(sum(black_white_colormap(0.5,0.8),2)/3,'k')
 % hold off;
-% By Satwik Rajaram and Benjamin Pavie 31st Aug 2011
+%
+%
+%
+% ------------------------------------------------------------------------------
+% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% Authors:
+% Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
+% For latest updates, check: < http://www.PhenoRipper.org >.
+%
+% All rights reserved.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, version 3 of the License.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details:
+% < http://www.gnu.org/licenses/ >.
+%
+% ------------------------------------------------------------------------------
+%%
+
 if ~exist('n','var')
     n = 0.5;
     r = 0.5;

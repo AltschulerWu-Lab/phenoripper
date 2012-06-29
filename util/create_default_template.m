@@ -1,5 +1,27 @@
-%Create the default template list
 function templates=create_default_template()
+%Create the default template list
+%
+% ------------------------------------------------------------------------------
+% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% Authors:
+% Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
+% For latest updates, check: < http://www.PhenoRipper.org >.
+%
+% All rights reserved.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, version 3 of the License.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details:
+% < http://www.gnu.org/licenses/ >.
+%
+% ------------------------------------------------------------------------------
+%%
+
+
   templates=[];
   templates{1}=MyTemplate('A1/xxxxxxxx__SEPARATOR__1.__EXTENSION__','(?<Row>[A-Z]*)(?<Column>[0-9]{1,2})\/\S*(?<Separator>__SEPARATOR__)(?<Channel>\S*)(?<Extension>.__EXTENSION__)$');
   templates{1}.Description='Template which can detect Well directory, Row, Column and ChannelNumber based on the folder name following this convention:%s[Row][Column]\xxxx[channel sep][ChannelNumber].[file ext]%s (e.g. A1\img-2.tiff).%sSupport Single channel Image only.';
