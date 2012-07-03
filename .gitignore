@@ -3,10 +3,8 @@
 
 #Data files
 #*.mat
-
 #Zip files
 *.zip
-
 #Subdirectories
 clickA3DPoint/
 Logo/
@@ -18,10 +16,9 @@ uiremember_uirestore/
 dragzoom/
 GUIs_FEX/
 TestImages/
-
 #Test files
 Test*
 test*
-
 #Vim temporary files
 .*.swp
+/\

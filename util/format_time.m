@@ -1,5 +1,7 @@
 function td=format_time(seconds)
-%
+% FORMAT_TIME format time in seconds to hours/minutes/seconds
+%   TD=FORMAT_TIME(SECONDS) converts the time in seconds to a string which
+%   specified the same time in hours, mingutes and seconds.
 % ------------------------------------------------------------------------------
 % Copyright ©2012, The University of Texas Southwestern Medical Center 
 % Authors:

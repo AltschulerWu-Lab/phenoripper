@@ -1,5 +1,10 @@
 function colors=phenoripper_colormap(number_of_colors)
-%
+% PHENORIPPER_COLORMAP - colormap with qualitatively different levels 
+%   COLORS=PHENORIPPER_COLORMAP(NUMBER_OF_COLORS) generates a colormap (array
+%   of size:number_of_colors x 3) having number_of_colors qualitatively
+%   different color levels. If number_of_colors exceeds 13 the colormap
+%   defaults to the standard jet colormap used by matlab.  
+
 % ------------------------------------------------------------------------------
 % Copyright ©2012, The University of Texas Southwestern Medical Center 
 % Authors:

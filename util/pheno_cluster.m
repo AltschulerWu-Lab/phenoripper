@@ -1,6 +1,40 @@
 function positions=pheno_cluster(data,representatives,row_labels,row_bg_colors,...
     marker_scales,display_colors,sb_marker_profiles,block_size,sb_ordering_score,use_sb_dendrogram)
-%
+% PHENO_CLUSTER custom PhenoRipper clustergram
+%  POSITIONS=PHENO_CLUSTER(DATA,REPRESENTATIVES,ROW_LABELS,ROW_BG_COLORS,...
+%    MARKER_SCALES,DISPLAY_COLORS,SB_MARKER_PROFILES,BLOCK_SIZE,SB_ORDERING_SCORE,USE_SB_DENDROGRAM)
+%    generates a custom clustergram that groups conditions based on their
+%    superblock profiles (rows of clustergram). The columns of the clustergram
+%    are the different superblock types, and representative images of each of
+%    these types along with a bar plot displaying marker levels in each
+%    superblock type are displayed.
+%    
+%    pheno_cluster arguments:
+%    DATA - a matrix containing superblock profiles of different conditions.
+%    Rows correspond to different conditions and columns to superblock types.
+%    REPRESENTATIVES - A cell array, each element of which is a representative
+%    image of a different superblock type in the form of a three dimensional
+%    array.
+%    ROW_LABELS - A cell array containing the names of the different conditions
+%    ROW_BG_COLORS - An array (size: number_of_conditions x 3) containing the
+%    colors, in RGB format, for each condition.
+%    MARKER_SCALES - An array of size [number of channels x 2]. The first column is the min
+%    value of each channel, and the second the max value
+%    DISPLAY_COLORS - A cell array of color names (in human readable form, see 
+%    color_names_to_colormap) to be used for displaying the different channels
+%    for the sample superblock images. 
+%    SB_MARKER_PROFILES - an array (size: number_of_superblock_types x
+%    number_of_channels), with each row containing the levels of the different
+%    markers in a specific superblock type.
+%    BLOCK_SIZE - block size (in pixels) used by PhenoRipper. Used for display
+%    in representative superblock images.
+%    SB_ORDERING_SCORE - A vector containing numbers associated with each
+%    superblock type which can be used for ordering the superblock types and
+%    over-ride the standard dendrogram ordering. For example the phenobrowser
+%    has the option of using the level of a marker (in a superblock) to order
+%    the superblocks.
+%    USE_SB_DENDROGRAM - a bool specifying if dendrogram based ordering should
+%    be used to choose the order of the superblock types
 % ------------------------------------------------------------------------------
 % Copyright ©2012, The University of Texas Southwestern Medical Center 
 % Authors:

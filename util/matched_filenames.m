@@ -1,16 +1,16 @@
 function filenames=matched_filenames(file_list,expr,channel_names)
-% Each image has n files corresponding to the n channels. We want to group
-% the files per image.
-
-% This code takes in:
-% file_list : the list of all files in a directory (a cell array) 
-% expr : Regular expression used to extract the information from those
-% files. Must contain (?<Channel>xxxxxxx)
-% channels_name: Cell array which contains the channel names
-
-%Disclaimer: This function doen't do any checking to make sure the file
-%exist. Make sure all you channel exist (it won't be checked) 
-%
+% MATCHED_FILENAMES group filenames belonging to same image 
+%   FILENAMES=MATCHED_FILENAMES(FILE_LIST,EXPR,CHANNEL_NAMES) groups the n files corresponding to the n channels of each image.
+%  
+%   matched_filenames arguments:
+%   FILE_LIST : the list of all files in a directory (a cell array) 
+%   EXPR : Regular expression used to extract the information from those
+%   files. Must contain (?<Channel>xxxxxxx)
+%   CHANNELS_NAME: Cell array which contains the channel names
+%  
+%   Disclaimer: This function doen't do any checking to make sure the file
+%   exist. Make sure all you channel exist (it won't be checked) 
+%  
 % ------------------------------------------------------------------------------
 % Copyright ©2012, The University of Texas Southwestern Medical Center 
 % Authors:

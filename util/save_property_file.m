@@ -1,5 +1,5 @@
 function save_property_file(fileName,property)
-% Save a property into a properties file.
+% SAVE_PROPERTY_FILE - Save a property into a properties file.
 % Parameters :
 % @fileName : the file which contains the properties. - String - Required
 % @property : the property to save. - String - Required

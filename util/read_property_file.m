@@ -1,5 +1,6 @@
 function propertyList = read_property_file(fileName)
-% Read a property file and return a struture containing the property list with their values.
+% READ_PROPERTY_FILE - read a project properties file
+% Read a property file and return a structure containing the property list with their values.
 % Parameters :
 % @fileName : the file which contains the properties. - String - Required
 % Output Parameters :

@@ -1,5 +1,11 @@
 function [table_data,field_names]=convert_struct_to_table(data)
-%
+% CONVERT_STRUCT_TO_TABLE convert a vector of structs to a  cell array
+%   [TABLE_DATA,FIELD_NAMES]=CONVERT_STRUCT_TO_TABLE(DATA) converts data, an
+%   vector of structs, to a cell array, table_data. Each row of table_data
+%   corresponds to a different element of the original vector of structs, and
+%   each column corresponds to a different field of the struct. It is assumed
+%   that all elements in the original vector have the same fields and the names
+%   of these fields are returned as field_names.
 % ------------------------------------------------------------------------------
 % Copyright ©2012, The University of Texas Southwestern Medical Center 
 % Authors:

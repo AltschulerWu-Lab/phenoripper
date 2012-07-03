@@ -1,6 +1,7 @@
-function mink_vals = mink(x,N)
-% ------------------------------------------------------------------------
-% returns the index of the largest N values in the array
+function mink_vals = mink(x,k)
+% MINK_VALS find the k smallest values in an array
+%   MINK_VALS = MINK(X,K) returns the K smallest values (in order) in the
+%   array X.
 %
 % ------------------------------------------------------------------------------
 % Copyright ©2012, The University of Texas Southwestern Medical Center 
@@ -23,8 +24,8 @@ function mink_vals = mink(x,N)
 %%
 
 
-if(length(x)<N); N=length(x); mink_vals=zeros(N,1); end
-for ii=1:N
-    [mink_vals(ii) min_index]= min(x);
+if(length(x)<k); k=length(x); mink_vals=zeros(k,1); end
+for i=1:k
+    [mink_vals(i) min_index]= min(x);
     x(min_index) = +inf;
 end

@@ -1,4 +1,4 @@
-function varargout = splash(varargin)
+function varargout = show_splash_screen(varargin)
 %SPLASH  Creates a splash screen.
 %   SPLASH(FILENAME,FMT,TIME) creates a splash screen using the image from the
 %   file specified by the string FILENAME, where the string FMT specifies

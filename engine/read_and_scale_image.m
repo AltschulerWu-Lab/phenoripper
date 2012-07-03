@@ -1,5 +1,14 @@
 function img=read_and_scale_image(filenames,marker_scales,xres_full,yres_full,channels_per_file,xres_cropped,yres_cropped)
-number_of_channels=max(length(filenames),channels_per_file);
+%imread Read, scale, crop and possibly combine images from graphics files.
+%    IMG=READ_AND_SCALE_IMAGE(FILENAMES,MARKER_SCALES,XRES_FULL,YRES_FULL,...
+%    CHANNELS_PER_FILE,XRES_CROPPED,YRES_CROPPED) reads an image of size 
+%    [XRES_FULL,YRES_FULL] from the file(s) specified by the cell array FILENAME. 
+%    Presently either a single multi-channel with CHANNELS_PER_FILE channels or
+%    multiple gray-scale (CHANNELS_PER_FILE=1) files are supported. The
+%    output array IMG is a multichannel array cropped to  size
+%    [XRES_CROPPED,YRES_CROPPED] with intensities rescaled scaled by values
+%    specified by MARKER_SCALES which is an array of size [number of channels x 2]. 
+%    The first column is the min value of each channel, and the second the max value.
 %
 % ------------------------------------------------------------------------------
 % Copyright ©2012, The University of Texas Southwestern Medical Center 
@@ -20,7 +29,7 @@ number_of_channels=max(length(filenames),channels_per_file);
 %
 % ------------------------------------------------------------------------------
 %%
-
+number_of_channels=max(length(filenames),channels_per_file);
 
 
 %     if(length(filenames)>1)

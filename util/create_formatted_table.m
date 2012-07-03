@@ -1,4 +1,12 @@
 function formatted_table=create_formatted_table(data_table,fg_table,bg_table)
+% CREATE_FORMATTED_TABLE construct a GUI embeddable table with specified colors
+%   FORMATTED_TABLE=CREATE_FORMATTED_TABLE(DATA_TABLE,FG_TABLE,BG_TABLE) takes
+%   a cell array, data_table, and foreground (fg_table) and background
+%   (bg_table) color specification of each cell in the table, and constructs a
+%   GUI embeddable table with the specified colors. The color specification
+%   tables have the same size as the data, and colors are specified using HTML
+%   color codes
+%
 %
 % ------------------------------------------------------------------------------
 % Copyright ©2012, The University of Texas Southwestern Medical Center 

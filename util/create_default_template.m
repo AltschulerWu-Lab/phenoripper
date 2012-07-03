@@ -1,5 +1,8 @@
 function templates=create_default_template()
-%Create the default template list
+% CREATE_DEFAULT_TEMPLATE Create PhenoRipper's default list of templates.
+%   TEMPLATES=CREATE_DEFAULT_TEMPLATE() generates the defualt list of templates
+%   shipped with PhenoRipper. Each template allows the loading of images stored
+%   in a different file/directory naming convention.
 %
 % ------------------------------------------------------------------------------
 % Copyright ©2012, The University of Texas Southwestern Medical Center 

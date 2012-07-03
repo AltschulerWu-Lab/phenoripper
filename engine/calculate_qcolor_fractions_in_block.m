@@ -1,5 +1,25 @@
-function [weights block_ids] =calculate_qcolor_fractions_in_block(block,centroids,intensity_cutoff,include_bg)
-%
+function [weights pixel_ids] =calculate_qcolor_fractions_in_block(block,centroids,intensity_cutoff,include_bg)
+% CALCULATE_QCOLOR_FRACTIONS_IN_BLOCK calculate pixel qcolor fractions in  block 
+%   [WEIGHTS PIXEL_IDS] = CALCULATE_QCOLOR_FRACTIONS_IN_BLOCK calculates the
+%   fraction of pixels (WEIGHTS) and the  q-color state(previously define) 
+%   of each pixel (PIXEL_IDS) in the specified block
+%   
+% calculate_qcolor_fractions_in_block arguments:
+%   BLOCK : An array of size [block_size x block_size x  number_of_channels] that
+%   contains the multi-channel  pixel intensities for a block of image
+%   pixels
+%   CENTROIDS - Previously identified multi-channel intensities for the
+%   (centroids of) the different qcolor states. For purposes of speed,
+%   these need to be reformatted to be a matrix of size 
+%   [block_size x block_size x number_of_channels x
+%   number_of_q_color_types]. Thus each q-color type is represented by a
+%   block where each pixel is in that q-color state.
+%   CUTOFF_INTENSITY - Pixel intensity level below which pixels are 
+%   considered background pixels. Value of cutoff_intensity must lie 
+%   between 1 and 100. Note: Intensity is calculated after scaling as
+%   specified in marker_scales variable passed to the identify_block_types
+%   function
+%   INCLUDE_BG - a bool which determines if background pixels are used
 % ------------------------------------------------------------------------------
 % Copyright ©2012, The University of Texas Southwestern Medical Center 
 % Authors:
@@ -29,10 +49,10 @@ bg=sqrt(sum(block.^2,3)/number_of_channels)<intensity_cutoff;
 for cluster=1:number_of_clusters
     distmat(:,:,cluster)=sum((block-centroids(:,:,:,cluster)).^2,3);
 end
-[~,block_ids]=min(distmat,[],3);
+[~,pixel_ids]=min(distmat,[],3);
 
 % All background blocks are set to have id=0
-block_ids(bg(:))=0;
+pixel_ids(bg(:))=0;
 
 weights=zeros(number_of_clusters+1,1);
 % If backround is not used, then the weight of the background (first) component is
@@ -45,7 +65,7 @@ end
 %for cluster=0:number_of_clusters
 for cluster=start_cluster:number_of_clusters
     %weights(cluster+1)=sum(block_ids(:)==cluster)/(xsize*ysize);
-    weights(cluster+1)=sum(block_ids(:)==cluster)/(nnz(block_ids>=start_cluster));
+    weights(cluster+1)=sum(pixel_ids(:)==cluster)/(nnz(pixel_ids>=start_cluster));
 end
 
 end

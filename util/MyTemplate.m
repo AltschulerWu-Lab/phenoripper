@@ -1,7 +1,9 @@
 classdef MyTemplate
-%How to use:
-%Template a;
-%[idx edx ext mat tok a.Groupby]=regexp(a.Name,a.Pattern,'start','end','tokenExtents','match','tokens','names');
+% MyTemplate all templates are instances of this class
+%
+% Usage:
+% MyTemplate a;
+% [idx edx ext mat tok a.Groupby]=regexp(a.Name,a.Pattern,'start','end','tokenExtents','match','tokens','names');
 %
 % ------------------------------------------------------------------------------
 % Copyright ©2012, The University of Texas Southwestern Medical Center 

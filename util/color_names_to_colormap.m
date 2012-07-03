@@ -1,5 +1,11 @@
 function cmap=color_names_to_colormap(display_colors)
+% COLOR_NAMES_TO_COLORMAP construct colormap from human readable list of colors
+%   CMAP=COLOR_NAMES_TO_COLORMAP(DISPLAY_COLORS) takes as input, display_colors, 
+%   a list of human-readable colors, specified as string in a cell array. It produces a
+%   colormap array containing the R,G and B values for these specified colors.
 %
+%   Usage:
+%   cmap=color_names_to_colormap({'Red','Gray','Yellow'});
 % ------------------------------------------------------------------------------
 % Copyright ©2012, The University of Texas Southwestern Medical Center 
 % Authors:

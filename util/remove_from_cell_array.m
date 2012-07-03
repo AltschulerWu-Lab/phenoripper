@@ -1,5 +1,8 @@
 function newCellArray = remove_from_cell_array(cellArray,row)
-%
+% REMOVE_FROM_CELL_ARRAY - delete row in cell array
+%   NEWCELLARRAY = REMOVE_FROM_CELL_ARRAY(CELLARRAY,ROW) removes a specified
+%   row in a cell array and returns a new array missing that row, and with all
+%   subsequent rows moved up.
 % ------------------------------------------------------------------------------
 % Copyright ©2012, The University of Texas Southwestern Medical Center 
 % Authors:

@@ -1,4 +1,17 @@
 function isSucceed = write_data(fileName, metadata, RootDir, NrChannelPerImage, Markers)
+% WRITE_DATA - write metadata to file in PhenoRipper format
+%   ISSUCCEED = WRITE_DATA(FILENAME, METADATA, ROOTDIR, NRCHANNELPERIMAGE, MARKERS) creates
+%   a metadata file, in PhenoRipper format, with name filename. On success
+%   isSucceed returnd true.
+%
+%   write_data arguments:
+%   FILENAME - name of output file
+%   METADATA - struct array containing image metadata in PhenoRipper format
+%   ROOTDIR - root directory name as string. All paths are measured relative to
+%   this
+%   NRCHANNELPERIMAGE - Number of channels in each image file (e.g. 1 for
+%   grayscale)
+%   MARKERS - Cell array containing names of markers
 %
 % ------------------------------------------------------------------------------
 % Copyright ©2012, The University of Texas Southwestern Medical Center 

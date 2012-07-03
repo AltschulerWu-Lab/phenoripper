@@ -1,16 +1,19 @@
 function [filenames,metadata,RootDir,NrChannelPerImage,Markers,errorMessage]=read_data(filename,delim)
-% Parse the Metadata file which describe for each image the different group
-% Parameters :
+% READ_DATA Read and parse PhenoRipper metadata files
+%
+% read_data arguments :
 % @filename     : the full patch to the medatada file - Required
 % @delim        : the delimiter between the different field - String - Required
 %
 % Output parameters:
-% @filenames
-% @metadata
-% @RootDir
-% @NrChannelPerImage
-% @Markers
-% @errorMessage
+% filenames - cell array containing filenames (different files from the same
+% image for the rows)
+% metadata - struct array used by PhenoRipper to store metadata
+% RootDir - The root dir from which all paths are specified
+% NrChannelPerImage - number of channels stored in each image file (1 for
+% graysale, 3 for RGB etc)
+% Markers - Cell array containing marker names
+% errorMessage - any error message generated
 %
 % Metadata file example (simple Text file):
 % #RootDir:/home/project/2006_10_Subpopulations/plates/070330_Subpopulation_Final_24hr/normalized_images/

@@ -4,17 +4,56 @@ function data=identify_block_types(filenames,block_size,cutoff_intensity, number
 %   IDENTIFY_BLOCK_TYPES takes a set of images as input and identifies the
 %   optimal reduced set of colors and block types for PhenoRipper
 %
-%   Parameters: 
-%   FILENAMES - cell array with rows corresponding to different images; the
+%   identify_block_types arguments: 
+%   FILENAMES - cell array of filenames with rows corresponding to different images; the
 %   columns correspond to different channels
 %   BLOCK_SIZE - size, in pixels, of each block in grid that PhenoRipper
 %   divided imgaes into
-%   CUTOFF_INTENSITY - pixels above this intensity are considered
-%   foreground pixel
+%   CUTOFF_INTENSITY - Pixel intensity level below which pixels are 
+%   considered background pixels. Value of cutoff_intensity must lie 
+%   between 1 and 100. Note: Intensity is calculated by scaling contained
+%   in  marker_scales.
+%   NUMBER_OF_RGB_CLUSTERS - Number of q-colors. This specifies the
+%   numberof colors in the reduced colorspace used by PhenoRipper for its
+%   calculations
+%   NUMBER_OF_BLOCK_CLUSTERS - Number of block types
+%   NUMBER_OF_BLOCKS_PER_IMAGE - Maximum number of blocks sampled from each
+%   image to identify block types
+%   RGB_SAMPLES_PER_IMAGE - maximum number of pixels sampled per image to
+%   identify reduced color set
+%   NUMBER_OF_REPRESENTATIVE_BLOCKS - Number of example blocks for each block type
+%   to be stored for display later
 %   MARKER_SCALES - An array of size [number of channels x 2]. The first column is the min
 %   value of each channel, and the second the max value
 %   INCLUDE_BG - a bool which determines if background pixels are used
-%   all other parameters are integers, with (hopefully) self-descriptive name
+%   
+%   identify_block_types output: data is a structure with fields
+%   BLOCK_SIZE - block size in pixels
+%   CUTOFF_INTENSITY - cutoff intensity specified above
+%   NUMBER_OF_RGB_CLUSTERS - number of q-color types
+%   NUMBER_OF_BLOCK_CLUSTERS -  number of block types
+%   XRES_FULL - image size (in pixels) in X direction
+%   YRES_FULL - image size (in pixels) in Y direction
+%   XRES_CROP - image size (in pixels) in X direction after cropping
+%   YRES_CROP - image size (in pixels) in Y direction after cropping
+%   CHANNELS_PER_FILE - number of channels in each image file (1 for grayscale
+%   etc)
+%   A1, B1 - matrices sefined so that for an image img, A1*img*B1 contains mean intensities 
+%   in each block in the image
+%   A2,B2 - versions of A1,B1 for cropped images
+%   RGB_CENTROIDS - array of size [number_of_RGB_clusters x number_of_channels]. 
+%   Each row contains the marker levels for a distinct qcolor.
+%   BLOCK_CENTROIDS -  array of size [number_of_BLOCK_clusters x (number_of_RGB_clusters+1)]. 
+%   Each row describes the fractions of the the different q-colors for a
+%   distinct block type. The 1st column contains the fraction of background
+%   pixels.
+%   BLOCK_WEIGHTS - an array containing the fractions of pixels in the
+%   different q-color states for each block analyzed.
+%   REPRESENTATIVE_BLOCKS - a 4D array containing images of representatives of
+%   the different block types (the 4th dimension is block type)
+%
+%
+%
 %
 % ------------------------------------------------------------------------------
 % Copyright ©2012, The University of Texas Southwestern Medical Center 

@@ -1,5 +1,10 @@
 function formatted_data=color_table(raw_data,groups)
-%
+% COLOR_TABLE construct a colored table
+%   FORMATTED_DATA=COLOR_TABLE(RAW_DATA,GROUPS) accepts as input raw_data formatted
+%   as a cell array, and a vector groups specifying the group number of each
+%   row. The output of color_table is cell array with the same dimensions as
+%   raw_data, but formated so that when displayed as a table in a MATLAB gui,
+%   rows corresponding to the different groups are colored differently.
 % ------------------------------------------------------------------------------
 % Copyright ©2012, The University of Texas Southwestern Medical Center 
 % Authors:
