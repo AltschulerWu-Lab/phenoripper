@@ -1,9 +1,9 @@
 function fileList = get_all_files_in_dir(dirName)
 % GET_ALL_FILES_IN_DIR recursively list all files in a directory
-% FILELIST = GET_ALL_FILES_IN_DIR(DIRNAME) returns a cell array containing all
-% the files contained in directory dirname and its sub-directories.
+%   FILELIST = GET_ALL_FILES_IN_DIR(DIRNAME) returns a cell array containing 
+%   all the files contained in directory dirname and its sub-directories.
 % ------------------------------------------------------------------------------
-% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% Copyright ??2012, The University of Texas Southwestern Medical Center 
 % Authors:
 % Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
 % For latest updates, check: < http://www.PhenoRipper.org >.

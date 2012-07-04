@@ -1,10 +1,11 @@
 function data=rip_image(filenames,global_data,marker_scales,include_bg)
 % RIP_IMAGE PhenoRip individual images
-%   RIP_IMAGE produces a phenotypic profile of a specified image based on
-%   the fractions of (previoulsy identified) superblock types it contains.
-%   optimal reduced set of colors and block types for PhenoRipper
+%   DATA=RIP_IMAGE(FILENAMES,GLOBAL_DATA,MARKER_SCALES,INCLUDE_BG) produces 
+%   a phenotypic profile of a specified image based on the fractions of 
+%   (previously identified) superblock types it contains.
+%   
 %
-% identify_block_type arguments: 
+% rip_image arguments: 
 %   FILENAMES - cell array of filenames with rows corresponding to different images; the
 %   columns correspond to different channels.
 %   GLOBAL_DATA - Output of identify_superblock_types that contains information
@@ -16,7 +17,7 @@ function data=rip_image(filenames,global_data,marker_scales,include_bg)
 %   one used in identify_block_types and identify_superblock_types
 %   INCLUDE_BG - a bool which determines if background pixels are used
 %
-%  rip_image output: data is a structure with fields
+%  rip_image output: DATA is a structure with fields
 %    SUPERBLOCK_PROFILE - a vector containing fractions of different superblock
 %    types in the image
 %    BLOCK_PROFILE - avector containing the fraction of different block types
@@ -33,7 +34,7 @@ function data=rip_image(filenames,global_data,marker_scales,include_bg)
 %    measure of quality of the superblock assignment.
 
 % ------------------------------------------------------------------------------
-% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% Copyright ??2012, The University of Texas Southwestern Medical Center 
 % Authors:
 % Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
 % For latest updates, check: < http://www.PhenoRipper.org >.

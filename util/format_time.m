@@ -3,7 +3,7 @@ function td=format_time(seconds)
 %   TD=FORMAT_TIME(SECONDS) converts the time in seconds to a string which
 %   specified the same time in hours, mingutes and seconds.
 % ------------------------------------------------------------------------------
-% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% Copyright ??2012, The University of Texas Southwestern Medical Center 
 % Authors:
 % Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
 % For latest updates, check: < http://www.PhenoRipper.org >.

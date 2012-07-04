@@ -2,9 +2,9 @@ function propertyList = read_property_file(fileName)
 % READ_PROPERTY_FILE - read a project properties file
 % Read a property file and return a structure containing the property list with their values.
 % Parameters :
-% @fileName : the file which contains the properties. - String - Required
+% FILENAME : the file which contains the properties. - String - Required
 % Output Parameters :
-% @propertyList : a structure which contain the properties and their values.
+% PROPERTYLIST : a structure which contain the properties and their values.
 % i.e. :
 %       read_property_file(W:\Common\toolbox_v2.0\project.properties)
 %       return a struct like :
@@ -22,7 +22,7 @@ function propertyList = read_property_file(fileName)
 % unixRootDir=/home/project/
 %
 % ------------------------------------------------------------------------------
-% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% Copyright ??2012, The University of Texas Southwestern Medical Center 
 % Authors:
 % Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
 % For latest updates, check: < http://www.PhenoRipper.org >.

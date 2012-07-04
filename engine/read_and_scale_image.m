@@ -1,5 +1,5 @@
 function img=read_and_scale_image(filenames,marker_scales,xres_full,yres_full,channels_per_file,xres_cropped,yres_cropped)
-%imread Read, scale, crop and possibly combine images from graphics files.
+%imread Read, scale and crop images from graphics files.
 %    IMG=READ_AND_SCALE_IMAGE(FILENAMES,MARKER_SCALES,XRES_FULL,YRES_FULL,...
 %    CHANNELS_PER_FILE,XRES_CROPPED,YRES_CROPPED) reads an image of size 
 %    [XRES_FULL,YRES_FULL] from the file(s) specified by the cell array FILENAME. 
@@ -11,7 +11,7 @@ function img=read_and_scale_image(filenames,marker_scales,xres_full,yres_full,ch
 %    The first column is the min value of each channel, and the second the max value.
 %
 % ------------------------------------------------------------------------------
-% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% Copyright ??2012, The University of Texas Southwestern Medical Center 
 % Authors:
 % Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
 % For latest updates, check: < http://www.PhenoRipper.org >.

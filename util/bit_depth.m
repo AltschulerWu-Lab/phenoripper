@@ -1,14 +1,14 @@
 function bd= bit_depth(max_value,standard_levels)
 % BIT_DEPTH estimate bit depth (of an image)
-%   BD= BIT_DEPTH(MAX_VALUE,STANDARD_LEVELS) returns the optimal bit depth BD from 
-%   among the possible values STANDARD_LEVELS for an image with maximum pixel 
-%   intensity value MAX_VALUE, 
+%   BD= BIT_DEPTH(MAX_VALUE,STANDARD_LEVELS) returns the optimal bit depth 
+%   BD from among the possible values STANDARD_LEVELS for an image with 
+%   maximum pixel intensity value MAX_VALUE, 
 %   
 %   Usage:
 %    img= imread('cameraman.tif');
 %    bd= bit_depth(max(img(:)),[8,12,14,16,32]);
 % ------------------------------------------------------------------------------
-% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% Copyright ??2012, The University of Texas Southwestern Medical Center 
 % Authors:
 % Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
 % For latest updates, check: < http://www.PhenoRipper.org >.

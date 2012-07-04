@@ -1,11 +1,11 @@
 function path=load_last_path(type)
 % LOAD_LAST_PATH load the path of the last used directory
-%   PATH=LOAD_LAST_PATH(TYPE) returns a string, path, pointing to the last
-%   directory used in the context type. type may be one of 'metadata',
-%   'wizard','save','result','importtemplate' and the returned path will be the
-%   last directory used for that type of operation.
+%   PATH=LOAD_LAST_PATH(TYPE) returns a string, PATH, pointing to the last
+%   directory used in the context type. TYPE may be one of 'metadata',
+%   'wizard','save','result','importtemplate' and the returned path will be 
+%   the last directory used for that type of operation.
 % ------------------------------------------------------------------------------
-% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% Copyright ??2012, The University of Texas Southwestern Medical Center 
 % Authors:
 % Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
 % For latest updates, check: < http://www.PhenoRipper.org >.

@@ -2,18 +2,18 @@ function [filenames,metadata,RootDir,NrChannelPerImage,Markers,errorMessage]=rea
 % READ_DATA Read and parse PhenoRipper metadata files
 %
 % read_data arguments :
-% @filename     : the full patch to the medatada file - Required
-% @delim        : the delimiter between the different field - String - Required
+% FILENAME     : the full patch to the medatada file - Required
+% DELIM        : the delimiter between the different field - String - Required
 %
 % Output parameters:
-% filenames - cell array containing filenames (different files from the same
+% FILENAMES - cell array containing filenames (different files from the same
 % image for the rows)
-% metadata - struct array used by PhenoRipper to store metadata
-% RootDir - The root dir from which all paths are specified
-% NrChannelPerImage - number of channels stored in each image file (1 for
+% METADATA - struct array used by PhenoRipper to store metadata
+% ROOTDIR - The root dir from which all paths are specified
+% NRCHANNELPERIMAGE - number of channels stored in each image file (1 for
 % graysale, 3 for RGB etc)
-% Markers - Cell array containing marker names
-% errorMessage - any error message generated
+% MARKERS - Cell array containing marker names
+% ERRORMESSAGE - any error message generated
 %
 % Metadata file example (simple Text file):
 % #RootDir:/home/project/2006_10_Subpopulations/plates/070330_Subpopulation_Final_24hr/normalized_images/
@@ -25,7 +25,7 @@ function [filenames,metadata,RootDir,NrChannelPerImage,Markers,errorMessage]=rea
 % B16/HeLa9504-2.png;B16/HeLa9504-3.png;B16/HeLa9504-1.png,Aldosterone, Glucocorticoid receptor
 %
 % ------------------------------------------------------------------------------
-% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% Copyright ??2012, The University of Texas Southwestern Medical Center 
 % Authors:
 % Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
 % For latest updates, check: < http://www.PhenoRipper.org >.

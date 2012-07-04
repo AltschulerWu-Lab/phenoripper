@@ -1,10 +1,10 @@
 function save_last_path(path,type)
 % SAVE_LAST_PATH save the path of the last used directory
-%   SAVE_LAST_PATH(TYPE) stores the last  directory used in the context type to
-%   a property file. type may be one of 'metadata','wizard','save','result','importtemplate'.
-%   Used in conjunction with load_last_path 
+%   SAVE_LAST_PATH(TYPE) stores the last  directory used in the context 
+%   TYPE to a property file. TYPE may be one of 'metadata','wizard','save',
+%   'result','importtemplate'. Used in conjunction with load_last_path 
 % ------------------------------------------------------------------------------
-% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% Copyright ??2012, The University of Texas Southwestern Medical Center 
 % Authors:
 % Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
 % For latest updates, check: < http://www.PhenoRipper.org >.

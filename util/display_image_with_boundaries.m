@@ -1,13 +1,14 @@
 function display_image_with_boundaries(img,axis_handle,color_scaling,colors,mask,boundary_mask)
 % DISPLAY_IMAGE_WITH_BOUNDARIES display an image in specified axis with border
-%   DISPLAY_IMAGE_WITH_BOUNDARIES(IMG,AXIS_HANDLE,COLOR_SCALING,COLORS,MASK,boundary_mask)
-%   displays a matrix img in the axis specified by axis_handle. The matrix img is typically
-%   3-dimensional, and each layer in the third dimension can be scaled linearly
-%   using parameters in color_scaling and with specified color. Additionally, a
-%   mask can be supplied to show highlighted regions and a border can be drawn
-%   around the image.
+%   DISPLAY_IMAGE_WITH_BOUNDARIES(IMG,AXIS_HANDLE,COLOR_SCALING,COLORS,...
+%   MASK,BOUNDARY_MASK) displays a matrix img in the axis specified by 
+%   axis_handle. The matrix img is typically 3-dimensional, and each layer
+%   in the third dimension can be scaled linearly using parameters in 
+%   color_scaling and with specified color. Additionally, a mask can be 
+%   supplied to show highlighted regions and a border can be drawn around 
+%   the image.
 %
-%   display_image arguments:
+%   display_image_with_boundaries arguments:
 %   IMG - A matrix representing image to be displayed (typically 3 dimensional)
 %   AXIS_HANDLE - handle of the axis where image will be displayed
 %   COLOR_SCALING - An array of size [number of channels x 2]. The first column is the min
@@ -19,7 +20,7 @@ function display_image_with_boundaries(img,axis_handle,color_scaling,colors,mask
 %   BOUNDARY_MASK -a 2D binary array having the same x,y dimensions as the image.
 %   Portions of the mask that are marked true are set to white in the displayed image
 % ------------------------------------------------------------------------------
-% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% Copyright ??2012, The University of Texas Southwestern Medical Center 
 % Authors:
 % Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
 % For latest updates, check: < http://www.PhenoRipper.org >.

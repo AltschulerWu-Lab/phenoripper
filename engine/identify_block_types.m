@@ -1,7 +1,11 @@
 function data=identify_block_types(filenames,block_size,cutoff_intensity, number_of_RGB_clusters,number_of_block_clusters,...
     number_of_blocks_per_image,rgb_samples_per_image,number_of_representative_blocks,marker_scales,include_bg)
 % IDENTIFY_BLOCK_TYPES Identify PhenoRipper block types 
-%   IDENTIFY_BLOCK_TYPES takes a set of images as input and identifies the
+%   DATA=IDENTIFY_BLOCK_TYPES(FILENAMES,BLOCK_SIZE,CUTOFF_INTENSITY, ...
+%        NUMBER_OF_RGB_CLUSTERS,NUMBER_OF_BLOCK_CLUSTERS,...
+%        NUMBER_OF_BLOCKS_PER_IMAGE,RGB_SAMPLES_PER_IMAGE,...
+%        NUMBER_OF_REPRESENTATIVE_BLOCKS,MARKER_SCALES,INCLUDE_BG) 
+%   takes a set of images as input and identifies the
 %   optimal reduced set of colors and block types for PhenoRipper
 %
 %   identify_block_types arguments: 
@@ -56,7 +60,7 @@ function data=identify_block_types(filenames,block_size,cutoff_intensity, number
 %
 %
 % ------------------------------------------------------------------------------
-% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% Copyright ??2012, The University of Texas Southwestern Medical Center 
 % Authors:
 % Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
 % For latest updates, check: < http://www.PhenoRipper.org >.

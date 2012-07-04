@@ -3,10 +3,11 @@ classdef MyTemplate
 %
 % Usage:
 % MyTemplate a;
-% [idx edx ext mat tok a.Groupby]=regexp(a.Name,a.Pattern,'start','end','tokenExtents','match','tokens','names');
+% [idx edx ext mat tok a.Groupby]=regexp(a.Name,a.Pattern,...
+% 'start','end','tokenExtents','match','tokens','names');
 %
 % ------------------------------------------------------------------------------
-% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% Copyright ??2012, The University of Texas Southwestern Medical Center 
 % Authors:
 % Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
 % For latest updates, check: < http://www.PhenoRipper.org >.

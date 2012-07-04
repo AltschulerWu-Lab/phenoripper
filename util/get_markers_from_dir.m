@@ -1,7 +1,12 @@
 function channelList = get_markers_from_dir(dirName,regExp, rootDir)
-%
-% ------------------------------------------------------------------------------
-% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% GET_MARKERS_FROM_DIR  get marker names from file structure
+%   CHANNELLIST = GET_MARKERS_FROM_DIR(DIRNAME,REGEXP, ROOTDIR) applies the
+%   regular expression REGEXP(which can capture Channel name from filename)
+%   to files in directory DIRNAME to extract names of channels and returns
+%   them as a cell array CHANNELLIST. All paths are measures with respect
+%   to root directory ROOTDIR.
+%------------------------------------------------------------------------------
+% Copyright ??2012, The University of Texas Southwestern Medical Center 
 % Authors:
 % Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
 % For latest updates, check: < http://www.PhenoRipper.org >.

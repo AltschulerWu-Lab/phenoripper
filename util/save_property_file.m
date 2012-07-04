@@ -1,10 +1,10 @@
 function save_property_file(fileName,property)
 % SAVE_PROPERTY_FILE - Save a property into a properties file.
 % Parameters :
-% @fileName : the file which contains the properties. - String - Required
-% @property : the property to save. - String - Required
+% FILENAME : the file which contains the properties. - String - Required
+% PROPERTY : the property to save. - String - Required
 % Output Parameters :
-% @propertyList : a structure which contain the properties and their values.
+% PROPERTYLIST : a structure which contain the properties and their values.
 % i.e. :
 %       save_property_file('/tmp/test.properties','myRootDir=/tmp/')
 %       write a file like :
@@ -17,7 +17,7 @@ function save_property_file(fileName,property)
 %       one given in parameters.
 %
 % ------------------------------------------------------------------------------
-% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% Copyright ??2012, The University of Texas Southwestern Medical Center 
 % Authors:
 % Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
 % For latest updates, check: < http://www.PhenoRipper.org >.

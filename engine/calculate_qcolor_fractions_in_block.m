@@ -1,8 +1,8 @@
 function [weights pixel_ids] =calculate_qcolor_fractions_in_block(block,centroids,intensity_cutoff,include_bg)
 % CALCULATE_QCOLOR_FRACTIONS_IN_BLOCK calculate pixel qcolor fractions in  block 
-%   [WEIGHTS PIXEL_IDS] = CALCULATE_QCOLOR_FRACTIONS_IN_BLOCK calculates the
-%   fraction of pixels (WEIGHTS) and the  q-color state(previously define) 
-%   of each pixel (PIXEL_IDS) in the specified block
+%   [WEIGHTS PIXEL_IDS] = CALCULATE_QCOLOR_FRACTIONS_IN_BLOCK calculates 
+%   the qcolor state (previously defined) of each pixel in a block (PIXEL_IDS)
+%   and the fraction of pixels in the different qcolor states (WEIGHTS). 
 %   
 % calculate_qcolor_fractions_in_block arguments:
 %   BLOCK : An array of size [block_size x block_size x  number_of_channels] that
@@ -21,7 +21,7 @@ function [weights pixel_ids] =calculate_qcolor_fractions_in_block(block,centroid
 %   function
 %   INCLUDE_BG - a bool which determines if background pixels are used
 % ------------------------------------------------------------------------------
-% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% Copyright ??2012, The University of Texas Southwestern Medical Center 
 % Authors:
 % Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
 % For latest updates, check: < http://www.PhenoRipper.org >.

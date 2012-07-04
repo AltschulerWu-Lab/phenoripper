@@ -2,41 +2,43 @@ function [grouped_metadata,grouped_superblock_profiles,metadata_order,groups,...
     metadata_file_indices]=calculate_groups(group_index,metadata,...
     individual_superblock_profiles,individual_number_foreground_blocks,is_file_blacklisted)
 %  CALCULATE_GROUPS calculate phenoripper profiles, metadata for specified groups of images
-%    CALCULATE_GROUPS groups images with the same value of the GROUP_INDEXth field in METADATA
-%    (which contains metadata for each image) to produce GROUPED_SUPERBLOCK_PROFILES and 
-%    GROUPED_METADATA for each group of images. 
+%    CALCULATE_GROUPS groups images with the same value of the 
+%    GROUP_INDEXth field in METADATA (which contains metadata for each 
+%    image) to produce averaged superblock profiles 
+%    (GROUPED_SUPERBLOCK_PROFILES) and metadata (GROUPED_METADATA) for
+%    each group of images. 
 %    
-%   calculate_groups arguments:
-%   METADATA - an array of structs containing metadata for each image
-%   GROUP_INDEX - an integer specifying which metadata field to use for grouping images
-%   INDIVIDUAL_SUPERBLOCK_PROFILES - an array of superblock profiles calculated
-%   by PhenoRipper for all the images (each row represents a different image)
-%   INDIVIDUAL_NUMBER_FOREGROUND_BLOCKS - A vector containing the number of \
-%   foreground blocks in each image. Profiles of images in the same group are
-%   averaged with a weight proportional to the number of foreground blocks they
-%   contain
-%   IS_FILE_BLACKLISTED - a bool vector which is true for images that are
-%   blacklisted and are not to be used for grouping calculation
+%    calculate_groups arguments:
+%    METADATA - an array of structs containing metadata for each image
+%    GROUP_INDEX - an integer specifying which metadata field to use for grouping images
+%    INDIVIDUAL_SUPERBLOCK_PROFILES - an array of superblock profiles calculated
+%    by PhenoRipper for all the images (each row represents a different image)
+%    INDIVIDUAL_NUMBER_FOREGROUND_BLOCKS - A vector containing the number of \
+%    foreground blocks in each image. Profiles of images in the same group are
+%    averaged with a weight proportional to the number of foreground blocks they
+%    contain
+%    IS_FILE_BLACKLISTED - a bool vector which is true for images that are
+%    blacklisted and are not to be used for grouping calculation
 %
-%   calculate_groups output:
-%   GROUPED_METADATA - an array (one lement per group) of structs containing metadata for the
-%   different groups of images. If all images in the group have the same value
-%   of a field in the original metadata, the grouped metadata preserves this
-%   value. Otherwise it is replaced by a NaN.
-%   GROUPED_SUPERBLOCK_PROFILES -  an array containing the (averaged)
-%   superblock profiles for the different groups of images.
-%   METADATA_ORDER - an array of integers have the same number of elements as
-%   the original metadata. This specifies an ordering of the original metadata
-%   where images in the same group are placed consecutively. Used primarily for
-%   display of image grouping results.
-%   GROUPS - an array of integers containing the group number of each image
-%   (after they have been re-ordered using matadata_order). Primary use is for
-%   display of image grouping results.
-%   METADATA_FILE_INDICES - A cell array with as many elements as the number of
-%   groups identified. Each element in the cell is a vector of integers
-%   denoting the indexes of the images belonging to that group
+%    calculate_groups output:
+%    GROUPED_METADATA - an array (one lement per group) of structs containing 
+%    %metadata for the different groups of images. If all images in the group
+%    have the same value of a field in the original metadata, the grouped
+%    metadata preserves this value. Otherwise it is replaced by a NaN.
+%    GROUPED_SUPERBLOCK_PROFILES -  an array containing the (averaged)
+%    superblock profiles for the different groups of images.
+%    METADATA_ORDER - an array of integers have the same number of elements as
+%    the original metadata. This specifies an ordering of the original metadata
+%    where images in the same group are placed consecutively. Used primarily for
+%    display of image grouping results.
+%    GROUPS - an array of integers containing the group number of each image
+%    (after they have been re-ordered using matadata_order). Primary use is for
+%    display of image grouping results.
+%    METADATA_FILE_INDICES - A cell array with as many elements as the number of
+%    groups identified. Each element in the cell is a vector of integers
+%    denoting the indexes of the images belonging to that group
 % ------------------------------------------------------------------------------
-% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% Copyright ??2012, The University of Texas Southwestern Medical Center 
 % Authors:
 % Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
 % For latest updates, check: < http://www.PhenoRipper.org >.

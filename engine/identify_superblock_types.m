@@ -1,9 +1,11 @@
 function data=identify_superblock_types(filenames,global_data,number_of_superblocks,marker_scales,include_bg)
 % IDENTIFY_BLOCK_TYPES Identify PhenoRipper superblock types 
-%   IDENTIFY_SUPERBLOCK_TYPES Identify PhenoRipper superblock types on a sample 
-%   set of images using previously identified block/color types
+%   DATA=IDENTIFY_SUPERBLOCK_TYPES(FILENAMES,GLOBAL_DATA,...
+%        NUMBER_OF_SUPERBLOCKS,MARKER_SCALES,INCLUDE_BG) 
+%   Identify PhenoRipper superblock types on a sample set of images using
+%   previously identified block/color types
 %
-% identify_block_type arguments: 
+% identify_superblock_type arguments: 
 %   FILENAMES - cell array of filenames with rows corresponding to different images; the
 %   columns correspond to different channels.
 %   GLOBAL_DATA - Output of identify_block_types that contains information
@@ -15,8 +17,8 @@ function data=identify_superblock_types(filenames,global_data,number_of_superblo
 %   one used in identify_block_types
 %   INCLUDE_BG - a bool which determines if background pixels are used
 %
-%   identify_superblock_types output: data is a structure with all the same
-%   fields as the output by identify_block_types and the additional fields
+%   identify_superblock_types output: DATA is a structure with 
+%   fields output by identify_block_types and the additional fields
 %   SUPERBLOCK_CENTROIDS - array of size [number_of_SUPERBLOCK_clusters x (number_of_BLOCK_clusters+1)]. 
 %   Each row describes the fractions of the the different block types for a
 %   distinct superblock type. The 1st column contains the fraction of background blocks
@@ -27,7 +29,7 @@ function data=identify_superblock_types(filenames,global_data,number_of_superblo
 %
 
 % ------------------------------------------------------------------------------
-% Copyright ©2012, The University of Texas Southwestern Medical Center 
+% Copyright ??2012, The University of Texas Southwestern Medical Center 
 % Authors:
 % Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
 % For latest updates, check: < http://www.PhenoRipper.org >.
