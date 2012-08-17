@@ -12,13 +12,13 @@ function data=identify_block_types(filenames,block_size,cutoff_intensity, number
 %   FILENAMES - cell array of filenames with rows corresponding to different images; the
 %   columns correspond to different channels
 %   BLOCK_SIZE - size, in pixels, of each block in grid that PhenoRipper
-%   divided imgaes into
+%   divided images into
 %   CUTOFF_INTENSITY - Pixel intensity level below which pixels are 
 %   considered background pixels. Value of cutoff_intensity must lie 
 %   between 1 and 100. Note: Intensity is calculated by scaling contained
 %   in  marker_scales.
 %   NUMBER_OF_RGB_CLUSTERS - Number of q-colors. This specifies the
-%   numberof colors in the reduced colorspace used by PhenoRipper for its
+%   number of colors in the reduced colorspace used by PhenoRipper for its
 %   calculations
 %   NUMBER_OF_BLOCK_CLUSTERS - Number of block types
 %   NUMBER_OF_BLOCKS_PER_IMAGE - Maximum number of blocks sampled from each
@@ -42,7 +42,7 @@ function data=identify_block_types(filenames,block_size,cutoff_intensity, number
 %   YRES_CROP - image size (in pixels) in Y direction after cropping
 %   CHANNELS_PER_FILE - number of channels in each image file (1 for grayscale
 %   etc)
-%   A1, B1 - matrices sefined so that for an image img, A1*img*B1 contains mean intensities 
+%   A1, B1 - matrices defined so that for an image img, A1*img*B1 contains mean intensities 
 %   in each block in the image
 %   A2,B2 - versions of A1,B1 for cropped images
 %   RGB_CENTROIDS - array of size [number_of_RGB_clusters x number_of_channels]. 
@@ -167,8 +167,8 @@ end
 
 %% Read and Process Images
 
-%Temporarary variable to store all the training blocks
-%(needed because we dont know number of valid blocks before hand)
+%Temporary variable to store all the training blocks
+%(needed because we don't know number of valid blocks before hand)
 block_data_temp=zeros(block_size,block_size,number_of_channels,...
     number_of_blocks_per_image*number_of_training_images); 
 %Temporary variable to store all the foreground pixels used to train color
@@ -238,7 +238,7 @@ block_data=block_data_temp(:,:,:,1:block_counter);
 rgb_data=rgb_data_temp(1:rgb_counter,:);
 
 %Perform k-means on the RGB data to identify reduced color set
-[ids0,data.RGB_centroids]=kmeans(rgb_data,...
+[~,data.RGB_centroids]=kmeans(rgb_data,...
     number_of_RGB_clusters,'emptyaction','singleton','start','cluster');
 
 % Used for 0th and First Order only
