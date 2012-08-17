@@ -40,19 +40,24 @@ function A = imread2(filename)
 % ------------------------------------------------------------------------------
 %%
 
-
-  imageInfo=imfinfo(filename);  
+imageInfo=imfinfo(filename);  
   if(~strcmpi(imageInfo.Format,'tif')||strcmpi(imageInfo.ColorType,'truecolor'))
     A=imread(filename);
   else
-    tmp=tiffread2(filename);    
-    if (~isImagesSameSize(tmp))
-      %errordlg('This format is NOT supported');
-      error('Format Not Supported! All Images in the TIFF stack MUST have the same size');
-    end    
-    A=zeros(tmp(1).height,tmp(1).width,length(tmp));
-    for i=1:length(tmp)
-      A(:,:,i)=tmp(i).data;
+    try
+        tmp=tiffread2(filename);    
+        if (~isImagesSameSize(tmp))
+          %errordlg('This format is NOT supported');
+          error('Format Not Supported! All Images in the TIFF stack MUST have the same size');
+        end    
+        A=zeros(tmp(1).height,tmp(1).width,length(tmp));
+        for i=1:length(tmp)
+          A(:,:,i)=tmp(i).data;
+        end
+    catch %Tiffread2 do not open compressed Tiff files
+      % so try a last time to use matlab library that work only for
+      % single tiff channel.
+        A=imread(filename);
     end
   end
   
