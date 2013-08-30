@@ -75,6 +75,8 @@ function phenoripper_gui_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to phenoripper_gui (see VARARGIN)
 initializeMyHandle();
+%TODO MAKE IT AN OPTIONAL PARAMETERS PASSED
+%rng(10);
 show_splash_screen('phenoripper_logo','png');
 % Choose default command line output for phenoripper_gui
 handles.output = hObject;
@@ -374,6 +376,12 @@ set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on'
 myhandles.statusbarHandles=statusbar(hObject,'Calculating File Structure');
 analysistime_handle=tic;
 
+%Seeds the random number generator if option selecetd in set_parameters (default is Not doing that)
+% if(myhandles.fix_random_number_generator)
+%   rng();
+% else
+%   rng('shuffle');
+% end
 
 block_size = myhandles.block_size;
 cutoff_intensity=myhandles.cutoff_intensity;
@@ -431,6 +439,9 @@ else
     end
 end
 global_filenames=cell(size(chosen_files,1),files_per_image);
+%Get params tu be used for rescaling each image according to 2 params A and
+% such that Inew = I*A+B;
+global_filenames_rescale_param=cell(size(chosen_files,1),files_per_image);
 for i=1:size(chosen_files,1)
 %     filenames=cellfun(@(x) strcat(myhandles.rootDir,x),...
 %           myhandles.grouped_metadata{condition}.files_in_group,'UniformOutput',false);
@@ -438,7 +449,8 @@ for i=1:size(chosen_files,1)
     file_num=chosen_files(i,2);%randi(size(myhandles.grouped_metadata{condition}.files_in_group,1));%Pick Random File
     for channel=1:files_per_image
         global_filenames{i,channel}=strcat(myhandles.rootDir,...
-          myhandles.grouped_metadata{condition}.files_in_group{file_num,channel}); 
+          myhandles.grouped_metadata{condition}.files_in_group{file_num,channel});
+        global_filenames_rescale_param{i,channel}=myhandles.grouped_metadata{condition}.files_in_group{file_num,channel,2};
     end
 end
 setappdata(0,'myhandles',myhandles);
@@ -450,29 +462,35 @@ global_data=identify_block_types(global_filenames,block_size,...
     cutoff_intensity,number_of_RGB_clusters,number_of_block_clusters,...
     number_of_blocks_per_training_image,...
     rgb_samples_per_training_image,number_of_block_representatives,myhandles.marker_scales,...
-    myhandles.include_background_superblocks);
+    myhandles.include_background_superblocks,...
+    myhandles.foreground_channels,...
+    myhandles.analyze_channels,...
+    global_filenames_rescale_param);
 set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
 myhandles.statusbarHandles=statusbar(hObject,'Learning Superblock Types (2/3)');
 
 warning on;
-try
+%try
 third_order=identify_superblock_types(global_filenames,global_data,number_of_superblocks,...
-    myhandles.marker_scales,myhandles.include_background_superblocks);
-catch exception
-  if(strcmp(exception.identifier,'MATLAB:nomem'))    
-    errordlg(['You are running out of Memory due to :' char(10)... 
-       ' 1) A too small block size value (try to increase it)' char(10)... 
-       ' 2) A too large number of group: try to use a smaller '...
-       'set of image groups used during the training step '...
-       '(e.g. analyse your image by row instead well)']);
-     myhandles.statusbarHandles=statusbar(hObject,'Error in the data processing, Out of Memory');
-     set(myhandles.statusbarHandles.ProgressBar, 'Visible','off', 'Indeterminate','off');
-     rethrow(exception);
-  else
-    errordlg('Error in the data processing');
-    rethrow(exception);
-  end
-end
+    myhandles.marker_scales,myhandles.include_background_superblocks,...
+    myhandles.foreground_channels,...
+    myhandles.analyze_channels,...
+    global_filenames_rescale_param);
+%catch exception
+%   if(strcmp(exception.identifier,'MATLAB:nomem'))    
+%     errordlg(['You are running out of Memory due to :' char(10)... 
+%        ' 1) A too small block size value (try to increase it)' char(10)... 
+%        ' 2) A too large number of group: try to use a smaller '...
+%        'set of image groups used during the training step '...
+%        '(e.g. analyse your image by row instead well)']);
+%      myhandles.statusbarHandles=statusbar(hObject,'Error in the data processing, Out of Memory');
+%      set(myhandles.statusbarHandles.ProgressBar, 'Visible','off', 'Indeterminate','off');
+%      rethrow(exception);
+%   else
+%     errordlg('Error in the data processing');
+%     rethrow(exception);
+%  end
+%end
 global_data.superblock_centroids=third_order.superblock_centroids;
 global_data.superblock_representatives=third_order.superblock_representatives;
 myhandles.global_data=global_data;
@@ -490,16 +508,21 @@ myhandles.statusbarHandles=statusbar(hObject,'Analysing Images (3/3)');
 tStart=tic; 
  myhandles.files_analyzed=0;
 filenames=cell(1,files_per_image); 
+filenames_rescale_param=cell(1,files_per_image); 
 for file_num=1:length(myhandles.metadata)
     myhandles.tElapsed=toc(tStart); 
     setappdata(0,'myhandles',myhandles);
     for i=1:files_per_image
-        filenames{1,i}=strcat(myhandles.rootDir,myhandles.metadata{file_num}.FileNames{i});
+        %filenames{1,i}=strcat(myhandles.rootDir,myhandles.metadata{file_num}.FileNames{i});
+        filenames{1,i}=strcat(myhandles.rootDir,myhandles.metadata{file_num}.FileNames{1,i,1});
+        filenames_rescale_param{1,i}=myhandles.metadata{file_num}.FileNames{1,i,2};
     end
 %     filenames=cellfun(@(x) strcat(myhandles.rootDir,x),...
 %           myhandles.metadata{file_num}.FileNames,'UniformOutput',false);       
     results=rip_image(filenames,global_data,myhandles.marker_scales,...
-        myhandles.include_background_superblocks);
+        myhandles.include_background_superblocks,...
+        myhandles.foreground_channels,...
+        myhandles.analyze_channels,filenames_rescale_param);
     Ripped_Data(file_num).block_profile=results.block_profile;
     individual_block_profiles(file_num,:)=results.block_profile;
     individual_superblock_profiles(file_num,:)=results.superblock_profile;
@@ -848,7 +871,7 @@ if(~Show_Visualization_Window)
   number_of_test_files=10;
   selected_files=cell(number_of_test_files,files_per_image);
   
-    set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximum',number_of_test_files, 'Value',0);
+  set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximum',number_of_test_files, 'Value',0);
   myhandles.statusbarHandles=statusbar(hObject,'Scanning through all images');
   drawnow;
   for test_num=1:number_of_test_files
@@ -859,6 +882,7 @@ if(~Show_Visualization_Window)
     for channel=1:files_per_image
       selected_files{test_num,channel}=strcat(myhandles.rootDir,...
           myhandles.grouped_metadata{condition}.files_in_group{file_num,channel});
+      selected_files_scaling_parameters{test_num,channel}=  myhandles.grouped_metadata{condition}.files_in_group{file_num,channel,2};
 %       
 %       imagenames{file_num,channel};
     end
@@ -879,13 +903,17 @@ if(~Show_Visualization_Window)
     thresholds=zeros(size(selected_files,1),number_of_channels);
     max_val=0;
     color_scales=zeros(size(selected_files,1),number_of_channels);
+    
     for file_num=1:size(selected_files,1)
         if(number_of_channels~=files_per_image)
-            img=double(imread2(selected_files{file_num,1}));
+          is_multi_channel=true;
+            img=double(imread2(selected_files{file_num,1},is_multi_channel,selected_files_scaling_parameters(file_num,1)));
         else
+          is_multi_channel=false;
             for channel=1:number_of_channels
                 %USE IMREAD FOR SINGLE CHANNEL ALWAYS
-                img(:,:,channel)=double(imread(selected_files{file_num,channel}));
+                %img(:,:,channel)=double(imread(selected_files{file_num,channel}));
+                img(:,:,channel)=double(imread2(selected_files{file_num,channel},is_multi_channel,selected_files_scaling_parameters{file_num,channel}));
             end
         end
         channel_thresholds=zeros(number_of_channels,1);
@@ -916,6 +944,9 @@ if(~Show_Visualization_Window)
 %     set(handles.ThreshodIntensity,'String',num2str(cutoff_intensity));
     myhandles.color_order={'Blue','Green','Red','Yellow','Magenta','Gray'};
     myhandles.display_colors=myhandles.color_order(1:number_of_channels);
+    %Used to define the channels used to determine foreground
+    myhandles.foreground_channels=ones(number_of_channels,1);
+    myhandles.analyze_channels=ones(number_of_channels,1);
     myhandles.statusbarHandles=statusbar(hObject,'');
     set(myhandles.statusbarHandles.ProgressBar, 'Visible','off'); 
     myhandles.amplitude_range=max(cutoff_intensity,30);
@@ -923,6 +954,7 @@ if(~Show_Visualization_Window)
     
     %myhandles=getappdata(0,'myhandles');
     myhandles.test_files=selected_files;
+    myhandles.test_files_scaling_parameters=selected_files_scaling_parameters;
     myhandles.cutoff_intensity=cutoff_intensity;
 %     myhandles.block_size=str2double(get(handles.blockSize,'String'));
     myhandles.block_size=10;

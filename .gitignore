@@ -5,20 +5,9 @@
 #*.mat
 #Zip files
 *.zip
-#Subdirectories
-clickA3DPoint/
-Logo/
-uipickfiles/
-createTable/
-GUILayout_1p3/
-partial_sort_index/
-uiremember_uirestore/
-dragzoom/
-GUIs_FEX/
-TestImages/
-#Test files
-Test*
-test*
 #Vim temporary files
 .*.swp
+.*.swx
+# Matlab temp files
+*.asv
 /\

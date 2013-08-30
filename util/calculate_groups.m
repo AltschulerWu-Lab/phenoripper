@@ -59,7 +59,7 @@ function [grouped_metadata,grouped_superblock_profiles,metadata_order,groups,...
 
 
   
-number_of_files=length(metadata);
+number_of_files=size(metadata,2);
 field_names=fieldnames(metadata{1});
 file_class=cell(1,number_of_files);
 for i=1:number_of_files
@@ -111,9 +111,10 @@ for group_number=1:number_of_groups
    % contiguous. Used only in the wizard_accept function for display purposes.
    % 3) groups: this contains the group number of each file. Used to
    % determine color in wizard_accept
-   filenames=cell(length(image_indices),length(metadata{image_indices(1)}.FileNames));
+   %filenames=cell(length(image_indices),length(metadata{image_indices(1)}.FileNames));
+   filenames=cell(length(image_indices),size(metadata{image_indices(1)}.FileNames,2),size(metadata{image_indices(1)}.FileNames,3) );
    for i=1:length(image_indices)
-       filenames(i,:)=metadata{image_indices(image_order(i))}.FileNames; %assigns files belonging to this group
+       filenames(i,:,:)=metadata{image_indices(image_order(i))}.FileNames; %assigns files belonging to this group
        metadata_order(counter)=image_indices(image_order(i)); 
        groups(counter)=group_number;
        counter=counter+1;

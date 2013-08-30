@@ -86,7 +86,7 @@ pause(0.01);
 wizard_samplingHandles.acceptedFiles=[];
 wizard_samplingHandles.rejectedFiles=[];
 setappdata(0,'wizard_samplingHandles',wizard_samplingHandles);
-try
+%try
   handles.output = hObject;
   % Update handles structure
   guidata(hObject, handles);  
@@ -131,9 +131,9 @@ try
   
 
   
-catch
-  close(parsingMsgDlg);
-end
+%catch
+  %close(parsingMsgDlg);
+%end
 
 
 
@@ -213,6 +213,9 @@ if isfield(myhandles,'wizard_handle')
   delete(myhandles.wizard_handle);
 end
 if isfield(myhandles,'wizardMetaData_handle')
-  delete(myhandles.wizardMetaData_handle);
+  try
+    delete(myhandles.wizardMetaData_handle);
+  catch
+  end
 end
 delete(gcf);

@@ -582,15 +582,22 @@ metadata=cell(1,number_of_images);
 dir_start=regexp(file_matrix(:,1),filesep);
 
 for i=1:number_of_images
- temp=file_matrix(i,:);
+  temp=file_matrix(i,:);
+  temp2=cell(1,size(temp,2),2);
+  for nr=1:size(temp,2)
+    temp2{1,nr,1}=temp{1,nr};
+    temp2{1,nr,2}={1,0};%Default value for Intensity scaling A and B to do Iscaled=I*A+B;
+  end
+ 
   for j=1:files_per_image
-    metadata{i}.FileNames{j}=temp{j};
+    %metadata{i}.FileNames{j}=temp{j};
+    metadata{i}.FileNames=temp2;
   end
   metadata{i}.None=file_matrix{i,1}; 
   if(~isempty(dir_start{i}))
     metadata{i}.Directory=file_matrix{i,1}(1:dir_start{i}(end));
-  else
-    metadata{i}.Directory='';
+  %else
+    %metadata{i}.Directory='';
   end
 end
 
@@ -893,7 +900,7 @@ else
     errordlg('The regular expression does not match with your multichannel Images');
     return;
   end
-  image1=imread2([selectedFolder filesep fileName]);  
+  image1=imread2([selectedFolder filesep fileName],true);  
   if(length(size(image1))~=3)
     errordlg('The regular expression does not match with your multichannel Images');
     return;
@@ -1038,7 +1045,7 @@ else
     'PhenoRipper Regular Expression (*.txt)';
     '*.*',  'All Files (*.*)'},'Select a Metadata File', lastPath);
 end
-if(isnumeric(pathname))%If user pressed cancle button
+if(isnumeric(pathname))%If user pressed cancel button
   return;
 end
 if(~exist(pathname,'dir'))

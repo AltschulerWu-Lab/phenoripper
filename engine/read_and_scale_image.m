@@ -1,4 +1,4 @@
-function img=read_and_scale_image(filenames,marker_scales,xres_full,yres_full,channels_per_file,xres_cropped,yres_cropped)
+function img=read_and_scale_image(filenames,marker_scales,xres_full,yres_full,channels_per_file,xres_cropped,yres_cropped,rescale_param)
 %imread Read, scale and crop images from graphics files.
 %    IMG=READ_AND_SCALE_IMAGE(FILENAMES,MARKER_SCALES,XRES_FULL,YRES_FULL,...
 %    CHANNELS_PER_FILE,XRES_CROPPED,YRES_CROPPED) reads an image of size 
@@ -52,10 +52,10 @@ dont_split_image=((xres_full==xres_cropped)&&(yres_full==yres_cropped));
 if(dont_split_image)
     
     if(channels_per_file>1)%If MultiChannel
-        img=double(imread2(filenames{1}));
+        img=double(imread2(filenames{1},true,rescale_param));
         for channel=1:number_of_channels
-            img(:,:,channel)=min(max(img(:,:,channel)-marker_scales(channel,1),0)/...
-                (marker_scales(channel,2)-marker_scales(channel,1)),1)*100;
+          img(:,:,channel)=min(max(img(:,:,channel)-marker_scales(channel,1),0)/...
+            (marker_scales(channel,2)-marker_scales(channel,1)),1)*100;
             %        temp=img(:,:,channel);
             %        temp=100*(temp-marker_scales(channel,1))/(marker_scales(channel,2)-marker_scales(channel,1));
             %       % temp(temp<0)=0;
@@ -66,7 +66,7 @@ if(dont_split_image)
     else%If Single Channel Image File
         for channel_counter=1:number_of_channels
           %USE IMREAD FOR SINGLE CHANNEL ALWAYS
-          img(:,:,channel_counter)=100*min(max((double(imread(filenames{channel_counter}))-marker_scales(channel_counter,1))/...
+          img(:,:,channel_counter)=100*min(max((double(imread2(filenames{channel_counter},false,rescale_param{channel_counter}))-marker_scales(channel_counter,1))/...
                 (marker_scales(channel_counter,2)-marker_scales(channel_counter,1)),0),1);
         end
     end
@@ -77,23 +77,31 @@ else
     y2=y1+yres_cropped-1;
     
     if(channels_per_file>1)%If MultiChannel
-        temp=double(imread2(filenames{1}));
-        for channel=1:number_of_channels
-            img=temp(x1:x2,y1:y2,:);
-            img(:,:,channel)=min(max(img(:,:,channel)-marker_scales(channel,1),0)/...
-                (marker_scales(channel,2)-marker_scales(channel,1)),1)*100;
-            
-            %        temp=img(:,:,channel);
-            %        temp=100*(temp-marker_scales(channel,1))/(marker_scales(channel,2)-marker_scales(channel,1));
-            %       % temp(temp<0)=0;
-            %        %temp(temp>100)=100;
-            %        temp=min(max(temp,0),100);
-            %        img(:,:,channel)=temp;
-        end
+      temp=double(imread2(filenames{1},true,rescale_param));
+      for channel=1:number_of_channels
+        %A=rescale_param{channel}{1};
+        %B=rescale_param{channel}{2};
+%         img=temp(x1:x2,y1:y2,:);
+%         img(:,:,channel)=min(max(img(:,:,channel)-marker_scales(channel,1),0)/...
+%             (marker_scales(channel,2)-marker_scales(channel,1)),1)*100;
+          
+        imgtemp=temp(x1:x2,y1:y2,channel);
+        img(:,:,channel)=min(max(imgtemp(:,:)-marker_scales(channel,1),0)/...
+            (marker_scales(channel,2)-marker_scales(channel,1)),1)*100;
+
+          %        temp=img(:,:,channel);
+          %        temp=100*(temp-marker_scales(channel,1))/(marker_scales(channel,2)-marker_scales(channel,1));
+          %       % temp(temp<0)=0;
+          %        %temp(temp>100)=100;
+          %        temp=min(max(temp,0),100);
+          %        img(:,:,channel)=temp;
+      end
     else%If Single Channel Image File
-        for channel_counter=1:number_of_channels
+        for channel_counter=1:number_of_channels        
+          A=rescale_param{channel_counter}{1};
+          B=rescale_param{channel_counter}{2};
           %USE IMREAD FOR SINGLE CHANNEL ALWAYS
-          temp=imread(filenames{channel_counter});
+          temp=imread2(filenames{channel_counter},false,rescale_param{number_of_channels});
           temp=temp(x1:x2,y1:y2);
           img(:,:,channel_counter)=100*min(max((double(temp)-marker_scales(channel_counter,1))/...
               (marker_scales(channel_counter,2)-marker_scales(channel_counter,1)),0),1);

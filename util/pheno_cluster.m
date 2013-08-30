@@ -1,5 +1,6 @@
 function positions=pheno_cluster(data,representatives,row_labels,row_bg_colors,...
-    marker_scales,display_colors,sb_marker_profiles,block_size,sb_ordering_score,use_sb_dendrogram)
+    marker_scales,display_colors,sb_marker_profiles,block_size,...
+    sb_ordering_score,use_sb_dendrogram)
 % PHENO_CLUSTER custom PhenoRipper clustergram
 %  POSITIONS=PHENO_CLUSTER(DATA,REPRESENTATIVES,ROW_LABELS,ROW_BG_COLORS,...
 %    MARKER_SCALES,DISPLAY_COLORS,SB_MARKER_PROFILES,BLOCK_SIZE,SB_ORDERING_SCORE,USE_SB_DENDROGRAM)
@@ -139,7 +140,9 @@ for rep_num=1:number_of_representatives
    %perm2a=flipud(perm2);
    img=double(representatives{perm2(rep_num),1});
    max_col=max(img(:));
-   display_image(img,h1,marker_scales,display_colors,[]);axis equal;axis off;
+   %Already scaled see identify_superclock_types.m line temp=read_and_scale_image(filenames(image_counter),marker_scales,xres_full,yres_full,channels_per_file,xres_crop,yres_crop); 
+   %display_image(img,h1,marker_scales,display_colors,[]);axis equal;axis off;
+   display_image(img,h1,100,display_colors,[]);axis equal;axis off;
    line([2*block_size,5*block_size],[2*block_size,2*block_size],'Color','w');
    line([2*block_size,2*block_size],[5*block_size,2*block_size],'Color','w');
    line([2*block_size,5*block_size],[5*block_size,5*block_size],'Color','w');
@@ -178,9 +181,13 @@ for rep_num=1:number_of_representatives
     fvd = get(ch,'Faces');
     fvcd = get(ch,'FaceVertexCData');
     
+    j=1;
     for i=1:length(display_colors)
-        %set(h(i),'facecolor',myhandles.display_colors{i}(1));
-        fvcd(fvd(i,:))=length(cmap1)+i;
+      if(~strcmpi(display_colors(i),''))
+      %set(h(i),'facecolor',myhandles.display_colors{i}(1));
+        fvcd(fvd(j,:))=length(cmap1)+j;
+        j=j+1;
+      end
     end
     %colormap(my_cmap);
     set(ch,'FaceVertexCData',fvcd);axis off;

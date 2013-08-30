@@ -137,6 +137,13 @@ end
         set(myhandles.h,'LineWidth',1);
        
         myhandles.marker_scales=color_scale;
+        for i=1:length(colors)
+          if(strcmpi(colors{i},''))
+            myhandles.analyze_channels(i)=0;
+          else
+            myhandles.analyze_channels(i)=1;
+          end
+        end
         myhandles.display_colors=colors;
         setappdata(0,'myhandles',myhandles);
     end

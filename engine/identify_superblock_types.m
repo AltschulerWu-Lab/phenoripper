@@ -1,7 +1,9 @@
-function data=identify_superblock_types(filenames,global_data,number_of_superblocks,marker_scales,include_bg)
-% IDENTIFY_BLOCK_TYPES Identify PhenoRipper superblock types 
+function data=identify_superblock_types(filenames,global_data,number_of_superblocks,marker_scales,include_bg,...
+    foreground_channels, analyze_channels, rescale_param)
+% IDENTIFY_SUPERBLOCK_TYPES Identify PhenoRipper superblock types 
 %   DATA=IDENTIFY_SUPERBLOCK_TYPES(FILENAMES,GLOBAL_DATA,...
-%        NUMBER_OF_SUPERBLOCKS,MARKER_SCALES,INCLUDE_BG) 
+%        NUMBER_OF_SUPERBLOCKS,MARKER_SCALES,INCLUDE_BG,...
+%        FOREGROUND_CHANNELS, ANALYZE_CHANNELS, RESCALE_PARAM) 
 %   Identify PhenoRipper superblock types on a sample set of images using
 %   previously identified block/color types
 %
@@ -16,6 +18,9 @@ function data=identify_superblock_types(filenames,global_data,number_of_superblo
 %   value of each channel, and the second the max value. Should be the same
 %   one used in identify_block_types
 %   INCLUDE_BG - a bool which determines if background pixels are used
+%   FOREGROUND_CHANNELS - 
+%   ANALYZE_CHANNELS - 
+%   RESCALE_PARAM - 
 %
 %   identify_superblock_types output: DATA is a structure with 
 %   fields output by identify_block_types and the additional fields
@@ -104,18 +109,50 @@ superblock_counter=0;
 for image_counter=1:number_of_training_images
     %Read and Scale Images    
     if(channels_per_file>1)
-        img=read_and_scale_image(filenames(image_counter),marker_scales,xres_full,yres_full,channels_per_file,xres_crop,yres_crop); 
+        img=read_and_scale_image(filenames(image_counter),marker_scales,xres_full,yres_full,channels_per_file,xres_crop,yres_crop,rescale_param(image_counter)); 
     else
-        img=read_and_scale_image(filenames(image_counter,:),marker_scales,xres_full,yres_full,channels_per_file,xres_crop,yres_crop); 
+        img=read_and_scale_image(filenames(image_counter,:),marker_scales,xres_full,yres_full,channels_per_file,xres_crop,yres_crop,rescale_param(image_counter,:)); 
     end
-    
+    [number_of_training_images,number_of_channels]=size(filenames);
+    number_of_channels=max(number_of_channels,channels_per_file);
     
     % Crop image to have integer number of blocks in each direction
     cropped_image=img(x_offset:(x_offset+blocks_nx*block_size-1),...
         y_offset:(y_offset+blocks_ny*block_size-1),1:number_of_channels);
     
     % Calculate intensity of cropped image and identify foreground points
-    intensity=sqrt(sum(double(cropped_image).^2,3)/number_of_channels);
+    %intensity=sqrt(sum(double(cropped_image).^2,3)/number_of_channels);  
+    
+    %Identify foreground pixels and store their RBG (i.e., multi-channel intensity) values
+    %Define the foreground intensity mask based on the channel used to
+    %define foreground
+    j=0;
+    for i=1:length(foreground_channels)
+      if(foreground_channels(i))
+        j=j+1;
+        img2(:,:,j)=cropped_image(:,:,i);
+      end
+    end
+    number_of_channels=j;
+    intensity=sqrt(sum(img2.^2,3)/number_of_channels);
+    img2=[];
+    
+    %Do the analysis only on the selected channels (reset img to the selected channels)
+    j=0;
+    for i=1:length(analyze_channels)
+      if(analyze_channels(i))
+        j=j+1;
+        img2(:,:,j)=cropped_image(:,:,i);
+      end
+    end
+    cropped_image=img2;
+    number_of_channels=j;
+    
+    
+    
+    
+    
+    
     is.foreground=(intensity>cutoff_intensity);
     number_of_foreground_points=sum(sum(is.foreground));
     
@@ -407,6 +444,11 @@ for i=1:number_of_superblocks
     end
 end
 
+
+% [number_of_training_images,number_of_channels]=size(filenames);
+% number_of_channels=max(number_of_channels,channels_per_file);
+
+
 %included_files=find(bintprog(ones(number_of_training_images,1),-FvB',-number_of_superblock_representatives*ones(number_of_superblocks,1))>0.5);
 included_files=1:number_of_training_images;
 superblock_representatives=cell(number_of_superblocks,number_of_superblock_representatives);
@@ -415,26 +457,33 @@ supr_counter=zeros(number_of_superblocks,1);
 for file_num=1:length(included_files)
     if(any(~cellfun('isempty',locations(file_num,:))))
         img=zeros(xres_crop,yres_crop,number_of_channels);
-        if((xres_full~=xres_crop)||(yres_full~=yres_crop))
-            x1=ceil((xres_full-xres_crop)/2);
-            y1=ceil((yres_full-yres_crop)/2);
-            x2=x1+xres_crop-1;
-            y2=y1+yres_crop-1;
-        else
-            x1=1;x2=xres_full;
-            y1=1;y2=yres_full;
-        end
+        
+        %img_temp=zeros(xres_crop,yres_crop,number_of_channels);
+        %if((xres_full~=xres_crop)||(yres_full~=yres_crop))
+        %    x1=ceil((xres_full-xres_crop)/2);
+        %    y1=ceil((yres_full-yres_crop)/2);
+        %    x2=x1+xres_crop-1;
+        %    y2=y1+yres_crop-1;
+        %else
+         %   x1=1;x2=xres_full;
+         %   y1=1;y2=yres_full;
+        %end
         
         if(channels_per_file>1)
             %img=double(imread2(cell2mat(filenames(image_counter))));
-            temp=imread2(cell2mat(filenames(included_files(file_num),1)));
-            img=temp(x1:x2,y1:y2,:);
+            %temp=imread2(cell2mat(filenames(included_files(file_num),1)));
+            
+            img=read_and_scale_image(filenames(included_files(file_num)),marker_scales,xres_full,yres_full,channels_per_file,xres_crop,yres_crop,rescale_param(included_files(file_num))); 
+            
+            %img=temp(x1:x2,y1:y2,:);
         else
             for channel=1:number_of_channels
                 %img(:,:,channel_counter)=imread2(cell2mat(filenames(image_counter,channel_counter)));
                 %USE IMREAD FOR SINGLE CHANNEL ALWAYS
-                temp=imread(cell2mat(filenames(included_files(file_num),channel)));
-                img(:,:,channel)=temp(x1:x2,y1:y2);
+                
+                img=read_and_scale_image(filenames(included_files(file_num),:),marker_scales,xres_full,yres_full,channels_per_file,xres_crop,yres_crop,rescale_param(included_files(file_num),:)); 
+                %temp=imread(cell2mat(filenames(included_files(file_num),channel)));
+                %img(:,:,channel)=temp(x1:x2,y1:y2);
             end
         end
         
@@ -461,6 +510,8 @@ for file_num=1:length(included_files)
         end
     end
 end
+
+
 
 data.superblock_representatives=superblock_representatives;
 

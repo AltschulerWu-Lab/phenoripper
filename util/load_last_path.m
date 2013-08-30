@@ -45,6 +45,8 @@ switch type
     path=getPath('resultPath');
   case 'importtemplate'
     path=getPath('importtemplatePath');
+  case 'phenoloaderroot'
+    path=getPath('phenoloaderrootPath');
   otherwise
     path='';
 end

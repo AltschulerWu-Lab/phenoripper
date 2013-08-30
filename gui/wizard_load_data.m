@@ -45,7 +45,7 @@ function varargout = wizard_load_data(varargin)
 
 % Edit the above text to modify the response to help wizard_load_data
 
-% Last Modified by GUIDE v2.5 25-Jun-2012 11:33:01
+% Last Modified by GUIDE v2.5 25-Mar-2013 14:28:40
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -138,7 +138,7 @@ set(hc(2),'Visible','off');
 drawnow;
 pause(0.01);
 
-try
+%try
   [filenames,metadata,RootDir,NrChannelPerImage,Markers,errorMessage]=...
     read_data([pathname filesep filename],',');
 
@@ -157,7 +157,7 @@ try
 
 
   if(NrChannelPerImage>1)
-    if(length(filenames{1})>1)   
+    if(size(filenames{1},2)>1)   
       close(parsingMsgDlg);
       warndlg(['Inconsistency between NrChannelPerImage and number'...
         ' of file per image! Please check your MetaData file.']);
@@ -166,7 +166,7 @@ try
       channelNr=NrChannelPerImage;
     end
   else
-    channelNr=length(filenames{1});  
+    channelNr=size(filenames{1},2);  
   end
   if(channelNr<1)
     close(parsingMsgDlg);
@@ -205,13 +205,15 @@ try
   set(handles.markerTable,'Data',data);
   set(handles.markerTable, 'ColumnWidth', {30 110 220, 90});
 
-  file_matrix=cell(length(filenames),length(filenames{1}));
+  file_matrix=cell(length(filenames), size(filenames{1},2),2);
   for i=1:length(filenames)
-      for j=1:length(filenames{1})
-          file_matrix{i,j}=filenames{i}{j};
-          if(~exist([RootDir file_matrix{i,j}],'file'))
+      %for j=1:length(filenames{1})
+      for j=1:size(filenames{1},2)
+          file_matrix{i,j,1}=filenames{i}{1,j};
+          file_matrix{i,j,2}=filenames{i}{2,j};
+          if(~exist([RootDir file_matrix{i,j,1}],'file'))
               close(parsingMsgDlg);
-              errordlg(['File Missing:' file_matrix{i,j}] );
+              errordlg(['File Missing:' file_matrix{i,j,1}] );
               return;
           end
       end
@@ -219,14 +221,17 @@ try
   myhandles.file_matrix=file_matrix;
   fnames=fieldnames(metadata);
   for i=1:length(filenames)
-      myhandles.metadata{i}.FileNames={file_matrix{i,:}};
-      myhandles.metadata{i}.None=file_matrix{i,1};
+      %myhandles.metadata{i}.FileNames={file_matrix{i,:}};
+      %myhandles.metadata{i}.None=file_matrix{i,1};
+      myhandles.metadata{i}.FileNames=file_matrix(i,:,:);
+      myhandles.metadata{i}.None=file_matrix{i,1,1};
       for j=2:length(fnames)    
           myhandles.metadata{i}.(fnames{j})=metadata(i).(fnames{j});
       end
   end
   myhandles.NrChannelPerImage=NrChannelPerImage;
-  myhandles.files_per_image=length(filenames{1});
+  %myhandles.files_per_image=length(filenames{1});
+  myhandles.files_per_image=size(filenames{1},2);
   handles=getappdata(0,'handles');
   %fnames=fieldnames(myhandles.metadata{1});
   %set(handles.groupSelector,'String',fnames);
@@ -234,9 +239,9 @@ try
   setappdata(0,'myhandles',myhandles); %Should probably throw in some checks to
                                        % make sure that myhandles.files_per_image is not being reset
   close(parsingMsgDlg);
-catch
-  close(parsingMsgDlg);
-end
+%catch
+%  close(parsingMsgDlg);
+%end
 
                                      
 function setGUIVisible(handles,isVisible)
@@ -396,3 +401,17 @@ myhandles.wizardMetaData_handle=handles.figure1;
 setappdata(0,'myhandles',myhandles);
 wizard_template;
 %set(handles.figure1,'Visible','off');
+
+
+% --- Executes on button press in phenoLoaderButton.
+function phenoLoaderButton_Callback(hObject, eventdata, handles)
+% hObject    handle to phenoLoaderButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+myhandles=getappdata(0,'myhandles');
+myhandles.wizardMetaData_handle=handles.figure1;
+setappdata(0,'myhandles',myhandles);
+if(ismac==0 && isunix == 1)
+  warndlg({'Linux platform may not support well this option.';'This option is using some Undocumented Matlab functions';'that may not work on Linux (e.g. with Unity Desktop).'},'Linux Implementation Warning','modal');
+end
+phenoloader_gui;

@@ -45,7 +45,7 @@ function varargout = set_parameters(varargin)
 
 % Edit the above text to modify the response to help set_parameters
 
-% Last Modified by GUIDE v2.5 25-Jun-2012 17:09:12
+% Last Modified by GUIDE v2.5 25-Feb-2013 14:19:28
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -91,13 +91,14 @@ if(isnan(myhandles.block_size))
 end
 setFileLabel(filenames{myhandles.image_number,1},handles);
 if(number_of_channels~=files_per_image)
-  img=imread2(filenames{myhandles.image_number,1});
+  img=imread2(filenames{myhandles.image_number,1},true,myhandles.test_files_scaling_parameters(myhandles.image_number,1));
 else
   for channel=1:myhandles.number_of_channels
     %USE IMREAD FOR SINGLE CHANNEL ALWAYS
-    img(:,:,channel)=imread(filenames{myhandles.image_number,channel});
+    img(:,:,channel)=imread2(filenames{myhandles.image_number,channel},false,myhandles.test_files_scaling_parameters{myhandles.image_number,channel});
   end
 end
+
 myhandles.intensity=CalculateIntensity(img,myhandles.marker_scales);
 myhandles.h=gca;
 set(myhandles.h,'Interruptible','on');
@@ -125,11 +126,16 @@ set(handles.SuperBlockNr,'String',num2str(myhandles.number_of_superblocks));
 set(handles.MinImageTraining,'String',num2str(min(myhandles.minimum_training_files),length(myhandles.metadata)));
 set(handles.MaxImageTraining,'String',num2str(myhandles.maximum_training_files));
 set(handles.useBackgroundInfoCB,'Value',myhandles.include_background_superblocks);
+try
+  set(handles.randomCB,'Value',myhandles.fix_random_number_generator);
+catch
+  set(handles.randomCB,'Value',false);
+end
 %Display a message for the first start right in the middle
 axlim = axis(gca); 
 axwidth = diff(axlim(1:2));
 axheight = diff(axlim(3:4));
-text(axwidth/2,axheight/2,'\color{white}Greyed Out Portions are Background And Won''t be Analyzed',...
+text(axwidth/2,axheight/2,'\color{white}Black background (outside of grey overlay) will not be analyzed',...
     'FontSize',20,'parent',myhandles.h, 'HorizontalAlignment', 'center');
 guidata(hObject, handles);
 
@@ -195,11 +201,11 @@ setFileLabel(filenames{myhandles.image_number,1},handles);
 guidata(hObject, handles);
 img=zeros(myhandles.xres,myhandles.yres,myhandles.number_of_channels);
 if(myhandles.number_of_channels~=myhandles.files_per_image)
-  img=imread2(filenames{myhandles.image_number,1});
+  img=imread2(filenames{myhandles.image_number,1},true,myhandles.test_files_scaling_parameters(myhandles.image_number,1));
 else
   for channel=1:myhandles.number_of_channels
     %USE IMREAD FOR SINGLE CHANNEL ALWAYS
-    img(:,:,channel)=imread(filenames{myhandles.image_number,channel});
+    img(:,:,channel)=imread2(filenames{myhandles.image_number,channel},false,myhandles.test_files_scaling_parameters{myhandles.image_number,channel});
   end
 end
 myhandles.img=img;
@@ -225,11 +231,11 @@ setFileLabel(filenames{myhandles.image_number,1},handles);
 guidata(hObject, handles);
 img=zeros(myhandles.xres,myhandles.yres,myhandles.number_of_channels);
 if(myhandles.number_of_channels~=myhandles.files_per_image)
-  img=imread2(filenames{myhandles.image_number,1});
+  img=imread2(filenames{myhandles.image_number,1},true,myhandles.test_files_scaling_parameters(myhandles.image_number,1));
 else
   for channel=1:myhandles.number_of_channels
     %USE IMREAD FOR SINGLE CHANNEL ALWAYS
-    img(:,:,channel)=imread(filenames{myhandles.image_number,channel});
+    img(:,:,channel)=imread2(filenames{myhandles.image_number,channel},false,myhandles.test_files_scaling_parameters{myhandles.image_number,channel});
   end
 end
 myhandles.img=img;
@@ -256,6 +262,11 @@ myhandles.number_of_superblocks=str2double(get(handles.SuperBlockNr,'String'));
 myhandles.minimum_training_files=min(str2double(get(handles.MinImageTraining,'String')),length(myhandles.metadata));
 myhandles.maximum_training_files=str2double(get(handles.MaxImageTraining,'String'));
 myhandles.include_background_superblocks=get(handles.useBackgroundInfoCB,'value');
+try
+  myhandles.fix_random_number_generator=get(handles.randomCB,'value');
+catch ERROR
+  ERROR.message
+end
 
 if(isfield(myhandles,'scale_figure'))
   if(ishandle(myhandles.scale_figure))
@@ -346,13 +357,25 @@ display_image_local(handles);
 
 
 function intensity=CalculateIntensity(img,marker_scales)
-img=double(img);
-  number_of_channels=size(img,3);
-  for channel=1:number_of_channels
-   img(:,:,channel)=min(max(img(:,:,channel)-marker_scales(channel,1),0)/...
-       (marker_scales(channel,2)-marker_scales(channel,1)),1)*100; 
+myhandles=getappdata(0,'myhandles');
+if(~isempty(find(myhandles.foreground_channels==0)))
+  j=1;
+  for i=1:length(myhandles.foreground_channels)
+    if(myhandles.foreground_channels(i))
+      img2(:,:,j)=img(:,:,i);
+      j=j+1;
+    end
   end
-  intensity=sqrt(sum(img.^2,3)/number_of_channels);
+  img=double(img2);
+else  
+  img=double(img);
+end
+number_of_channels=size(img,3);
+for channel=1:number_of_channels
+ img(:,:,channel)=min(max(img(:,:,channel)-marker_scales(channel,1),0)/...
+     (marker_scales(channel,2)-marker_scales(channel,1)),1)*100; 
+end
+intensity=sqrt(sum(img.^2,3)/number_of_channels);
 
 
 % --- Executes on button press in ShowAdvanced.
@@ -523,3 +546,28 @@ else
   end
   warndlg(['Value has to be set between ' num2str(minVal) ' and ' num2str(maxVal) '!']);
 end
+
+
+% --- Executes on button press in threshold_channels_Button.
+function threshold_channels_Button_Callback(hObject, eventdata, handles)
+%Uncheck the threshold mask button
+set(handles.show_mask_checkbox,'Value',0.0);
+threshold_channels();
+uiwait;
+myhandles=getappdata(0,'myhandles');
+myhandles.intensity=CalculateIntensity(myhandles.img,myhandles.marker_scales);
+display_image_local(handles);     
+setappdata(0,'myhandles',myhandles);
+%myhandles=getappdata(0,'myhandles');
+% hObject    handle to threshold_channels_Button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in randomCB.
+function randomCB_Callback(hObject, eventdata, handles)
+% hObject    handle to randomCB (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of randomCB

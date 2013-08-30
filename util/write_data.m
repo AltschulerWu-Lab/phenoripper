@@ -77,7 +77,8 @@ function isSucceed = write_data(fileName, metadata, RootDir, NrChannelPerImage, 
   %fileName1;fileName2;fileName3,fieldGroup1,fieldGroup2
   for i=1:length(metadata)
     %Get the FileNames
-    metdataLine=sprintf('%s;',metadata{i}.FileNames{:});
+    %metdataLine=sprintf('%s;',metadata{i}.FileNames{:});
+    metdataLine=sprintf('%s;', metadata{i}.FileNames{:,:,1});
     metdataLine=metdataLine(1:length(metdataLine)-1);
     
     %get the other field and exclude 'None'

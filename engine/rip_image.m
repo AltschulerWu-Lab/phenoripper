@@ -1,6 +1,8 @@
-function data=rip_image(filenames,global_data,marker_scales,include_bg)
+function data=rip_image(filenames,global_data,marker_scales,include_bg,...
+    foreground_channels, analyze_channels, rescale_param)
 % RIP_IMAGE PhenoRip individual images
-%   DATA=RIP_IMAGE(FILENAMES,GLOBAL_DATA,MARKER_SCALES,INCLUDE_BG) produces 
+%   DATA=RIP_IMAGE(FILENAMES,GLOBAL_DATA,MARKER_SCALES,INCLUDE_BG,...
+%        FOREGROUND_CHANNELS, ANALYZE_CHANNELS, RESCALE_PARAM)  produces 
 %   a phenotypic profile of a specified image based on the fractions of 
 %   (previously identified) superblock types it contains.
 %   
@@ -16,6 +18,9 @@ function data=rip_image(filenames,global_data,marker_scales,include_bg)
 %   value of each channel, and the second the max value. Should be the same
 %   one used in identify_block_types and identify_superblock_types
 %   INCLUDE_BG - a bool which determines if background pixels are used
+%   FOREGROUND_CHANNELS - 
+%   ANALYZE_CHANNELS - 
+%   RESCALE_PARAM - 
 %
 %  rip_image output: DATA is a structure with fields
 %    SUPERBLOCK_PROFILE - a vector containing fractions of different superblock
@@ -107,17 +112,46 @@ superblock_counter=0;
 for image_counter=1:number_of_repeats 
     %Read and Scale Images 
     if(channels_per_file>1)
-        img=read_and_scale_image(filenames(image_counter),marker_scales,xres_full,yres_full,channels_per_file,xres_full,yres_full); 
+        img=read_and_scale_image(filenames(image_counter),marker_scales,xres_full,yres_full,channels_per_file,xres_full,yres_full,rescale_param(image_counter)); 
     else
-        img=read_and_scale_image(filenames(image_counter,:),marker_scales,xres_full,yres_full,channels_per_file,xres_full,yres_full); 
+        img=read_and_scale_image(filenames(image_counter,:),marker_scales,xres_full,yres_full,channels_per_file,xres_full,yres_full,rescale_param(image_counter,:)); 
     end
     
+    number_of_channels=max(number_of_channels,channels_per_file);
     % Crop image to have integer number of blocks in each direction
     cropped_image=img(x_offset:(x_offset+blocks_nx*block_size-1),...
         y_offset:(y_offset+blocks_ny*block_size-1),1:number_of_channels);
 
     % Calculate intensity of cropped image and identify foreground points
-    intensity=sqrt(sum(double(cropped_image).^2,3)/number_of_channels);
+    %intensity=sqrt(sum(double(cropped_image).^2,3)/number_of_channels);
+    
+    
+    %Identify foreground pixels and store their RBG (i.e., multi-channel intensity) values
+    %Define the foreground intensity mask based on the channel used to
+    %define foreground
+    j=0;
+    for i=1:length(foreground_channels)
+      if(foreground_channels(i))
+        j=j+1;
+        img2(:,:,j)=cropped_image(:,:,i);
+      end
+    end
+    number_of_channels=j;
+    intensity=sqrt(sum(img2.^2,3)/number_of_channels);    
+    img2=[];
+    %Do the analysis only on the selected channels (reset img to the selected channels)
+    j=0;
+    for i=1:length(analyze_channels)
+      if(analyze_channels(i))
+        j=j+1;
+        img2(:,:,j)=cropped_image(:,:,i);
+      end
+    end
+    cropped_image=img2;    
+    number_of_channels=j;
+    
+    
+    
     bool_foreground_image=(intensity>cutoff_intensity);
     number_of_foreground_points=sum(sum(bool_foreground_image));
     

@@ -1,10 +1,12 @@
 function data=identify_block_types(filenames,block_size,cutoff_intensity, number_of_RGB_clusters,number_of_block_clusters,...
-    number_of_blocks_per_image,rgb_samples_per_image,number_of_representative_blocks,marker_scales,include_bg)
+    number_of_blocks_per_image,rgb_samples_per_image,number_of_representative_blocks,marker_scales,include_bg,...
+    foreground_channels, analyze_channels, rescale_param)
 % IDENTIFY_BLOCK_TYPES Identify PhenoRipper block types 
 %   DATA=IDENTIFY_BLOCK_TYPES(FILENAMES,BLOCK_SIZE,CUTOFF_INTENSITY, ...
 %        NUMBER_OF_RGB_CLUSTERS,NUMBER_OF_BLOCK_CLUSTERS,...
 %        NUMBER_OF_BLOCKS_PER_IMAGE,RGB_SAMPLES_PER_IMAGE,...
-%        NUMBER_OF_REPRESENTATIVE_BLOCKS,MARKER_SCALES,INCLUDE_BG) 
+%        NUMBER_OF_REPRESENTATIVE_BLOCKS,MARKER_SCALES,INCLUDE_BG,...
+%        FOREGROUND_CHANNELS, ANALYZE_CHANNELS, RESCALE_PARAM) 
 %   takes a set of images as input and identifies the
 %   optimal reduced set of colors and block types for PhenoRipper
 %
@@ -30,6 +32,9 @@ function data=identify_block_types(filenames,block_size,cutoff_intensity, number
 %   MARKER_SCALES - An array of size [number of channels x 2]. The first column is the min
 %   value of each channel, and the second the max value
 %   INCLUDE_BG - a bool which determines if background pixels are used
+%   FOREGROUND_CHANNELS - 
+%   ANALYZE_CHANNELS - 
+%   RESCALE_PARAM - 
 %   
 %   identify_block_types output: data is a structure with fields
 %   BLOCK_SIZE - block size in pixels
@@ -60,7 +65,7 @@ function data=identify_block_types(filenames,block_size,cutoff_intensity, number
 %
 %
 % ------------------------------------------------------------------------------
-% Copyright ??2012, The University of Texas Southwestern Medical Center 
+% Copyright 2012, The University of Texas Southwestern Medical Center 
 % Authors:
 % Satwik Rajaram and Benjamin Pavie for the Altschuler and Wu Lab
 % For latest updates, check: < http://www.PhenoRipper.org >.
@@ -93,7 +98,9 @@ data.number_of_block_clusters=number_of_block_clusters;
 split_image_res=1000;
 
 %Setting image parameters
-test=imread2(cell2mat(filenames(1,1)));
+%res=cell(1,1);
+%res{1}={1,0};
+test=imread2(cell2mat(filenames(1,1)),true,rescale_param(1));
 xres_full=size(test,1);
 yres_full=size(test,2);
 
@@ -169,24 +176,57 @@ end
 
 %Temporary variable to store all the training blocks
 %(needed because we don't know number of valid blocks before hand)
-block_data_temp=zeros(block_size,block_size,number_of_channels,...
-    number_of_blocks_per_image*number_of_training_images); 
+%block_data_temp=zeros(block_size,block_size,number_of_channels,...
+%    number_of_blocks_per_image*number_of_training_images); 
 %Temporary variable to store all the foreground pixels used to train color
 %reduction. Since we are not sure how many foreground pixels are present,
 %we pre-allocate max possible number for speed
-rgb_data_temp=zeros(rgb_samples_per_image*number_of_training_images,number_of_channels);
+%rgb_data_temp=zeros(rgb_samples_per_image*number_of_training_images,number_of_channels);
 block_counter=0; %Number of foreground blocks used
 rgb_counter=0; % Number of foreground pixels used
 for image_counter=1:number_of_training_images
     %Read and Scale Images 
     if(channels_per_file>1)
-        img=read_and_scale_image(filenames(image_counter),marker_scales,xres_full,yres_full,channels_per_file,xres_crop,yres_crop); 
+        img=read_and_scale_image(filenames(image_counter),marker_scales,xres_full,yres_full,channels_per_file,xres_crop,yres_crop,rescale_param(image_counter)); 
     else
-        img=read_and_scale_image(filenames(image_counter,:),marker_scales,xres_full,yres_full,channels_per_file,xres_crop,yres_crop); 
+        img=read_and_scale_image(filenames(image_counter,:),marker_scales,xres_full,yres_full,channels_per_file,xres_crop,yres_crop,rescale_param(image_counter,:)); 
     end
     
     %Identify foreground pixels and store their RBG (i.e., multi-channel intensity) values
-    intensity=sqrt(sum(img.^2,3)/number_of_channels);
+    %intensity=sqrt(sum(img.^2,3)/number_of_channels);
+    %Define the foreground intensity mask based on the channel used to
+    %define foreground
+    j=0;
+    for i=1:length(foreground_channels)
+      if(foreground_channels(i))
+        j=j+1;
+        img2(:,:,j)=img(:,:,i);
+      end
+    end
+    number_of_channels=j;
+    intensity=sqrt(sum(img2.^2,3)/number_of_channels);
+    img2=[];
+    %Do the analysis only on the selected channels (reset img to the selected channels)
+    j=0;
+    for i=1:length(analyze_channels)
+      if(analyze_channels(i))
+        j=j+1;
+        img2(:,:,j)=img(:,:,i);
+      end
+    end
+    number_of_channels=j;
+    img=img2;   
+    
+    %Temporary variable to store all the training blocks
+    %(needed because we don't know number of valid blocks before hand)
+    block_data_temp=zeros(block_size,block_size,number_of_channels,...
+        number_of_blocks_per_image*number_of_training_images); 
+    %Temporary variable to store all the foreground pixels used to train color
+    %reduction. Since we are not sure how many foreground pixels are present,
+    %we pre-allocate max possible number for speed
+    rgb_data_temp=zeros(rgb_samples_per_image*number_of_training_images,number_of_channels);
+    
+    
     foreground_points=zeros(sum(sum(intensity>cutoff_intensity)),number_of_channels);
     for channel_counter=1:number_of_channels
         temp=squeeze(img(:,:,channel_counter));

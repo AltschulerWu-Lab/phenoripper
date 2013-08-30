@@ -41,28 +41,66 @@ img=double(img);
 [xres,yres,nch]=size(img);
 final_image=zeros(xres,yres,3);
 
-for channel=1:nch
-    img(:,:,channel)=max(min((img(:,:,channel)-color_scaling(channel,1))...
-        /(color_scaling(channel,2)-color_scaling(channel,1)),1),0);
-    switch colors{channel}
-        case {'b','B','Blue'},    ch = 3;     wt = 1;
-        case {'g','G','Green'},   ch = 2;     wt = 1;
-        case {'r','R','Red'},     ch = 1;     wt = 1;
-        case {'k','K','Gray'},    ch = 1:3;   wt = [1 1 1];
-        case {'o','O','Orange'},  ch = 1:2;   wt = [1 .75];
-        case {'y','Y','Yellow'},  ch = 1:2;   wt = [.5 .5];
-        case {'c','C','Cyan'},    ch = 2:3;   wt = [1 1];
-        case {'m','M','Magenta'}, ch = [1 3]; wt = [1 1];
-        case {'','-' ,'None'},    ch=[];      wt=[];
+if(nch~=length(colors))%Means all images are not being used
+  counter=1;
+  for channel=1:length(colors)
+    if(~strcmpi(colors{channel},''))     
+      if(size(color_scaling,2)==1 && color_scaling(1,1)==100)
+        img(:,:,counter)=img(:,:,counter)/100;
+      else
+        img(:,:,counter)=max(min((img(:,:,counter)-color_scaling(channel,1))...
+            /(color_scaling(channel,2)-color_scaling(channel,1)),1),0);
+      end
+      switch colors{channel}
+          case {'b','B','Blue'},    ch = 3;     wt = 1;
+          case {'g','G','Green'},   ch = 2;     wt = 1;
+          case {'r','R','Red'},     ch = 1;     wt = 1;
+          case {'k','K','Gray'},    ch = 1:3;   wt = [1 1 1];
+          case {'o','O','Orange'},  ch = 1:2;   wt = [1 .75];
+          case {'y','Y','Yellow'},  ch = 1:2;   wt = [.5 .5];
+          case {'c','C','Cyan'},    ch = 2:3;   wt = [1 1];
+          case {'m','M','Magenta'}, ch = [1 3]; wt = [1 1];
+          case {'','-' ,'None'},    ch=[];      wt=0;
+      end
+      for h=1:length(ch)
+          if(isempty(mask))
+              final_image(:,:,ch(h))=final_image(:,:,ch(h))+wt(h)*img(:,:,counter);
+          else
+             final_image(:,:,ch(h))=final_image(:,:,ch(h))+wt(h)*img(:,:,counter)+0.25*mask; 
+          end
+      end
+      counter = counter+1;
     end
-    for h=1:length(ch)
-        if(isempty(mask))
-            final_image(:,:,ch(h))=final_image(:,:,ch(h))+wt(h)*img(:,:,channel);
-        else
-           final_image(:,:,ch(h))=final_image(:,:,ch(h))+wt(h)*img(:,:,channel)+0.25*mask; 
-        end
-    end
-    
+  end
+  
+else
+  for channel=1:nch     
+      if(size(color_scaling,2)==1 && color_scaling(1,1)==100)
+        img(:,:,channel)=img(:,:,channel)/100;
+      else
+        img(:,:,channel)=max(min((img(:,:,channel)-color_scaling(channel,1))...
+          /(color_scaling(channel,2)-color_scaling(channel,1)),1),0);
+      end
+      switch colors{channel}
+          case {'b','B','Blue'},    ch = 3;     wt = 1;
+          case {'g','G','Green'},   ch = 2;     wt = 1;
+          case {'r','R','Red'},     ch = 1;     wt = 1;
+          case {'k','K','Gray'},    ch = 1:3;   wt = [1 1 1];
+          case {'o','O','Orange'},  ch = 1:2;   wt = [1 .75];
+          case {'y','Y','Yellow'},  ch = 1:2;   wt = [.5 .5];
+          case {'c','C','Cyan'},    ch = 2:3;   wt = [1 1];
+          case {'m','M','Magenta'}, ch = [1 3]; wt = [1 1];
+          case {'','-' ,'None'},    ch=[];      wt=0;
+      end
+      for h=1:length(ch)
+          if(isempty(mask))
+              final_image(:,:,ch(h))=final_image(:,:,ch(h))+wt(h)*img(:,:,channel);
+          else
+             final_image(:,:,ch(h))=final_image(:,:,ch(h))+wt(h)*img(:,:,channel)+0.25*mask; 
+          end
+      end
+
+  end
 end
 
 final_image=min(max(final_image,0),1);

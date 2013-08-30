@@ -128,17 +128,62 @@ function [filenames,metadata,RootDir,NrChannelPerImage,Markers,errorMessage]=rea
     %Read the fileName
     data=textscan(fid,'%s',1,'delimiter','\n');
     while (~feof(fid)) 
-        tokens=regexp(data{1},delim,'split');
-        tokens=tokens{1};
-        filenames{line_counter}=regexp(tokens{1},';','split');
+      tokens=regexp(data{1},delim,'split');
+      tokens=tokens{1};
+      
+      f=regexp(tokens{1},';','split');
+      
+      file=cell(2,size(f,2));
+      for i=1:size(f,2)
+        file{1,i}=f{1,i};
+        file{2,i}={1,0};
+      end
+      
+%       if(NrChannelPerImage>1)
+%         for i=1:NrChannelPerImage
+%           file{2,i}={1,0};
+%         end
+%       end
+      
+      
+      
+      
+      %filenames{line_counter}=regexp(tokens{1},';','split');
+      %filenames{line_counter}=file;
+
+      
+      
+      indexScaleIntensityA=find(not(cellfun('isempty', strfind(HeaderFields,'PHENORIPPER_I_SCALING_A'))));
+      indexScaleIntensityB=find(not(cellfun('isempty', strfind(HeaderFields,'PHENORIPPER_I_SCALING_B'))));
+
+      if(isempty(indexScaleIntensityA) || isempty(indexScaleIntensityB))  
         metadata(line_counter).None=tokens{1};
         for field_num=2:length(HeaderFields)
-                metadata(line_counter).(HeaderFields{field_num})=tokens{field_num};
+          metadata(line_counter).(HeaderFields{field_num})=tokens{field_num};
         end
-        line_counter=line_counter+1;
-       data=textscan(fid,'%s',1,'delimiter','\n');
+        data=textscan(fid,'%s',1,'delimiter','\n');
+      else
+        metadata(line_counter).None=tokens{1};
+        for field_num=2:length(HeaderFields)
+          if(strcmp(HeaderFields{field_num},'PHENORIPPER_I_SCALING_A'))
+            intensity_scaling_a=regexp(tokens{field_num},';','split');
+            for i=1:size(f,2)
+              file{2,i}{1}=str2double(intensity_scaling_a{1,i});
+            end
+          elseif(strcmp(HeaderFields{field_num},'PHENORIPPER_I_SCALING_B'))
+            intensity_scaling_b=regexp(tokens{field_num},';','split');   
+            for i=1:size(f,2)
+              file{2,i}{2}=str2double(intensity_scaling_b{1,i});
+            end
+          else
+            metadata(line_counter).(HeaderFields{field_num})=tokens{field_num};
+          end
+        end
+        data=textscan(fid,'%s',1,'delimiter','\n');
+      end
+      filenames{line_counter}=file;
+      line_counter=line_counter+1;
     end
-    
     if(NrChannelPerImage==1 && size(Markers,2)~=size(filenames{1,1},2))
         errorMessage='Number of marker and number of image does not match!';
     elseif(NrChannelPerImage>1&&size(Markers,2)~=NrChannelPerImage)

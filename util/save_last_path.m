@@ -43,6 +43,8 @@ try
       save_property_file([userdir filesep 'lastPath.properties'],['resultPath=' path]);
     case 'importtemplate'
       save_property_file([userdir filesep 'lastPath.properties'],['importtemplatePath=' path]);
+    case 'phenoloaderroot'
+      save_property_file([userdir filesep 'lastPath.properties'],['phenoloaderrootPath=' path]);
     otherwise
       ;
   end
