@@ -176,12 +176,12 @@ end
 
 %Temporary variable to store all the training blocks
 %(needed because we don't know number of valid blocks before hand)
-%block_data_temp=zeros(block_size,block_size,number_of_channels,...
-%    number_of_blocks_per_image*number_of_training_images); 
+block_data_temp=zeros(block_size,block_size,number_of_channels,...
+    number_of_blocks_per_image*number_of_training_images); 
 %Temporary variable to store all the foreground pixels used to train color
 %reduction. Since we are not sure how many foreground pixels are present,
 %we pre-allocate max possible number for speed
-%rgb_data_temp=zeros(rgb_samples_per_image*number_of_training_images,number_of_channels);
+rgb_data_temp=zeros(rgb_samples_per_image*number_of_training_images,number_of_channels);
 block_counter=0; %Number of foreground blocks used
 rgb_counter=0; % Number of foreground pixels used
 for image_counter=1:number_of_training_images
@@ -217,14 +217,6 @@ for image_counter=1:number_of_training_images
     number_of_channels=j;
     img=img2;   
     
-    %Temporary variable to store all the training blocks
-    %(needed because we don't know number of valid blocks before hand)
-    block_data_temp=zeros(block_size,block_size,number_of_channels,...
-        number_of_blocks_per_image*number_of_training_images); 
-    %Temporary variable to store all the foreground pixels used to train color
-    %reduction. Since we are not sure how many foreground pixels are present,
-    %we pre-allocate max possible number for speed
-    rgb_data_temp=zeros(rgb_samples_per_image*number_of_training_images,number_of_channels);
     
     
     foreground_points=zeros(sum(sum(intensity>cutoff_intensity)),number_of_channels);
