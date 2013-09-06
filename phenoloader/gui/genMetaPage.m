@@ -176,7 +176,7 @@ function genMetaPage
         % Populate final table for confirmation
         cwidth = maxLen;
         set(handles.metaTable,'Data',handles.dispList,'ColumnName',cname,'ColumnWidth',cwidth); 
-        close(h.wbar);
+%        close(h.wbar);
     else
         warndlg('Define Markers!',handles.title)
         setappdata(0,'handles',handles);
