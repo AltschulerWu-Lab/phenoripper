@@ -1354,23 +1354,26 @@ function CalcSB_1_Button_Callback(hObject, eventdata, handles)
 myhandles=getappdata(0,'myhandles');
 image_num=myhandles.file_number1;
 %filenames=myhandles.grouped_metadata{myhandles.chosen_points(2)}.files_in_group(image_num,:);
-filenames=cellfun(@(x) concatenateString(myhandles.rootDir,x),...
-          myhandles.grouped_metadata{myhandles.chosen_points(2)}.files_in_group(image_num,:),...
-          'UniformOutput',false);
+
+filenames= myhandles.grouped_metadata{myhandles.chosen_points(2)}.files_in_group(image_num,:,1);
+rescale_params= myhandles.grouped_metadata{myhandles.chosen_points(2)}.files_in_group(image_num,:,2);
+ filenames=cellfun(@(x) concatenateString(myhandles.rootDir,x),...
+          filenames,'UniformOutput',false);     
 results=rip_image(filenames,myhandles.global_data,myhandles.marker_scales,...
     myhandles.include_background_superblocks,myhandles.foreground_channels,...
-    myhandles.analyze_channels);
+    myhandles.analyze_channels,rescale_params);
 myhandles.image1_in_sb_states=results.image_superblock_states;
 myhandles.distance_to_superblock_centroid1=results.distance_to_superblock_centroid;
 
 image_num=myhandles.file_number2;
 %filenames=myhandles.grouped_metadata{myhandles.chosen_points(1)}.files_in_group(image_num,:);
-filenames=cellfun(@(x) concatenateString(myhandles.rootDir,x),...
-          myhandles.grouped_metadata{myhandles.chosen_points(1)}.files_in_group(image_num,:),...
-          'UniformOutput',false);
+filenames= myhandles.grouped_metadata{myhandles.chosen_points(1)}.files_in_group(image_num,:,1);
+ filenames=cellfun(@(x) concatenateString(myhandles.rootDir,x),...
+          filenames,'UniformOutput',false);     
+rescale_params= myhandles.grouped_metadata{myhandles.chosen_points(2)}.files_in_group(image_num,:,2);
 results=rip_image(filenames,myhandles.global_data,myhandles.marker_scales,...
     myhandles.include_background_superblocks,myhandles.foreground_channels,...
-    myhandles.analyze_channels);
+    myhandles.analyze_channels,rescale_params);
 myhandles.image2_in_sb_states=results.image_superblock_states;
 myhandles.distance_to_superblock_centroid2=results.distance_to_superblock_centroid;
 number_of_bars=length(myhandles.bar_order);
@@ -1504,7 +1507,7 @@ for i=1:number_to_show(length(row),myhandles.superblocks_shown_choice)
     line([y3,y4],[x3,x4],'Color',color,'Parent',handles.axes3);
     line([y1,y3],[x1,x3],'Color',color,'Parent',handles.axes3);
 end
-disp('test');
+%disp('test');
 
 
 

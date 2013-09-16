@@ -412,6 +412,6 @@ myhandles=getappdata(0,'myhandles');
 myhandles.wizardMetaData_handle=handles.figure1;
 setappdata(0,'myhandles',myhandles);
 if(ismac==0 && isunix == 1)
-  warndlg({'Linux platform may not support well this option.';'This option is using some Undocumented Matlab functions';'that may not work on Linux (e.g. with Unity Desktop).'},'Linux Implementation Warning','modal');
+  warndlg({'The following guis may be glitchy on Linux'},'Linux Implementation Warning','modal');
 end
 phenoloader_gui;
