@@ -2335,7 +2335,15 @@ function Add_Metadata_Menu_Callback(hObject, eventdata, handles)
     % hObject    handle to Add_Metadata_Menu (see GCBO)
     % eventdata  reserved - to be defined in a future version of MATLAB
     % handles    structure with handles and user data (see GUIDATA)
+    proceed=add_metadata_instructions;
+    if(~proceed)
+  
+       return; 
+    end
     [filename,path]=uigetfile('*.csv','Pick Additional Metadata File');
+    if(isequal(filename,0))
+        return;
+    end
     fid=fopen([path filesep filename]);
     %fid=fopen('Test/test_metadata.csv');
     delim=',';
