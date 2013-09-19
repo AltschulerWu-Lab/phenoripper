@@ -196,7 +196,7 @@ function phenobrowser_OpeningFcn(hObject, eventdata, handles, varargin)
     set(handles.DiscardFrame1_Pushbutton,'Callback',{@DiscardFrame_Callback,1});
     set(handles.DiscardFrame2_Pushbutton,'Callback',{@DiscardFrame_Callback,2});
     
-    set(handles.SB_Num1_popupmenu,'Enable','off');
+    myhandles.is_sb_in_images_calculated=false;
     
     if(~exist('myhandles.label_field_number','var'))
         myhandles.label_field_number=1;
@@ -259,7 +259,7 @@ function phenobrowser_OpeningFcn(hObject, eventdata, handles, varargin)
         %             'BackgroundColor',myhandles.mds_colors(i,:),'parent',myhandles.MDSPlot_handle,...
         %             'FontSize',16);%not always cn
         %     end
-        
+         set(handles.show_sb_examples_instructions_text,'Visible','off');
         Plot_MDS(myhandles.mds_data,myhandles.mds_dim,myhandles.mds_text,myhandles.mds_colors,...
             myhandles.chosen_points,handles.MDSPlot,myhandles.show_mds_text,myhandles.labelToDisplay);
         %     set(handles.MDSPlot, 'XTickLabel','');
@@ -320,7 +320,6 @@ function phenobrowser_OpeningFcn(hObject, eventdata, handles, varargin)
     % if ismac
     %   set(handles.LegendCheckBox,'CData',cat(3,zeros(500),zeros(500),zeros(500)));
     %   set(handles.CalcSB_1_Button,'CData',cat(3,zeros(500),zeros(500),zeros(500)));
-    %   set(handles.SB_Num1_popupmenu,'CData',cat(3,zeros(500),zeros(500),zeros(500)));
     %   set(handles.DiscardFrame1_Pushbutton,'CData',cat(3,zeros(500),zeros(500),zeros(500)));
     %   set(handles.DiscardFrame2_Pushbutton,'CData',cat(3,zeros(500),zeros(500),zeros(500)));
     %   set(handles.PreviousImage1_pushbutton,'CData',cat(3,zeros(500),zeros(500),zeros(500)));
@@ -486,6 +485,7 @@ function MDSPlot_ButtonDownFcn(hObject, eventdata, handles)
                     myhandles.file_number2=1;
                 end
                 
+                setappdata(0,'myhandles',myhandles);
                 %         scatter3(myhandles.mds_data(:,1),myhandles.mds_data(:,2),myhandles.mds_data(:,3),50,myhandles.mds_colors,'parent',myhandles.MDSPlot_handle);
                 %
                 %         sizes=16*ones(number_of_points,1);
@@ -514,8 +514,19 @@ function MDSPlot_ButtonDownFcn(hObject, eventdata, handles)
             
             if(myhandles.axes_chosen==handles.axes2)
                 frame_handle=handles.uipanel3;
+                other_frame_handle=handles.uipanel7;
+                other_axes=handles.axes3;
+                other_file_number=myhandles.file_number2;
+                other_point_number=myhandles.chosen_points(1);
             else
                 frame_handle=handles.uipanel7;
+                other_frame_handle=handles.uipanel3;
+                other_axes=handles.axes2;
+                
+                
+                other_file_number=myhandles.file_number1;
+                other_point_number=myhandles.chosen_points(2);
+                
             end
             
             fnames=fieldnames(myhandles.grouped_metadata{point_number});
@@ -526,12 +537,50 @@ function MDSPlot_ButtonDownFcn(hObject, eventdata, handles)
             if(length(panel_text)>43)
                 panel_text=['...' panel_text(end-40:end)];
             end
+            
+            
+            setappdata(0,'myhandles',myhandles);
+            
+            
             ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,1,...
                 myhandles.axes_chosen,myhandles.mds_colors(point_number,:),...
                 panel_text,frame_handle);
+            if(myhandles.is_sb_in_images_calculated)
+                other_panel_text=myhandles.grouped_metadata{other_point_number}.(fnames{myhandles.chosen_grouping_field});
+                if(iscell(other_panel_text))
+                    other_panel_text=other_panel_text{1};
+                end
+                if(length(other_panel_text)>43)
+                    other_panel_text=['...' panel_text_panel(end-40:end)];
+                end
+                
+                ShowImages(myhandles.grouped_metadata{other_point_number}.files_in_group,...
+                    other_file_number,other_axes, myhandles.mds_colors(other_point_number,:),...
+                    other_panel_text,other_frame_handle,[]);
+            end
+            
             
             setappdata(0,'myhandles',myhandles);
             Update_Bar_Plot(handles);
+        end
+    else
+        
+        superblock_number=str2double(get(point_parent,'ButtonDownFcn'));
+        if(~isempty(superblock_number))
+            watchon;
+            drawnow;
+            try
+                if(~myhandles.is_sb_in_images_calculated)
+                    Calculate_Superblocks_In_Images();
+                end
+                Show_SB_In_Image(1,superblock_number,handles);
+                Show_SB_In_Image(2,superblock_number,handles);
+                
+            catch err
+                watchoff;
+                rethrow(err);
+            end;
+            watchoff;
         end
     end
     
@@ -794,6 +843,7 @@ function Update_Bar_Plot(handles)
             % set(gca,'Units','normalized');
             positions(rep_num,:)=dsxy2figxy(h,[x_positions(rep_num),y_positions(rep_num),scale_factor*diff(XLims)/number_of_reps,scale_factor*diff(YLims)/5]);
             myhandles.temp_handles(rep_num)=axes('position', positions(rep_num,:));
+            
             img=double(myhandles.global_data.superblock_representatives{p_indices(bar_order(rep_num)),1});
             %max_col=max(img(:));
             %image(img/max_col);axis equal;axis off;
@@ -807,8 +857,13 @@ function Update_Bar_Plot(handles)
             %set(myhandles.temp_handles(rep_num),'Box','on','Color','w');
             %image(representatives{perm2(rep_num)}./max(max(max(representatives{perm2(rep_num)}))));axis equal;axis off;
             axis off;axis equal;
+            set( myhandles.temp_handles(rep_num),'ButtonDownFcn',num2str(p_indices(bar_order(rep_num))));
+            setappdata(0,'myhandles',myhandles);
         end
         outerpos=get(h,'Position');
+        set(handles.show_sb_examples_instructions_text,'Visible','on');
+        set(myhandles.bar_legend_axis,'HitTest','off');
+        set(myhandles.bar_axes,'HitTest','off');
         setappdata(0,'myhandles',myhandles);
         % set(h,'Position',[outerpos(1) outerpos(2)+0.1 outerpos(3) outerpos(4)-0.1]);
         %set(h,'Position',[outerpos(1) outerpos(2)+0.1 outerpos(3) outerpos(4)-0.1]);
@@ -1231,9 +1286,9 @@ function group_by_callback(hObject, eventdata, handles,group_num)
         filterFileList=getFileFilterListed();
         myhandles=getappdata(0,'myhandles');
         is_file_blacklistedBK=myhandles.is_file_blacklisted; %This is used as a backup of the discarded files
-         % We then co-opt the blacklisting mechaninism used for discarding
-         % files just for grouping based on filter images (and restore the
-         % discarded files at the end of the function)
+        % We then co-opt the blacklisting mechaninism used for discarding
+        % files just for grouping based on filter images (and restore the
+        % discarded files at the end of the function)
         myhandles.is_file_blacklisted = is_file_blacklistedBK | filterFileList';
         myhandles.filterFileList = filterFileList;
         setappdata(0,'myhandles',myhandles);
@@ -1254,7 +1309,9 @@ function group_by_callback(hObject, eventdata, handles,group_num)
         myhandles.individual_superblock_profiles,...
         myhandles.individual_number_foreground_blocks,myhandles.is_file_blacklisted);
     myhandles.number_of_conditions=length(myhandles.grouped_metadata);
+    setappdata(0,'myhandles',myhandles);
     ResetAxes(handles);
+    myhandles=getappdata(0,'myhandles');
     waitbar(0.5,WaitingDialog,'Calculating MDS...');
     if(myhandles.number_of_conditions~=1)
         %     superblock_profiles=myhandles.superblock_profiles;
@@ -1323,7 +1380,7 @@ function group_by_callback(hObject, eventdata, handles,group_num)
     close(WaitingDialog);
     
 function mds_positions=Calculate_MDS(raw_profiles,dim)
-    max_number_of_points_for_mds=500;
+    max_number_of_points_for_mds=450;
     nan_pos=isnan(raw_profiles);
     raw_profiles(nan_pos)=rand(nnz(nan_pos),1)/100;
     if(size(raw_profiles)<max_number_of_points_for_mds)
@@ -1385,61 +1442,64 @@ function CalcSB_1_Button_Callback(hObject, eventdata, handles)
     for i=1:number_of_bars
         popup_string{i}=num2str(i);
     end
-    set(handles.SB_Num1_popupmenu,'Enable','on','String',popup_string);
+    myhandles.is_sb_in_images_calculated=true;
     setappdata(0,'myhandles',myhandles);
     
     
-    
-    % --- Executes on selection change in SB_Num1_popupmenu.
-function SB_Num1_popupmenu_Callback(hObject, eventdata, handles)
-    % hObject    handle to SB_Num1_popupmenu (see GCBO)
-    % eventdata  reserved - to be defined in a future version of MATLAB
-    % handles    structure with handles and user data (see GUIDATA)
-    
-    % Hints: contents = cellstr(get(hObject,'String')) returns SB_Num1_popupmenu contents as cell array
-    %        contents{get(hObject,'Value')} returns selected item from SB_Num1_popupmenu
+function Calculate_Superblocks_In_Images()
     myhandles=getappdata(0,'myhandles');
-    sb_number=myhandles.bar_order(get(hObject,'Value'));
-    mask=(myhandles.image1_in_sb_states==sb_number);
-    %
-    % mask_ext=bwmorph(mask,'dilate');
-    %mask_ext=mask;
-    block_size=myhandles.global_data.block_size;
-    % temp=zeros(size(mask,1)*block_size,size(mask,2)*block_size);
-    % [row,col]=find(mask_ext);
-    % for i=1:length(row)
-    %    temp((block_size*(row(i)-1)+1):(block_size*(row(i))),...
-    %        (block_size*(col(i)-1)+1):(block_size*(col(i))))=true;
-    % end
-    %filenames=myhandles.grouped_metadata{myhandles.chosen_points(2)}.files_in_group(1,:);
-    filenames=cellfun(@(x) concatenateString(myhandles.rootDir,x),...
-        myhandles.grouped_metadata{myhandles.chosen_points(2)}.files_in_group(1,:),...
-        'UniformOutput',false);
+    image_num=myhandles.file_number1;
+    myhandles.image_in_sb_states=cell(2,1);
+    %filenames=myhandles.grouped_metadata{myhandles.chosen_points(2)}.files_in_group(image_num,:);
     
+    filenames= myhandles.grouped_metadata{myhandles.chosen_points(2)}.files_in_group(image_num,:,1);
+    rescale_params= myhandles.grouped_metadata{myhandles.chosen_points(2)}.files_in_group(image_num,:,2);
+    filenames=cellfun(@(x) concatenateString(myhandles.rootDir,x),...
+        filenames,'UniformOutput',false);
+    results=rip_image(filenames,myhandles.global_data,myhandles.marker_scales,...
+        myhandles.include_background_superblocks,myhandles.foreground_channels,...
+        myhandles.analyze_channels,rescale_params);
+    myhandles.image_in_sb_states{1}=results.image_superblock_states;
+    myhandles.distance_to_superblock_centroid1=results.distance_to_superblock_centroid;
+    
+    image_num=myhandles.file_number2;
+    %filenames=myhandles.grouped_metadata{myhandles.chosen_points(1)}.files_in_group(image_num,:);
+    filenames= myhandles.grouped_metadata{myhandles.chosen_points(1)}.files_in_group(image_num,:,1);
+    filenames=cellfun(@(x) concatenateString(myhandles.rootDir,x),...
+        filenames,'UniformOutput',false);
+    rescale_params= myhandles.grouped_metadata{myhandles.chosen_points(2)}.files_in_group(image_num,:,2);
+    results=rip_image(filenames,myhandles.global_data,myhandles.marker_scales,...
+        myhandles.include_background_superblocks,myhandles.foreground_channels,...
+        myhandles.analyze_channels,rescale_params);
+    myhandles.image_in_sb_states{2}=results.image_superblock_states;
+    myhandles.distance_to_superblock_centroid2=results.distance_to_superblock_centroid;
+    number_of_bars=length(myhandles.bar_order);
+    popup_string=cell(number_of_bars,1);
+    for i=1:number_of_bars
+        popup_string{i}=num2str(i);
+    end
+    
+    myhandles.is_sb_in_images_calculated=true;
+    setappdata(0,'myhandles',myhandles);
+    
+    
+function Show_SB_In_Image(img_num,sb_number,handles)
+    
+    myhandles=getappdata(0,'myhandles');
+    mask=(myhandles.image_in_sb_states{img_num}==sb_number);
+    point_number=myhandles.chosen_points(3-img_num);
+    
+    %Image Info
+    block_size=myhandles.global_data.block_size;
+    filenames=cellfun(@(x) concatenateString(myhandles.rootDir,x),...
+        myhandles.grouped_metadata{point_number}.files_in_group(1,:),...
+        'UniformOutput',false);
     info=imfinfo(filenames{1});
     xres=info.Height;
-    %yres=info.Width;
-    %blocks_nx=floor(xres/block_size);
     x_offset=floor(rem(xres,block_size)/2)+1;
-    %blocks_ny=floor(yres/block_size);
-    %y_offset=floor(rem(yres,block_size)/2)+1;
-    %
-    % full_size_mask=false(xres,yres);
-    % full_size_boundary=false(xres,yres);
-    % full_size_mask(x_offset:(x_offset+blocks_nx*block_size-1),...
-    %         y_offset:(y_offset+blocks_ny*block_size-1))=temp;
-    % boundaries=bwboundaries(full_size_mask);
-    % for i=1:length(boundaries)
-    %     b=boundaries{i};
-    %     b1=sub2ind([xres,yres],b(:,1),b(:,2));
-    %     full_size_boundary(b1)=true;
-    % end
-    % ballSize = 2;
-    % full_size_boundary =imdilate(full_size_boundary,strel('disk',ballSize,0));
-    point_number=myhandles.chosen_points(2);
-    % ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
-    %     handles.axes2, myhandles.mds_colors(point_number,:),...
-    %     myhandles.mds_text{point_number},handles.uipanel3,full_size_boundary);
+    
+    
+    %Display Image
     fnames=fieldnames(myhandles.grouped_metadata{point_number});
     panel_text=myhandles.grouped_metadata{point_number}.(fnames{myhandles.chosen_grouping_field});
     if(iscell(panel_text))
@@ -1448,14 +1508,26 @@ function SB_Num1_popupmenu_Callback(hObject, eventdata, handles)
     if(length(panel_text)>43)
         panel_text=['...' panel_text(end-40:end)];
     end
-    ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
-        myhandles.file_number1,handles.axes2, myhandles.mds_colors(point_number,:),...
-        panel_text,handles.uipanel3,[]);
     
     [row,col]=find(mask);
-    fg_mask=(myhandles.image1_in_sb_states>0);
-    distances=myhandles.distance_to_superblock_centroid1(row,col);
-    all_distances=myhandles.distance_to_superblock_centroid1(fg_mask);
+    fg_mask=(myhandles.image_in_sb_states{img_num}>0);
+    if(img_num==1)
+        ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
+            myhandles.file_number1,handles.axes2, myhandles.mds_colors(point_number,:),...
+            panel_text,handles.uipanel3,[]);
+        distances=myhandles.distance_to_superblock_centroid1(row,col);
+        all_distances=myhandles.distance_to_superblock_centroid1(fg_mask);
+        img_handle=handles.axes2;
+    else
+        ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
+            myhandles.file_number2,handles.axes3, myhandles.mds_colors(point_number,:),...
+            panel_text,handles.uipanel7,[]);
+        distances=myhandles.distance_to_superblock_centroid2(row,col);
+        all_distances=myhandles.distance_to_superblock_centroid2(fg_mask);
+        img_handle=handles.axes3;
+    end
+    
+    %Display Superblocks
     [~,sb_order]=sort(distances);
     
     for i=1:number_to_show(length(row),myhandles.superblocks_shown_choice)
@@ -1470,62 +1542,16 @@ function SB_Num1_popupmenu_Callback(hObject, eventdata, handles)
         y3=y1;
         x4=x3;
         y4=y2;
-        line([y1,y2],[x1,x2],'Color',color,'Parent',handles.axes2);
-        line([y2,y4],[x2,x4],'Color',color,'Parent',handles.axes2);
-        line([y3,y4],[x3,x4],'Color',color,'Parent',handles.axes2);
-        line([y1,y3],[x1,x3],'Color',color,'Parent',handles.axes2);
+        
+        line([y1,y2],[x1,x2],'Color',color,'Parent',img_handle);
+        line([y2,y4],[x2,x4],'Color',color,'Parent',img_handle);
+        line([y3,y4],[x3,x4],'Color',color,'Parent',img_handle);
+        line([y1,y3],[x1,x3],'Color',color,'Parent',img_handle);
+        
+        
+        
     end
     
-    point_number=myhandles.chosen_points(1);
-    fnames=fieldnames(myhandles.grouped_metadata{point_number});
-    panel_text=myhandles.grouped_metadata{point_number}.(fnames{myhandles.chosen_grouping_field});
-    if(iscell(panel_text))
-        panel_text=panel_text{1};
-    end
-    if(length(panel_text)>43)
-        panel_text=['...' panel_text(end-40:end)];
-    end
-    ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
-        myhandles.file_number2,handles.axes3, myhandles.mds_colors(point_number,:),...
-        panel_text,handles.uipanel7,[]);
-    mask=(myhandles.image2_in_sb_states==sb_number);
-    [row,col]=find(mask);
-    fg_mask=(myhandles.image2_in_sb_states>0);
-    distances=myhandles.distance_to_superblock_centroid2(row,col);
-    all_distances=myhandles.distance_to_superblock_centroid2(fg_mask);
-    [~,sb_order]=sort(distances);
-    for i=1:number_to_show(length(row),myhandles.superblocks_shown_choice)
-        i1=sb_order(i);
-        scale_distance=sum(all_distances>distances(i1))/length(all_distances);
-        color=[scale_distance scale_distance scale_distance];
-        x1=x_offset+(row(i1)-2)*block_size;
-        y1=x_offset+(col(i1)-2)*block_size;
-        x2=x1;
-        y2=x_offset+(col(i1)+1)*block_size;
-        x3=x_offset+(row(i1)+1)*block_size;
-        y3=y1;
-        x4=x3;
-        y4=y2;
-        line([y1,y2],[x1,x2],'Color',color,'Parent',handles.axes3);
-        line([y2,y4],[x2,x4],'Color',color,'Parent',handles.axes3);
-        line([y3,y4],[x3,x4],'Color',color,'Parent',handles.axes3);
-        line([y1,y3],[x1,x3],'Color',color,'Parent',handles.axes3);
-    end
-    %disp('test');
-    
-    
-    
-    % --- Executes during object creation, after setting all properties.
-function SB_Num1_popupmenu_CreateFcn(hObject, eventdata, handles)
-    % hObject    handle to SB_Num1_popupmenu (see GCBO)
-    % eventdata  reserved - to be defined in a future version of MATLAB
-    % handles    empty - handles not created until after all CreateFcns called
-    
-    % Hint: popupmenu controls usually have a white background on Windows.
-    %       See ISPC and COMPUTER.
-    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-        set(hObject,'BackgroundColor','white');
-    end
     
     
     % --- Executes on button press in PreviousImage1_pushbutton.
@@ -1548,7 +1574,7 @@ function PreviousImage1_pushbutton_Callback(hObject, eventdata, handles)
     ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
         myhandles.file_number1,handles.axes2, myhandles.mds_colors(point_number,:),...
         panel_text,handles.uipanel3,[]);
-    set(handles.SB_Num1_popupmenu,'Enable','off');
+    myhandles.is_sb_in_images_calculated=false;
     setappdata(0,'myhandles',myhandles);
     
     % --- Executes on button press in PreviousImage2_pushbutton.
@@ -1571,7 +1597,7 @@ function PreviousImage2_pushbutton_Callback(hObject, eventdata, handles)
     ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
         myhandles.file_number2,handles.axes3, myhandles.mds_colors(point_number,:),...
         panel_text,handles.uipanel7,[]);
-    set(handles.SB_Num1_popupmenu,'Enable','off');
+    myhandles.is_sb_in_images_calculated=false;
     setappdata(0,'myhandles',myhandles);
     
     
@@ -1596,7 +1622,7 @@ function NextImage2_pushbutton_Callback(hObject, eventdata, handles)
     ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
         myhandles.file_number2,handles.axes3, myhandles.mds_colors(point_number,:),...
         panel_text,handles.uipanel7,[]);
-    set(handles.SB_Num1_popupmenu,'Enable','off');
+    myhandles.is_sb_in_images_calculated=false;
     setappdata(0,'myhandles',myhandles);
     
     
@@ -1621,7 +1647,7 @@ function NextImage1_pushbotton_Callback(hObject, eventdata, handles)
     ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
         myhandles.file_number1,handles.axes2, myhandles.mds_colors(point_number,:),...
         panel_text,handles.uipanel3,[]);
-    set(handles.SB_Num1_popupmenu,'Enable','off');
+    myhandles.is_sb_in_images_calculated=false;
     setappdata(0,'myhandles',myhandles);
     
     
@@ -1670,7 +1696,7 @@ function Barplot_Method_Chosen_Callback(hObject, eventdata,handles,method)
     myhandles.bar_plot_method=method;
     MenuList_Checkmark(myhandles.bar_plot_method,...
         myhandles.Barplot_Method_Chosen_Handles);
-    set(handles.SB_Num1_popupmenu,'Enable','off');
+    myhandles.is_sb_in_images_calculated=false;
     setappdata(0,'myhandles',myhandles);
     
     
@@ -1733,7 +1759,7 @@ function ResetAxes(handles)
     set(handles.axes2,'Color',[0 0 0]);
     cla(handles.axes3);
     set(handles.axes3,'Color',[0 0 0]);
-    set(handles.SB_Num1_popupmenu,'Enable','off');
+    myhandles.is_sb_in_images_calculated=false;
     
     if isfield(handles,'BarAxes')
         cla(handles.BarAxes);
@@ -1751,7 +1777,9 @@ function ResetAxes(handles)
             end
         end
     end
-    myhandles.temp_habndles=[];
+   set(handles.show_sb_examples_instructions_text,'Visible','off');
+    myhandles.temp_handles=[];
+    myhandles.is_sb_in_images_calculated=false;
     setappdata(0,'myhandles',myhandles);
     set(handles.Point1Info,'String','');
     set(handles.Point2Info,'String','');
@@ -1759,6 +1787,7 @@ function ResetAxes(handles)
         'ShadowColor',[1 1 1]) ;
     set(handles.uipanel3,'Title','','HighlightColor',[1 1 1],...
         'ShadowColor',[1 1 1]);
+    
     
     
     % --------------------------------------------------------------------
@@ -2251,7 +2280,7 @@ function filterFileList=getFileFilterListed()
         else
             matchingMetadata=(myhandles.individual_number_foreground_blocks==str2double(groupValue))';
         end
-     
+        
         switch groupOperator
             case 2   % !=
                 matchingMetadata=~matchingMetadata;
@@ -2337,8 +2366,8 @@ function Add_Metadata_Menu_Callback(hObject, eventdata, handles)
     % handles    structure with handles and user data (see GUIDATA)
     proceed=add_metadata_instructions;
     if(~proceed)
-  
-       return; 
+        
+        return;
     end
     [filename,path]=uigetfile('*.csv','Pick Additional Metadata File');
     if(isequal(filename,0))
