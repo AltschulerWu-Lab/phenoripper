@@ -259,7 +259,7 @@ function phenobrowser_OpeningFcn(hObject, eventdata, handles, varargin)
         %             'BackgroundColor',myhandles.mds_colors(i,:),'parent',myhandles.MDSPlot_handle,...
         %             'FontSize',16);%not always cn
         %     end
-         set(handles.show_sb_examples_instructions_text,'Visible','off');
+        set(handles.show_sb_examples_instructions_text,'Visible','off');
         Plot_MDS(myhandles.mds_data,myhandles.mds_dim,myhandles.mds_text,myhandles.mds_colors,...
             myhandles.chosen_points,handles.MDSPlot,myhandles.show_mds_text,myhandles.labelToDisplay);
         %     set(handles.MDSPlot, 'XTickLabel','');
@@ -514,19 +514,8 @@ function MDSPlot_ButtonDownFcn(hObject, eventdata, handles)
             
             if(myhandles.axes_chosen==handles.axes2)
                 frame_handle=handles.uipanel3;
-                other_frame_handle=handles.uipanel7;
-                other_axes=handles.axes3;
-                other_file_number=myhandles.file_number2;
-                other_point_number=myhandles.chosen_points(1);
             else
                 frame_handle=handles.uipanel7;
-                other_frame_handle=handles.uipanel3;
-                other_axes=handles.axes2;
-                
-                
-                other_file_number=myhandles.file_number1;
-                other_point_number=myhandles.chosen_points(2);
-                
             end
             
             fnames=fieldnames(myhandles.grouped_metadata{point_number});
@@ -546,6 +535,17 @@ function MDSPlot_ButtonDownFcn(hObject, eventdata, handles)
                 myhandles.axes_chosen,myhandles.mds_colors(point_number,:),...
                 panel_text,frame_handle);
             if(myhandles.is_sb_in_images_calculated)
+                if(myhandles.axes_chosen==handles.axes2)
+                    other_frame_handle=handles.uipanel7;
+                    other_axes=handles.axes3;
+                    other_file_number=myhandles.file_number2;
+                    other_point_number=myhandles.chosen_points(1);
+                else
+                    other_frame_handle=handles.uipanel3;
+                    other_axes=handles.axes2;
+                    other_file_number=myhandles.file_number1;
+                    other_point_number=myhandles.chosen_points(2);
+                end
                 other_panel_text=myhandles.grouped_metadata{other_point_number}.(fnames{myhandles.chosen_grouping_field});
                 if(iscell(other_panel_text))
                     other_panel_text=other_panel_text{1};
@@ -556,7 +556,7 @@ function MDSPlot_ButtonDownFcn(hObject, eventdata, handles)
                 
                 ShowImages(myhandles.grouped_metadata{other_point_number}.files_in_group,...
                     other_file_number,other_axes, myhandles.mds_colors(other_point_number,:),...
-                    other_panel_text,other_frame_handle,[]);
+                    other_panel_text,other_frame_handle);
             end
             
             
@@ -570,11 +570,16 @@ function MDSPlot_ButtonDownFcn(hObject, eventdata, handles)
             watchon;
             drawnow;
             try
-                if(~myhandles.is_sb_in_images_calculated)
-                    Calculate_Superblocks_In_Images();
+                if( isfield(myhandles,'temp_handles') &&...
+                        any(myhandles.temp_handles==point_parent))
+                    
+                    if(~myhandles.is_sb_in_images_calculated)
+                        Calculate_Superblocks_In_Images();
+                    end
+                    Show_SB_In_Image(1,superblock_number,handles);
+                    Show_SB_In_Image(2,superblock_number,handles);
+                    
                 end
-                Show_SB_In_Image(1,superblock_number,handles);
-                Show_SB_In_Image(2,superblock_number,handles);
                 
             catch err
                 watchoff;
@@ -864,6 +869,7 @@ function Update_Bar_Plot(handles)
         set(handles.show_sb_examples_instructions_text,'Visible','on');
         set(myhandles.bar_legend_axis,'HitTest','off');
         set(myhandles.bar_axes,'HitTest','off');
+        myhandles.is_sb_in_images_calculated=false;
         setappdata(0,'myhandles',myhandles);
         % set(h,'Position',[outerpos(1) outerpos(2)+0.1 outerpos(3) outerpos(4)-0.1]);
         %set(h,'Position',[outerpos(1) outerpos(2)+0.1 outerpos(3) outerpos(4)-0.1]);
@@ -1514,14 +1520,14 @@ function Show_SB_In_Image(img_num,sb_number,handles)
     if(img_num==1)
         ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
             myhandles.file_number1,handles.axes2, myhandles.mds_colors(point_number,:),...
-            panel_text,handles.uipanel3,[]);
+            panel_text,handles.uipanel3);
         distances=myhandles.distance_to_superblock_centroid1(row,col);
         all_distances=myhandles.distance_to_superblock_centroid1(fg_mask);
         img_handle=handles.axes2;
     else
         ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
             myhandles.file_number2,handles.axes3, myhandles.mds_colors(point_number,:),...
-            panel_text,handles.uipanel7,[]);
+            panel_text,handles.uipanel7);
         distances=myhandles.distance_to_superblock_centroid2(row,col);
         all_distances=myhandles.distance_to_superblock_centroid2(fg_mask);
         img_handle=handles.axes3;
@@ -1573,7 +1579,7 @@ function PreviousImage1_pushbutton_Callback(hObject, eventdata, handles)
     end
     ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
         myhandles.file_number1,handles.axes2, myhandles.mds_colors(point_number,:),...
-        panel_text,handles.uipanel3,[]);
+        panel_text,handles.uipanel3);
     myhandles.is_sb_in_images_calculated=false;
     setappdata(0,'myhandles',myhandles);
     
@@ -1596,7 +1602,7 @@ function PreviousImage2_pushbutton_Callback(hObject, eventdata, handles)
     end
     ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
         myhandles.file_number2,handles.axes3, myhandles.mds_colors(point_number,:),...
-        panel_text,handles.uipanel7,[]);
+        panel_text,handles.uipanel7);
     myhandles.is_sb_in_images_calculated=false;
     setappdata(0,'myhandles',myhandles);
     
@@ -1621,7 +1627,7 @@ function NextImage2_pushbutton_Callback(hObject, eventdata, handles)
     end
     ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
         myhandles.file_number2,handles.axes3, myhandles.mds_colors(point_number,:),...
-        panel_text,handles.uipanel7,[]);
+        panel_text,handles.uipanel7);
     myhandles.is_sb_in_images_calculated=false;
     setappdata(0,'myhandles',myhandles);
     
@@ -1646,7 +1652,7 @@ function NextImage1_pushbotton_Callback(hObject, eventdata, handles)
     end
     ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
         myhandles.file_number1,handles.axes2, myhandles.mds_colors(point_number,:),...
-        panel_text,handles.uipanel3,[]);
+        panel_text,handles.uipanel3);
     myhandles.is_sb_in_images_calculated=false;
     setappdata(0,'myhandles',myhandles);
     
@@ -1711,7 +1717,7 @@ function Barplot_Method_Chosen_Callback(hObject, eventdata,handles,method)
     end
     ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
         myhandles.file_number1,handles.axes2, myhandles.mds_colors(point_number,:),...
-        panel_text,handles.uipanel3,[]);
+        panel_text,handles.uipanel3);
     
     point_number=myhandles.chosen_points(1);
     panel_text=myhandles.grouped_metadata{point_number}.(fnames{myhandles.chosen_grouping_field});
@@ -1723,7 +1729,7 @@ function Barplot_Method_Chosen_Callback(hObject, eventdata,handles,method)
     end
     ShowImages(myhandles.grouped_metadata{point_number}.files_in_group,...
         myhandles.file_number1,handles.axes3, myhandles.mds_colors(point_number,:),...
-        panel_text,handles.uipanel7,[]);
+        panel_text,handles.uipanel7);
     
     
     if(all(myhandles.chosen_points~=0))
@@ -1777,7 +1783,7 @@ function ResetAxes(handles)
             end
         end
     end
-   set(handles.show_sb_examples_instructions_text,'Visible','off');
+    set(handles.show_sb_examples_instructions_text,'Visible','off');
     myhandles.temp_handles=[];
     myhandles.is_sb_in_images_calculated=false;
     setappdata(0,'myhandles',myhandles);
@@ -2523,24 +2529,52 @@ function showFGPixelsCB_Callback(hObject, eventdata, handles)
     myhandles=getappdata(0,'myhandles');
     myhandles.showOnlyFGPixels= get(hObject,'Value');
     setappdata(0,'myhandles',myhandles);
-    
-    %Replot the last images
-    if(myhandles.axes_chosen==handles.axes2)
-        frame_handle=handles.uipanel3;
-    else
-        frame_handle=handles.uipanel7;
+    try
+        %Replot the last images
+        if(myhandles.axes_chosen==handles.axes2)
+            frame_handle=handles.uipanel3;
+            file_number=myhandles.file_number1;
+        else
+            frame_handle=handles.uipanel7;
+            file_number=myhandles.file_number2;
+        end
+        fnames=fieldnames(myhandles.grouped_metadata{myhandles.selected_point});
+        panel_text=myhandles.grouped_metadata{myhandles.selected_point}.(fnames{myhandles.chosen_grouping_field});
+        if(iscell(panel_text))
+            panel_text=panel_text{1};
+        end
+        if(length(panel_text)>43)
+            panel_text=['...' panel_text(end-40:end)];
+        end
+        ShowImages(myhandles.grouped_metadata{myhandles.selected_point}.files_in_group,file_number,...
+            myhandles.axes_chosen,myhandles.mds_colors(myhandles.selected_point,:),...
+            panel_text,frame_handle);
+        
+        if(myhandles.axes_chosen==handles.axes2)
+            other_frame_handle=handles.uipanel7;
+            other_axes=handles.axes3;
+            other_file_number=myhandles.file_number2;
+            other_point_number=myhandles.chosen_points(1);
+        else
+            other_frame_handle=handles.uipanel3;
+            other_axes=handles.axes2;
+            other_file_number=myhandles.file_number1;
+            other_point_number=myhandles.chosen_points(2);
+        end
+        other_panel_text=myhandles.grouped_metadata{other_point_number}.(fnames{myhandles.chosen_grouping_field});
+        if(iscell(other_panel_text))
+            other_panel_text=other_panel_text{1};
+        end
+        if(length(other_panel_text)>43)
+            other_panel_text=['...' panel_text_panel(end-40:end)];
+        end
+        
+        ShowImages(myhandles.grouped_metadata{other_point_number}.files_in_group,...
+            other_file_number,other_axes, myhandles.mds_colors(other_point_number,:),...
+            other_panel_text,other_frame_handle);
+    catch err
+        rethrow(err);
     end
-    fnames=fieldnames(myhandles.grouped_metadata{myhandles.selected_point});
-    panel_text=myhandles.grouped_metadata{myhandles.selected_point}.(fnames{myhandles.chosen_grouping_field});
-    if(iscell(panel_text))
-        panel_text=panel_text{1};
-    end
-    if(length(panel_text)>43)
-        panel_text=['...' panel_text(end-40:end)];
-    end
-    ShowImages(myhandles.grouped_metadata{myhandles.selected_point}.files_in_group,1,...
-        myhandles.axes_chosen,myhandles.mds_colors(myhandles.selected_point,:),...
-        panel_text,frame_handle);
     %ShowImages(filenames,file_number,axis_handle,class_color,point_name,frame_handle)
     
     
