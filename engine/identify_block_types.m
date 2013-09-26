@@ -50,7 +50,7 @@ function data=identify_block_types(filenames,block_size,cutoff_intensity, number
 %   A1, B1 - matrices defined so that for an image img, A1*img*B1 contains mean intensities 
 %   in each block in the image
 %   A2,B2 - versions of A1,B1 for cropped images
-%   RGB_CENTROIDS - array of size [number_of_RGB_clusters x number_of_channels]. 
+%   RGB_CENTROIDS - array of size [number_of_RGB_clusters x number_of_analysis_channels]. 
 %   Each row contains the marker levels for a distinct qcolor.
 %   BLOCK_CENTROIDS -  array of size [number_of_BLOCK_clusters x (number_of_RGB_clusters+1)]. 
 %   Each row describes the fractions of the the different q-colors for a
@@ -126,6 +126,8 @@ y_offset=floor(rem(yres_crop,block_size)/2)+1;%because the image may not contain
 channels_per_file=size(test,3);
 data.channels_per_file=channels_per_file;
 number_of_channels=max(number_of_channels,channels_per_file);
+number_of_analysis_channels=nnz(analyze_channels);
+number_of_fg_channels=nnz(foreground_channels);
 
 %% Set up the matrices for averaging
 % A1 and B1 are matrices used to find average values within blocks in images
@@ -173,15 +175,14 @@ end
 
 
 %% Read and Process Images
-
 %Temporary variable to store all the training blocks
 %(needed because we don't know number of valid blocks before hand)
-block_data_temp=zeros(block_size,block_size,number_of_channels,...
+block_data_temp=zeros(block_size,block_size,number_of_analysis_channels,...
     number_of_blocks_per_image*number_of_training_images); 
 %Temporary variable to store all the foreground pixels used to train color
 %reduction. Since we are not sure how many foreground pixels are present,
 %we pre-allocate max possible number for speed
-rgb_data_temp=zeros(rgb_samples_per_image*number_of_training_images,number_of_channels);
+rgb_data_temp=zeros(rgb_samples_per_image*number_of_training_images,number_of_analysis_channels);
 block_counter=0; %Number of foreground blocks used
 rgb_counter=0; % Number of foreground pixels used
 for image_counter=1:number_of_training_images
@@ -193,34 +194,15 @@ for image_counter=1:number_of_training_images
     end
     
     %Identify foreground pixels and store their RBG (i.e., multi-channel intensity) values
-    %intensity=sqrt(sum(img.^2,3)/number_of_channels);
+    %intensity=sqrt(sum(img.^2,3)/number_of_analysis_channels);
     %Define the foreground intensity mask based on the channel used to
     %define foreground
-    j=0;
-    for i=1:length(foreground_channels)
-      if(foreground_channels(i))
-        j=j+1;
-        img2(:,:,j)=img(:,:,i);
-      end
-    end
-    number_of_channels=j;
-    intensity=sqrt(sum(img2.^2,3)/number_of_channels);
-    img2=[];
+    intensity=sqrt(sum(img(:,:,foreground_channels~=0).^2,3)/number_of_fg_channels);
     %Do the analysis only on the selected channels (reset img to the selected channels)
-    j=0;
-    for i=1:length(analyze_channels)
-      if(analyze_channels(i))
-        j=j+1;
-        img2(:,:,j)=img(:,:,i);
-      end
-    end
-    number_of_channels=j;
-    img=img2;   
+    img=img(:,:,analyze_channels~=0);
     
-    
-    
-    foreground_points=zeros(sum(sum(intensity>cutoff_intensity)),number_of_channels);
-    for channel_counter=1:number_of_channels
+    foreground_points=zeros(sum(sum(intensity>cutoff_intensity)),number_of_analysis_channels);
+    for channel_counter=1:number_of_analysis_channels
         temp=squeeze(img(:,:,channel_counter));
         foreground_points(:,channel_counter)=temp(intensity>cutoff_intensity);
     end
@@ -230,8 +212,8 @@ for image_counter=1:number_of_training_images
     
     %Crop image so that it contains integer number of blocks in both
     %directions
-    raw_data=zeros(block_size*blocks_nx,block_size*blocks_ny,number_of_channels);
-    for channel_counter=1:number_of_channels
+    raw_data=zeros(block_size*blocks_nx,block_size*blocks_ny,number_of_analysis_channels);
+    for channel_counter=1:number_of_analysis_channels
         raw_data(:,:,channel_counter)=img(x_offset:(x_offset+blocks_nx*block_size-1),...
             y_offset:(y_offset+blocks_ny*block_size-1),channel_counter);
     end
@@ -284,10 +266,10 @@ rgb_data=rgb_data_temp(1:rgb_counter,:);
 % Calculate fractions of various colors (RGB clusters) in the different
 % blocks
 data.block_weights=zeros(block_counter,number_of_RGB_clusters+1);
-%centroids_temp=reshape(x,[number_of_RGB_clusters,1,number_of_channels]);
-centroids_temp=zeros(block_size,block_size,number_of_channels,number_of_RGB_clusters);
+%centroids_temp=reshape(x,[number_of_RGB_clusters,1,number_of_analysis_channels]);
+centroids_temp=zeros(block_size,block_size,number_of_analysis_channels,number_of_RGB_clusters);
 for i=1:number_of_RGB_clusters
-    centroids_temp(:,:,:,i)=repmat(reshape(data.RGB_centroids(i,:),1,1,number_of_channels),block_size,block_size);
+    centroids_temp(:,:,:,i)=repmat(reshape(data.RGB_centroids(i,:),1,1,number_of_analysis_channels),block_size,block_size);
 end
 for k=1:block_counter
     %data.block_weights(k,:)=...
@@ -303,7 +285,7 @@ end
 
 % Pick out the blocks closest to centroids and store them as
 % representatives
-data.representative_blocks=zeros(number_of_block_clusters,block_size,block_size,number_of_channels,number_of_representative_blocks);
+data.representative_blocks=zeros(number_of_block_clusters,block_size,block_size,number_of_analysis_channels,number_of_representative_blocks);
 for cluster_counter=1:number_of_block_clusters
    [~,ids]=sort(distmat(:,cluster_counter));
    data.representative_blocks(cluster_counter,:,:,:,:)=block_data(:,:,:,ids(1:number_of_representative_blocks));

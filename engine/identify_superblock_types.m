@@ -72,7 +72,7 @@ number_of_superblock_representatives=3; % Number of sample images of superblock 
 %Load image parameters
 [number_of_training_images,number_of_channels]=size(filenames);
 channels_per_file=global_data.channels_per_file;
-number_of_channels=max(number_of_channels,channels_per_file);
+
 blocks_nx=floor(xres_crop/block_size);
 x_offset=floor(rem(xres_crop,block_size)/2)+1;%because the image may not contain an integer number of blocks
 blocks_ny=floor(yres_crop/block_size);
@@ -80,6 +80,9 @@ y_offset=floor(rem(yres_crop,block_size)/2)+1;%because the image may not contain
 
 
 max_training_superblocks_per_image=1000;
+number_of_channels=max(number_of_channels,channels_per_file);
+number_of_analysis_channels=nnz(analyze_channels);
+number_of_fg_channels=nnz(foreground_channels);
 
 %% Reading Images
 
@@ -113,45 +116,21 @@ for image_counter=1:number_of_training_images
     else
         img=read_and_scale_image(filenames(image_counter,:),marker_scales,xres_full,yres_full,channels_per_file,xres_crop,yres_crop,rescale_param(image_counter,:)); 
     end
-    [number_of_training_images,number_of_channels]=size(filenames);
-    number_of_channels=max(number_of_channels,channels_per_file);
     
     % Crop image to have integer number of blocks in each direction
     cropped_image=img(x_offset:(x_offset+blocks_nx*block_size-1),...
         y_offset:(y_offset+blocks_ny*block_size-1),1:number_of_channels);
     
     % Calculate intensity of cropped image and identify foreground points
-    %intensity=sqrt(sum(double(cropped_image).^2,3)/number_of_channels);  
+    %intensity=sqrt(sum(double(cropped_image).^2,3)/number_of_analysis_channels);  
     
     %Identify foreground pixels and store their RBG (i.e., multi-channel intensity) values
     %Define the foreground intensity mask based on the channel used to
     %define foreground
-    j=0;
-    for i=1:length(foreground_channels)
-      if(foreground_channels(i))
-        j=j+1;
-        img2(:,:,j)=cropped_image(:,:,i);
-      end
-    end
-    number_of_channels=j;
-    intensity=sqrt(sum(img2.^2,3)/number_of_channels);
-    img2=[];
-    
+    intensity=sqrt(sum(cropped_image(:,:,foreground_channels~=0).^2,3)/number_of_fg_channels);
+     
     %Do the analysis only on the selected channels (reset img to the selected channels)
-    j=0;
-    for i=1:length(analyze_channels)
-      if(analyze_channels(i))
-        j=j+1;
-        img2(:,:,j)=cropped_image(:,:,i);
-      end
-    end
-    cropped_image=img2;
-    number_of_channels=j;
-    
-    
-    
-    
-    
+    cropped_image=cropped_image(:,:,analyze_channels~=0);
     
     is.foreground=(intensity>cutoff_intensity);
     number_of_foreground_points=sum(sum(is.foreground));
@@ -159,8 +138,8 @@ for image_counter=1:number_of_training_images
     %Load the color profiles for the foreground points. A color profile is
     %the vector consisting of levels of pixels in the different channels (each of which lies in
     %[0,100])
-    foreground_points=zeros(number_of_foreground_points,number_of_channels); % Color profiles of FG points
-    for channel_counter=1:number_of_channels
+    foreground_points=zeros(number_of_foreground_points,number_of_analysis_channels); % Color profiles of FG points
+    for channel_counter=1:number_of_analysis_channels
         temp=squeeze(cropped_image(:,:,channel_counter)); %squeeze extracts a single channel image as a 2D array (instead of 3)
         foreground_points(:,channel_counter)=temp(intensity>cutoff_intensity);
     end
@@ -171,8 +150,8 @@ for image_counter=1:number_of_training_images
     % color profile is closest to
     RGB_distmat=zeros(number_of_foreground_points,number_of_RGB_clusters);% Distance of FG pixels to color centroids
     for reduced_color_state_index=1:number_of_RGB_clusters
-%         rgb_mat=ones(size(foreground_points,1),number_of_channels);
-%         for i=1:number_of_channels
+%         rgb_mat=ones(size(foreground_points,1),number_of_analysis_channels);
+%         for i=1:number_of_analysis_channels
 %             rgb_mat(:,i)=rgb_mat(:,i).*global_data.RGB_centroids(reduced_color_state_index,i);
 %         end
         % Instead of looping over every foreground point, we create a
@@ -445,8 +424,8 @@ for i=1:number_of_superblocks
 end
 
 
-% [number_of_training_images,number_of_channels]=size(filenames);
-% number_of_channels=max(number_of_channels,channels_per_file);
+% [number_of_training_images,number_of_analysis_channels]=size(filenames);
+% number_of_analysis_channels=max(number_of_analysis_channels,channels_per_file);
 
 
 %included_files=find(bintprog(ones(number_of_training_images,1),-FvB',-number_of_superblock_representatives*ones(number_of_superblocks,1))>0.5);
@@ -456,9 +435,9 @@ superblock_representatives=cell(number_of_superblocks,number_of_superblock_repre
 supr_counter=zeros(number_of_superblocks,1);
 for file_num=1:length(included_files)
     if(any(~cellfun('isempty',locations(file_num,:))))
-        img=zeros(xres_crop,yres_crop,number_of_channels);
+        %img=zeros(xres_crop,yres_crop,number_of_analysis_channels);
         
-        %img_temp=zeros(xres_crop,yres_crop,number_of_channels);
+        %img_temp=zeros(xres_crop,yres_crop,number_of_analysis_channels);
         %if((xres_full~=xres_crop)||(yres_full~=yres_crop))
         %    x1=ceil((xres_full-xres_crop)/2);
         %    y1=ceil((yres_full-yres_crop)/2);
@@ -477,17 +456,17 @@ for file_num=1:length(included_files)
             
             %img=temp(x1:x2,y1:y2,:);
         else
-            for channel=1:number_of_channels
+%            for channel=1:number_of_analysis_channels
                 %img(:,:,channel_counter)=imread2(cell2mat(filenames(image_counter,channel_counter)));
                 %USE IMREAD FOR SINGLE CHANNEL ALWAYS
                 
                 img=read_and_scale_image(filenames(included_files(file_num),:),marker_scales,xres_full,yres_full,channels_per_file,xres_crop,yres_crop,rescale_param(included_files(file_num),:)); 
                 %temp=imread(cell2mat(filenames(included_files(file_num),channel)));
                 %img(:,:,channel)=temp(x1:x2,y1:y2);
-            end
+ %           end
         end
         
-        %     for channel=1:number_of_channels
+        %     for channel=1:number_of_analysis_channels
         %        img(:,:,channel)=imread2(cell2mat(filenames(included_files(file_num),channel)));
         %
         %     end
@@ -496,7 +475,7 @@ for file_num=1:length(included_files)
             if(number_of_matches>0)
                 location_info=locations{included_files(file_num),i};
                 for j=1:min(number_of_matches,number_of_superblock_representatives-supr_counter(i))
-                    %rep_img=zeros(3*block_size,3*block_size,number_of_channels);
+                    %rep_img=zeros(3*block_size,3*block_size,number_of_analysis_channels);
                     x1=max(location_info(j,1)-3*block_size,1);
                     x2=min(location_info(j,1)+4*block_size-1,xres_crop);
                     y1=max(location_info(j,2)-3*block_size,1);
