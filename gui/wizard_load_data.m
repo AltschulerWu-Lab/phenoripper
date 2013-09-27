@@ -412,6 +412,6 @@ myhandles=getappdata(0,'myhandles');
 myhandles.wizardMetaData_handle=handles.figure1;
 setappdata(0,'myhandles',myhandles);
 if(ismac==0 && isunix == 1)
-  warndlg({'The following guis may be glitchy on Linux'},'Linux Implementation Warning','modal');
+  warndlg({'The following GUIs may be glitchy on Linux'},'Linux Implementation Warning','modal');
 end
 phenoloader_gui;

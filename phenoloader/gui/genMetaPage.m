@@ -210,7 +210,12 @@ function genMetaPage
     function saveParams(~, ~, ~)
       myhandles=getappdata(0,'myhandles');
       %fileConcat = cell(size(handles.finalList,1),1);
-      myhandles.file_matrix=handles.finalList(:,1:3);
+      %
+      if ~handles.multichannel
+        myhandles.file_matrix=handles.finalList(:,1:handles.numMarkers);
+      else
+        myhandles.file_matrix=handles.finalList(:,1);
+      end
       myhandles.markers = cell(1,handles.numMarkers);
       
       
@@ -233,13 +238,13 @@ function genMetaPage
       myhandles.metadata = cell(1,size(handles.finalList,1));
       for f=1:size(handles.finalList,1)
         myhandles.metadata{1,f}.FileNames=cell(1,handles.numMarkers,2);
-        for k=1:handles.numMarkers
+        for k=1:myhandles.files_per_image
           myhandles.metadata{1,f}.FileNames{1,k,1}=handles.finalList{f,k};
           myhandles.metadata{1,f}.FileNames{1,k,2}={1,0};
         end
         myhandles.metadata{1,f}.None=handles.finalList{f,1};
         for mm=1:size(cname,2)
-          myhandles.metadata{1,f}.(cname{1,mm})=handles.finalList{f,handles.numMarkers+mm};
+          myhandles.metadata{1,f}.(cname{1,mm})=handles.finalList{f,myhandles.files_per_image+mm};
         end
       end
       myhandles.use_metadata=1;

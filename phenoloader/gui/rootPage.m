@@ -208,7 +208,7 @@ function rootPage
     function rootDone_callback(~, ~, ~)
         % Triggers on clicking the done button 
 
-        choice = questdlg('Define which files to be used?',handles.title,'yes','no','no');
+        choice = questdlg('By default all files with selected extension will be analyzed. Specify a subset for analysis?',handles.title,'yes','no','no');
         
         switch choice
             case 'yes'
@@ -253,12 +253,13 @@ function rootPage
                 set(handles.remList,'String',handles.remFileNames,'Max',size(handles.remFileNames,1))
 
                 % Create filter expression edit box
-                uicontrol(handles.pFilterFiles,'Style','Text','String','Filter Expression','FontSize',12,'FontWeight','bold',...
+                uicontrol(handles.pFilterFiles,'Style','Text','String','Filter Pattern','FontSize',12,'FontWeight','bold',...
                         'BackgroundColor','black','ForegroundColor','white',...
                         'Position',[w*0.425 h*0.75 w*0.15 h*0.04]);
                 uicontrol(handles.pFilterFiles,'Style','edit','String','','FontSize',12,...
                         'callback',@filterExpression_callback,...
-                        'Position',[w*0.425 h*0.7 w*0.15 h*0.05]);
+                        'Position',[w*0.425 h*0.7 w*0.15,...
+                        h*0.05],'TooltipString','Enter sequence of letters common to the filenames to be discarded');
 
                 % Create FileFilter transfer right Button
                 uicontrol(handles.pFilterFiles,'String','>>>','FontSize',20,'FontWeight','Bold',...
