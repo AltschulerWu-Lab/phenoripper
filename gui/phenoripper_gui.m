@@ -376,6 +376,7 @@ set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on'
 myhandles.statusbarHandles=statusbar(hObject,'Calculating File Structure');
 analysistime_handle=tic;
 
+myhandles.minimum_training_files=min(myhandles.minimum_training_files,length(myhandles.metadata));
 %Seeds the random number generator if option selecetd in set_parameters (default is Not doing that)
 % if(myhandles.fix_random_number_generator)
 %   rng();
