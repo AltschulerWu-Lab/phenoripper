@@ -99,9 +99,13 @@ function markerPage
         uicontrol(handles.pMarker1,'String','Done','FontSize',12,'FontWeight','Bold',...
                     'callback',@markerDone_callback,...
                     'Position',[handles.wd*0.4 handles.ht*0.025 handles.wd*0.2 40]); 
-        
-        turnOffBorder(handles.markerTable);      
-        turnOnBorder(handles.FileNames);
+        if(handles.multichannel) 
+          turnOnBorder(handles.markerTable);      
+          turnOffBorder(handles.FileNames);
+        else
+          turnOffBorder(handles.markerTable);      
+          turnOnBorder(handles.FileNames);
+        end
         
         handles.showEx = false;
 
@@ -154,7 +158,7 @@ function markerPage
     function SelectedFile_MouseReleasedCallback(~,~,~)
         % Triggers on a mouse release in the Edit box
         % grabs the highlighted selected text
-        
+        try  
         drawnow;
         if ~handles.multichannel
             
@@ -188,22 +192,27 @@ function markerPage
                     [handles.sepIdx handles.matchstr handles.splitstr] = regexp(handles.fileGroups,'[!-.:-@{-~\[\]-`]','start','match','split');
                     
                     sepNumArray = cellfun(@(x) length(x),handles.sepIdx);
-                    if handles.entireFolder
-                        validSep = true(size(sepNumArray));
-                    else
-                        validSep = sepNumArray==handles.numSep;
-                    end
-                    handles.filteredNameGroups = filteredNameGroups(validSep,:);
-                    handles.sepIdx = handles.sepIdx(validSep,:);
-                    handles.matchstr = handles.matchstr(validSep,:);
-                    handles.splitstr = handles.splitstr(validSep,:);
-                    handles.fileGroups = handles.fileGroups(validSep,:);
-                    handles.filteredFileName = useFileNames(validSep);
+%                     if handles.entireFolder
+%                         validSep = true(size(sepNumArray));
+%                     else
+%                         validSep = sepNumArray==handles.numSep;
+%                     end
+%                     handles.filteredNameGroups = filteredNameGroups(validSep,:);
+%                   handles.sepIdx = handles.sepIdx(validSep,:);
+%                     handles.matchstr = handles.matchstr(validSep,:);
+%                     handles.splitstr = handles.splitstr(validSep,:);
+%                     handles.fileGroups = handles.fileGroups(validSep,:);
+%                     handles.filteredFileName = useFileNames(validSep);
+                    handles.filteredNameGroups = filteredNameGroups;
+                    handles.filteredFileName = useFileNames();
                     handles = findPatternInSet(handles);                    
                     
-                    temp = handles.filenameHighlight;
-                    fileGroupHighlight = useFileNames;
-                    fileGroupHighlight(validSep) = temp;
+%                     temp = handles.filenameHighlight;
+%                     fileGroupHighlight = useFileNames;
+%                     fileGroupHighlight(validSep) = temp;
+
+                    fileGroupHighlight= handles.filenameHighlight;
+                    
                     
                     handles.filenameHighlight = handles.useFileNames;
                     handles.filenameHighlight(validFolderIdx) = fileGroupHighlight;
@@ -254,6 +263,10 @@ function markerPage
             end            
         end
         setappdata(0,'handles',handles);
+        catch err
+                errordlg('Could not extract information from filenames. Try renaming files to use equal number of common separators such as .,-,_ and so on. Alternately, directly define a metadata file');
+                rethrow(err);
+        end
     end
    
     function markerTable_CellEditCallback(hObject, eventdata, ~)

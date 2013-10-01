@@ -65,6 +65,7 @@ end
 %     handles.rootDir = [];
 % end
 
+handles.multichannel = 0;
 handles.markerDB = cell(1,2);
 handles.markerDB(:) = cellstr('');  % [marker name, marker filename annotation]
 handles.extTypes = {};              % [.tiff; .png; etc...]

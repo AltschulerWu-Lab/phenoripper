@@ -223,6 +223,7 @@ function metaPage
     function SelectedFile2_MouseReleasedCallback(~,~,~)  
         % Triggers on a mouse release of the edit box
         % Grabs the index of selection in edit box
+        try
         drawnow;
         
         if isMultipleCall()
@@ -282,6 +283,11 @@ function metaPage
             end
         end
         setappdata(0,'handles',handles);
+
+        catch err
+                errordlg('Could not extract information from filenames. Try renaming files to use equal number of common separators such as .,-,_ and so on. Alternately, directly define a metadata file');
+        end
+        
     end
 
     function currFeatDropdown_callback(hObject,~,~)
@@ -327,7 +333,7 @@ function metaPage
 
     function ok1Button_callback(~,~,~)
 
-        labelName = get(handles.groupLabelEdit,'String');
+        labelName = genvarname(get(handles.groupLabelEdit,'String'));
         if ~isempty(labelName) 
             if handles.addingNewGroup
 

@@ -124,6 +124,9 @@ if(~exist(char(lastPath),'dir'))
 else
   [filename,pathname]=uigetfile({'*.csv;','Metadata Files';'*.*','All Files'},'Select a Metadata File', [lastPath]);
 end
+if isequal(filename,0)
+        return;
+end
 if(~exist(pathname,'dir'))
   warndlg('Invalid File');
   return;

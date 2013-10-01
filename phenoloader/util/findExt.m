@@ -40,11 +40,17 @@ function h = findExt(h)
     
     
     ext = regexp(h.origfileName,'\.','split');
+    number_without_extension=0;
     for k = 1:length(ext)
         temp = ext{k};
         ext(k) = cellstr(['.' temp{end}]);
+        if(length(temp)==1)
+             number_without_extension= number_without_extension+1;
+             ext(k)={'.<empty>'};
+        end
     end
     
+    h.fileExt=ext;
     h.extTypes = unique(ext);
     extHistogram = zeros(length(h.extTypes),1);
 
@@ -66,8 +72,13 @@ function h = findExt(h)
 
     set(h.ImageExtension,'String',popupStr,'Value',1);
 
-    idx = ~cellfun('isempty',regexp(h.origfileName,h.imageExt,'match'));
+%     idx = ~cellfun('isempty',regexp(h.origfileName,h.imageExt,'match'));
+    idx=strcmp(h.fileExt,['.' h.imageExt]);
     h.origfileName = h.origfileName(idx);
     h.origfileName = sort(h.origfileName);
     h.nameGroups = regexp(h.origfileName,'/','split');
+    
+    if(number_without_extension>0)
+       warndlg(['We detected ' num2str(number_without_extension) ' files without extension. If your images do in fact not have any extension select .<empty> in the dropdown menu']); 
+    end
    

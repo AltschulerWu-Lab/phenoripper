@@ -71,14 +71,19 @@ function genMetaPage
 
         handles.metaFilename = [handles.rootDir '/metafile.csv'];
     
-        % Generate column names for metafile (filename,drug,etc.)               
+        % Generate column names for metafile (filename,drug,etc.)
         numMeta = 0;
-        cname = handles.groupMetaDB(:,1)';
-        for x = 1:size(handles.groupMetaDB,1)
-            numMeta = numMeta + length(handles.groupMetaDB{x,2});
-            cname = [cname handles.groupMetaDB{x,2}];
+        if(~isempty(handles.groupMetaDB))
+            cname = handles.groupMetaDB(:,1)';
+            
+            for x = 1:size(handles.groupMetaDB,1)
+                numMeta = numMeta + length(handles.groupMetaDB{x,2});
+                cname = [cname handles.groupMetaDB{x,2}];
+            end
+        else
+            cname=cell(0);
         end
-
+        
         if ~handles.multichannel
             markerNames = handles.markerDB(:,1)';
             for x = 1:length(markerNames)
@@ -86,7 +91,7 @@ function genMetaPage
             end
             cname = [cname markerNames];
         else
-            cname = [cname cell(1)];
+            cname = [cname {'Image'}];
         end
 
         % split first groupedDB list by folder separators
@@ -290,7 +295,7 @@ function genMetaPage
         if ~handles.multichannel
             [overwrite handles.writeStatus] = cell2csv([handles.rootDir '/'],1,handles.markerDB(:,1),handles.metaFilename, fileConcat);
         else
-            [overwrite handles.writeStatus]= cell2csv([handles.rootDir '/'],handles.nbImages,handles.markerDB(:,1),handles.metaFilename, fileConcat);
+            [overwrite handles.writeStatus]= cell2csv([handles.rootDir '/'],handles.numMarkers,handles.markerDB(:,1),handles.metaFilename, fileConcat);
         end
         if overwrite && handles.writeStatus
           message = sprintf(['Metadata file ' handles.metaFilename ' saved!']);

@@ -173,7 +173,8 @@ function rootPage
             handles.imageExt = handles.imageExt(2:end);
 
             handles.origfileName = cellfun(@(x) x(:,2),regexp(handles.list,handles.rootDir,'split'));
-            handles.origfileName = handles.origfileName(~cellfun('isempty',regexp(handles.origfileName,handles.imageExt)));
+            handles.origfileName = handles.origfileName(strcmp(handles.fileExt,['.' handles.imageExt]));
+            %handles.origfileName = handles.origfileName(~cellfun('isempty',regexp(handles.origfileName,handles.imageExt)));
        
             handles.origfileName = sort(handles.origfileName);
             
@@ -251,6 +252,7 @@ function rootPage
                 end
                 set(handles.useList,'String',handles.useFileNames,'Max',size(handles.useFileNames,1))
                 set(handles.remList,'String',handles.remFileNames,'Max',size(handles.remFileNames,1))
+                handles.useFilterExpression=0;
 
                 % Create filter expression edit box
                 uicontrol(handles.pFilterFiles,'Style','Text','String','Filter Pattern','FontSize',12,'FontWeight','bold',...
@@ -277,7 +279,17 @@ function rootPage
                         'Position',[w*0.425 h*0.1 w*0.15 40]);     
             case 'no'
                 handles.useFileNames = handles.origfileName;
-                handles.multichannel = 0;
+                first_filename=[handles.rootDir handles.useFileNames{1}];
+                nc=Number_Of_Channels_In_File(first_filename);
+                handles.multichannel = nc>1;
+                handles.numMarkers = nc;
+                if(nc>1)
+                  handles.markerDB = cell(handles.numMarkers,2);
+                  handles.markerDB(:) = cellstr('');
+                  handles.markerDB(:,2) = cellstr([repmat('marker',handles.numMarkers,1) num2str((1:handles.numMarkers)')]);
+                  handles.markerDB(:,1) = handles.markerDB(:,2);
+                end
+               
                 close(handles.figRoot);   
         end
         setappdata(0,'handles',handles);
@@ -285,7 +297,7 @@ function rootPage
    
     function filterExpression_callback(hObject,~,~)
         filtExp = get(hObject,'String');
-        [matchstr splitstr] = regexp(filtExp,'[!-.:-@{-~\[\]-`]','match','split');
+        [matchstr,splitstr] = regexp(filtExp,'[!-.:-@{-~\[\]-`]','match','split');
         for k = 1:length(matchstr)
             matchstr(k) = cellstr(['\' matchstr{k}]);
         end
@@ -297,7 +309,7 @@ function rootPage
         
         jListUse = findjobj(handles.useList);
         jListUse = jListUse.getComponent(0).getComponent(0);          
-        if ~isempty(find(~handles.useidx))            
+        if ~isempty(find(~handles.useidx,1))            
             handles.useFileNames = [handles.useFileNames(~handles.useidx); handles.useFileNames(handles.useidx)];                        
             if isempty(handles.useFileNames)
                 handles.useFileNames = cellstr('');
@@ -311,7 +323,7 @@ function rootPage
         
         jListRem = findjobj(handles.remList);
         jListRem = jListRem.getComponent(0).getComponent(0);
-        if ~isempty(find(~handles.remidx))
+        if ~isempty(find(~handles.remidx,1))
             handles.remFileNames = [handles.remFileNames(~handles.remidx); handles.remFileNames(handles.remidx)];
             if isempty(handles.remFileNames)
                 handles.remFileNames = cellstr('');
@@ -421,7 +433,6 @@ function rootPage
     end
 
     function fileFilterDone_callback(~,~,~)
-        handles.multichannel = 0;
         
         if isempty(handles.useFileNames{1})
             handles.useFileNames(1) = handles.remFileNames(1);
@@ -429,25 +440,15 @@ function rootPage
         end
         
         wbar = waitbar(0.25,'Checking for multiple channels...');
-        info = imfinfo([handles.rootDir handles.useFileNames{1}]);
-        if strcmpi(info.ColorType,'truecolor')
-            handles.multichannel = 1;
-            handles.numMarkers = 3;
-            handles.nbImages = 3;
-            handles.markerDB = cell(handles.numMarkers,2);
-            handles.markerDB(:) = cellstr('');
-            handles.markerDB(:,2) = cellstr([repmat('marker',handles.numMarkers,1) num2str((1:handles.numMarkers)')]);
-            handles.markerDB(:,1) = handles.markerDB(:,2);
-        else
-            handles.nbImages = tiff_num_ch([handles.rootDir handles.useFileNames{1}]);
-            if handles.nbImages>1
-                handles.multichannel = 1;
-                handles.numMarkers = handles.nbImages;
-                handles.markerDB = cell(handles.numMarkers,2);
-                handles.markerDB(:) = cellstr('');
-                handles.markerDB(:,2) = cellstr([repmat('marker',handles.numMarkers,1) num2str((1:handles.numMarkers)')]);
-                handles.markerDB(:,1) = handles.markerDB(:,2);
-            end
+        first_filename=[handles.rootDir handles.useFileNames{1}];
+        nc=Number_Of_Channels_In_File(first_filename);
+        handles.multichannel = nc>1;
+        handles.numMarkers = nc;
+        if(nc>1)
+          handles.markerDB = cell(handles.numMarkers,2);
+          handles.markerDB(:) = cellstr('');
+          handles.markerDB(:,2) = cellstr([repmat('marker',handles.numMarkers,1) num2str((1:handles.numMarkers)')]);
+          handles.markerDB(:,1) = handles.markerDB(:,2);
         end
         handles.nameGroups = regexp(handles.useFileNames,'/','split');
         close(wbar);
@@ -604,3 +605,7 @@ function rootPage
     setappdata(0,'handles',handles);
 end
 
+function number_of_channels=Number_Of_Channels_In_File(first_filename)
+        img=imread2(first_filename,true);
+        number_of_channels=size(img,3);
+end
