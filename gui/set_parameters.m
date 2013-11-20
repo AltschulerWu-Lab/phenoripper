@@ -344,6 +344,8 @@ set(handles.show_mask_checkbox,'Value',0.0);
 scale_intensities(myhandles.h,[]);
 uiwait;
 myhandles=getappdata(0,'myhandles');
+myhandles.intensity=CalculateIntensity(myhandles.img,myhandles.marker_scales);
+setappdata(0,'myhandles',myhandles);
 display_image_local(handles);     
 setappdata(0,'myhandles',myhandles);
 
@@ -353,29 +355,34 @@ function show_mask_checkbox_Callback(hObject, eventdata, handles)
 % hObject    handle to show_mask_checkbox (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+myhandles=getappdata(0,'myhandles');
+myhandles.intensity=CalculateIntensity(myhandles.img,myhandles.marker_scales);
+setappdata(0,'myhandles',myhandles);
 display_image_local(handles);
 
 
 function intensity=CalculateIntensity(img,marker_scales)
 myhandles=getappdata(0,'myhandles');
-if(~isempty(find(myhandles.foreground_channels==0)))
-  j=1;
-  for i=1:length(myhandles.foreground_channels)
-    if(myhandles.foreground_channels(i))
-      img2(:,:,j)=img(:,:,i);
-      j=j+1;
-    end
-  end
-  img=double(img2);
-else  
-  img=double(img);
+% if(~isempty(find(myhandles.foreground_channels==0)))
+%   j=1;
+%   for i=1:length(myhandles.foreground_channels)
+%     if(myhandles.foreground_channels(i))
+%       img2(:,:,j)=img(:,:,i);
+%       j=j+1;
+%     end
+%   end
+%   img=double(img2);
+% else  
+%   img=double(img);
+% end
+img=double(img(:,:,myhandles.foreground_channels~=0));
+fg_marker_scales=marker_scales(myhandles.foreground_channels~=0,:);
+number_of_fg_channels=size(img,3);
+for channel=1:number_of_fg_channels
+ img(:,:,channel)=min(max(img(:,:,channel)-fg_marker_scales(channel,1),0)/...
+     (fg_marker_scales(channel,2)-fg_marker_scales(channel,1)),1)*100; 
 end
-number_of_channels=size(img,3);
-for channel=1:number_of_channels
- img(:,:,channel)=min(max(img(:,:,channel)-marker_scales(channel,1),0)/...
-     (marker_scales(channel,2)-marker_scales(channel,1)),1)*100; 
-end
-intensity=sqrt(sum(img.^2,3)/number_of_channels);
+intensity=sqrt(sum(img.^2,3)/number_of_fg_channels);
 
 
 % --- Executes on button press in ShowAdvanced.
