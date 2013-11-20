@@ -86,7 +86,7 @@ function phenobrowser_OpeningFcn(hObject, eventdata, handles, varargin)
     myhandles.mds_dim=3;
     myhandles.mds_data=Calculate_MDS(myhandles.superblock_profiles,myhandles.mds_dim);
     %myhandles.distanceBetweenPoints=squareform(pdist(myhandles.superblock_profiles));
-    B=mean(myhandles.superblock_profiles);
+    B=mean(myhandles.superblock_profiles,1);
     %myhandles.centroidDistance =  pdist2(myhandles.superblock_profiles,B,'euclidean');
     %Possible improvement: divide number of point into n clusters (using kmean),
     %get the ceontroid of all clusters then identify the 2 futhers (K1 and K2).
@@ -1386,7 +1386,7 @@ function group_by_callback(hObject, eventdata, handles,group_num)
     close(WaitingDialog);
     
 function mds_positions=Calculate_MDS(raw_profiles,dim)
-    max_number_of_points_for_mds=450;
+    max_number_of_points_for_mds=500;
     nan_pos=isnan(raw_profiles);
     raw_profiles(nan_pos)=rand(nnz(nan_pos),1)/100;
     if(size(raw_profiles)<max_number_of_points_for_mds)
@@ -2419,6 +2419,12 @@ function Add_Metadata_Menu_Callback(hObject, eventdata, handles)
         end
         line_counter=line_counter+1;
         data=textscan(fid,'%s',1,'delimiter','\n');
+    end
+    tokens=regexp(data{1},delim,'split');
+    tokens=tokens{1};
+    
+    for field_num=1:length(header_fields)
+        additional_metadata_table{line_counter,field_num}=tokens{field_num};
     end
     
     % Check if values in first column are valid

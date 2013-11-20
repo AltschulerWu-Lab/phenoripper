@@ -126,8 +126,13 @@ function [filenames,metadata,RootDir,NrChannelPerImage,Markers,errorMessage]=rea
     filenames=cell(0);
     line_counter=1;
     %Read the fileName
-    data=textscan(fid,'%s',1,'delimiter','\n');
-    while (~feof(fid)) 
+    
+    while (true) 
+        
+      data=textscan(fid,'%s',1,'delimiter','\n');  
+      if(isempty(data{1}))
+         break; 
+      end
       tokens=regexp(data{1},delim,'split');
       tokens=tokens{1};
       
@@ -161,7 +166,7 @@ function [filenames,metadata,RootDir,NrChannelPerImage,Markers,errorMessage]=rea
         for field_num=2:length(HeaderFields)
           metadata(line_counter).(HeaderFields{field_num})=tokens{field_num};
         end
-        data=textscan(fid,'%s',1,'delimiter','\n');
+        %data=textscan(fid,'%s',1,'delimiter','\n');
       else
         metadata(line_counter).None=tokens{1};
         for field_num=2:length(HeaderFields)
@@ -179,10 +184,13 @@ function [filenames,metadata,RootDir,NrChannelPerImage,Markers,errorMessage]=rea
             metadata(line_counter).(HeaderFields{field_num})=tokens{field_num};
           end
         end
-        data=textscan(fid,'%s',1,'delimiter','\n');
+        %data=textscan(fid,'%s',1,'delimiter','\n');
       end
       filenames{line_counter}=file;
       line_counter=line_counter+1;
+      if(feof(fid))
+          break
+      end
     end
     if(NrChannelPerImage==1 && size(Markers,2)~=size(filenames{1,1},2))
         errorMessage='Number of marker and number of image does not match!';
