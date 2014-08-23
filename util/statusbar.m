@@ -68,6 +68,10 @@ function statusbarHandles = statusbar(varargin)
 %      jCheckBox = javax.swing.JCheckBox('cb label');
 %      sb.add(jCheckBox,'West');  % Beware: East also works but doesn't resize automatically
 %
+%   Technical description:
+%      http://UndocumentedMatlab.com/blog/setting-status-bar-text
+%      http://UndocumentedMatlab.com/blog/setting-status-bar-components
+%
 %   Notes:
 %     Statusbar will probably NOT work on Matlab versions earlier than 6.0 (R12)
 %     In Matlab 6.0 (R12), figure statusbars are not supported (only desktop statusbar)
@@ -80,9 +84,10 @@ function statusbarHandles = statusbar(varargin)
 %     Please send to Yair Altman (altmany at gmail dot com)
 %
 %   Change log:
-%     2007-May-04: Added partial support for Matlab 6
-%     2007-Apr-29: Added internal ProgressBar; clarified main comment
-%     2007-Apr-25: First version posted on MathWorks file exchange: <a href="http://www.mathworks.com/matlabcentral/fileexchange/loadFile.do?objectId=14773">http://www.mathworks.com/matlabcentral/fileexchange/loadFile.do?objectId=14773</a>
+%     2007-04-25: First version posted on MathWorks file exchange: <a href="http://www.mathworks.com/matlabcentral/fileexchange/loadFile.do?objectId=14773">http://www.mathworks.com/matlabcentral/fileexchange/loadFile.do?objectId=14773</a>
+%     2007-04-29: Added internal ProgressBar; clarified main comment
+%     2007-05-04: Added partial support for Matlab 6
+%     2011-10-14: Fix for R2011b
 %
 %   See also:
 %     ishghandle, sprintf, findjobj (on the <a href="http://www.mathworks.com/matlabcentral/fileexchange/loadFile.do?objectId=14317">file exchange</a>)
@@ -91,7 +96,7 @@ function statusbarHandles = statusbar(varargin)
 % referenced and attributed as such. The original author maintains the right to be solely associated with this work.
 
 % Programmed and Copyright by Yair M. Altman: altmany(at)gmail.com
-% $Revision: 1.0 $  $Date: 2007/04/25 16:43:24 $
+% $Revision: 1.5 $  $Date: 2011/10/14 04:10:04 $
 
     % Check for available Java/AWT (not sure if Swing is really needed so let's just check AWT)
     if ~usejava('awt')
@@ -199,7 +204,7 @@ function setText(varargin)
 %% Set the status bar text for a figure
 function statusbarObj = setFigureStatus(hFig, deleteFlag, updateFlag, statusText)
     try
-        jFrame = get(hFig,'JavaFrame');
+        jFrame = get(handle(hFig),'JavaFrame');
         jFigPanel = get(jFrame,'FigurePanelContainer');
         jRootPane = jFigPanel.getComponent(0).getRootPane;
 
@@ -226,7 +231,7 @@ function statusbarObj = setFigureStatus(hFig, deleteFlag, updateFlag, statusText
             if isempty(statusbarObj)
                statusbarObj = com.mathworks.mwswing.MJStatusBar;
                jProgressBar = javax.swing.JProgressBar;
-               set(jProgressBar, 'Visible','off');
+               jProgressBar.setVisible(false);
                statusbarObj.add(jProgressBar,'West');  % Beware: East also works but doesn't resize automatically
                jRootPane.setStatusBar(statusbarObj);
             end
@@ -243,7 +248,11 @@ function statusbarObj = setFigureStatus(hFig, deleteFlag, updateFlag, statusText
         end
     catch
         try
-            title = jFrame.fFigureClient.getWindow.getTitle;
+            try
+                title = jFrame.fFigureClient.getWindow.getTitle;
+            catch
+                title = jFrame.fHG1Client.getWindow.getTitle;
+            end
         catch
             title = get(hFig,'Name');
         end
@@ -259,7 +268,7 @@ function addOrUpdateProp(handle,propName,propValue)
         end
         set(handle,propName,propValue);
     catch
-        % never mind...
-        lasterr
+        % never mind... - maybe propName is already in use
+        %lasterr
     end
 %end  %#ok for Matlab 6 compatibility

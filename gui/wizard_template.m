@@ -202,8 +202,11 @@ if(~exist(char(dir_name),'dir'))
   dir_name='';
   warndlg('Invalid Root Directory');
 else
-  set(myhandles.wizardStatusBarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
-  
+  %set(myhandles.wizardStatusBarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
+  myhandles.wizardStatusBarHandles.ProgressBar.setVisible(true);
+  myhandles.wizardStatusBarHandles.ProgressBar.setIndeterminate(true);
+
+
   myhandles.wizardStatusBarHandles=statusbar(hObject,'Scanning Folder for images');
   drawnow expose update;
   set(handles.rootDirSelectBT,'Enable','off');
@@ -220,7 +223,10 @@ else
   save_last_path(dir_name,'wizard');
 end
 set(handles.rootdirTF,'String',dir_name);
-set(myhandles.wizardStatusBarHandles.ProgressBar, 'Visible','off','StringPainted','off');
+%set(myhandles.wizardStatusBarHandles.ProgressBar, 'Visible','off',...
+%	'StringPainted','off');
+myhandles.wizardStatusBarHandles.ProgressBar.setVisible(false);
+myhandles.wizardStatusBarHandles.ProgressBar.setStringPainted(false);
 myhandles.wizardStatusBarHandles=statusbar(hObject,'');
 setappdata(0,'myhandles',myhandles);
 setappdata(0,'handles',handles);
@@ -495,7 +501,10 @@ function doneBT_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 myhandles=getappdata(0,'myhandles');
-set(myhandles.wizardStatusBarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
+%set(myhandles.wizardStatusBarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
+myhandles.wizardStatusBarHandles.ProgressBar.setVisible(true);
+myhandles.wizardStatusBarHandles.ProgressBar.setIndeterminate(true);
+
 myhandles.wizardStatusBarHandles=statusbar(hObject,'Scanning through all images');
 drawnow;
 data=getWizardData(handles);
@@ -1022,10 +1031,15 @@ myhandles=getappdata(0,'myhandles');
 warning off;
 myhandles.wizardStatusBarHandles=statusbar(handles.figure1,...
   'PhenoWizard, define your data.');
-set(myhandles.wizardStatusBarHandles.TextPanel, 'Foreground',[1,1,1],...
-  'Background','black', 'ToolTipText','Loading...');
-set(myhandles.wizardStatusBarHandles.ProgressBar, 'Background','white',...
-  'Foreground',[0.4,0,0]);
+%set(myhandles.wizardStatusBarHandles.TextPanel, 'Foreground',[1,1,1],...
+%  'Background','black', 'ToolTipText','Loading...');
+%set(myhandles.wizardStatusBarHandles.ProgressBar, 'Background','white',...
+%  'Foreground',[0.4,0,0]);
+myhandles.wizardStatusBarHandles.TextPanel.setForeground(java.awt.Color(1,1,1));
+myhandles.wizardStatusBarHandles.TextPanel.setBackground(java.awt.Color(0,0,0));
+myhandles.wizardStatusBarHandles.TextPanel.setToolTipText('Loading...');
+myhandles.wizardStatusBarHandles.ProgressBar.setBackground(java.awt.Color(1,1,1));
+myhandles.wizardStatusBarHandles.ProgressBar.setForeground(java.awt.Color(0.4,0,0));
 warning on;
 setappdata(0,'myhandles',myhandles);
 

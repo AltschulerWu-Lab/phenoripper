@@ -99,7 +99,8 @@ neighbor_profiles_temp=zeros(blocks_nx*blocks_ny*number_of_repeats,number_of_blo
 % timing bar
 myhandles=getappdata(0,'myhandles');
 if(~isempty(myhandles))
-    progress= get(myhandles.statusbarHandles.ProgressBar, 'Value');
+    %progress= get(myhandles.statusbarHandles.ProgressBar, 'Value');
+    progress= myhandles.statusbarHandles.ProgressBar.getValue();
 end
 tStart1=tic;
 
@@ -305,8 +306,11 @@ for image_counter=1:number_of_repeats
         tElapsed=myhandles.tElapsed+tElapsed1;
         files_analyzed=myhandles.files_analyzed+image_counter;
         time_left=(myhandles.number_of_files-files_analyzed)*tElapsed/(files_analyzed);
-        set(myhandles.statusbarHandles.ProgressBar,...
-            'Value',progress,'StringPainted','on', 'string',format_time(time_left));
+        %set(myhandles.statusbarHandles.ProgressBar,...
+        %    'Value',progress,'StringPainted','on', 'string',format_time(time_left));
+	    myhandles.statusbarHandles.ProgressBar.setStringPainted(true);
+	    myhandles.statusbarHandles.ProgressBar.setString(format_time(time_left));
+  		myhandles.statusbarHandles.ProgressBar.setValue(progress);
     end
 end
 

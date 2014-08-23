@@ -2322,10 +2322,15 @@ function addProgressBarToMyHandle(mainFigure)
     myhandles=getappdata(0,'myhandles');
     myhandles.statusbarHandlesExplorer=statusbar(mainFigure,...
         'Explore your data');
-    set(myhandles.statusbarHandlesExplorer.TextPanel, 'Foreground',[1,1,1],...
-        'Background','black', 'ToolTipText','Loading...');
-    set(myhandles.statusbarHandlesExplorer.ProgressBar, 'Background','white',...
-        'Foreground',[0.4,0,0]);
+    %set(myhandles.statusbarHandlesExplorer.TextPanel, 'Foreground',[1,1,1],...
+    %    'Background','black', 'ToolTipText','Loading...');
+    %set(myhandles.statusbarHandlesExplorer.ProgressBar, 'Background','white',...
+    %    'Foreground',[0.4,0,0]);
+	myhandles.statusbarHandlesExplorer.TextPanel.setForeground(java.awt.Color(1,1,1));
+	myhandles.statusbarHandlesExplorer.TextPanel.setBackground(java.awt.Color(0,0,0));
+	myhandles.statusbarHandlesExplorer.TextPanel.setToolTipText('Loading...');
+	myhandles.statusbarHandlesExplorer.ProgressBar.setBackground(java.awt.Color(1,1,1));
+	myhandles.statusbarHandlesExplorer.ProgressBar.setForeground(java.awt.Color(0.4,0,0));
     setappdata(0,'myhandles',myhandles);
     
     
