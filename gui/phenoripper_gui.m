@@ -372,7 +372,9 @@ if(~isfield(myhandles,'files_per_image'))
   return;
 end
 %try
-set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
+%set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
+myhandles.statusbarHandles.ProgressBar.setVisible(true);
+myhandles.statusbarHandles.ProgressBar.setIndeterminate(true);
 myhandles.statusbarHandles=statusbar(hObject,'Calculating File Structure');
 analysistime_handle=tic;
 
@@ -457,7 +459,9 @@ end
 setappdata(0,'myhandles',myhandles);
 %Generate Global Basis
 warning off;
-set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
+%set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
+myhandles.statusbarHandles.ProgressBar.setVisible(true);
+myhandles.statusbarHandles.ProgressBar.setIndeterminate(true);
 myhandles.statusbarHandles=statusbar(hObject,'Learning Block Types (1/3)');
 global_data=identify_block_types(global_filenames,block_size,...
     cutoff_intensity,number_of_RGB_clusters,number_of_block_clusters,...
@@ -467,7 +471,9 @@ global_data=identify_block_types(global_filenames,block_size,...
     myhandles.foreground_channels,...
     myhandles.analyze_channels,...
     global_filenames_rescale_param);
-set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
+%set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','on');
+myhandles.statusbarHandles.ProgressBar.setVisible(true);
+myhandles.statusbarHandles.ProgressBar.setIndeterminate(true);
 myhandles.statusbarHandles=statusbar(hObject,'Learning Superblock Types (2/3)');
 
 warning on;
@@ -503,8 +509,15 @@ individual_superblock_profiles=zeros(myhandles.number_of_files,number_of_superbl
 individual_number_foreground_blocks=zeros(myhandles.number_of_files,1);
 %Calculating Block Profiles per Image
 warning off;
-set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','off');
-set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximum',myhandles.number_of_files, 'Value',0);
+%set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Indeterminate','off');
+myhandles.statusbarHandles.ProgressBar.setVisible(true);
+myhandles.statusbarHandles.ProgressBar.setIndeterminate(false);
+%set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximum',myhandles.number_of_files, 'Value',0);
+myhandles.statusbarHandles.ProgressBar.setVisible(true);
+myhandles.statusbarHandles.ProgressBar.setValue(0);
+myhandles.statusbarHandles.ProgressBar.setMinimum(0);
+myhandles.statusbarHandles.ProgressBar.setMaximum(myhandles.number_of_files);
+
 myhandles.statusbarHandles=statusbar(hObject,'Analysing Images (3/3)');
 tStart=tic; 
  myhandles.files_analyzed=0;
@@ -533,7 +546,9 @@ for file_num=1:length(myhandles.metadata)
     setappdata(0,'myhandles',myhandles);
     drawnow;
 end
-set(myhandles.statusbarHandles.ProgressBar, 'Visible','off','StringPainted','off');
+%set(myhandles.statusbarHandles.ProgressBar, 'Visible','off','StringPainted','off');
+myhandles.statusbarHandles.ProgressBar.setVisible(false);
+myhandles.statusbarHandles.ProgressBar.setStringPainted(false);
 warning on;
 myhandles.Ripped_Data=Ripped_Data;
 myhandles.individual_superblock_profiles=individual_superblock_profiles;
@@ -798,8 +813,13 @@ myhandles = getappdata(gcf,'myhandles');
 % Lines below are added since loading the file does not initialize the
 % status bar (it is a java hack, not officially supported by matlab)
 myhandles.statusbarHandles=statusbar(gcf,'Welcome to PhenoRipper.');
-set(myhandles.statusbarHandles.TextPanel, 'Foreground',[1,1,1], 'Background','black', 'ToolTipText','Loading...')
-set(myhandles.statusbarHandles.ProgressBar, 'Background','white', 'Foreground',[0.4,0,0]);
+%set(myhandles.statusbarHandles.TextPanel, 'Foreground',[1,1,1], 'Background','black', 'ToolTipText','Loading...')
+%set(myhandles.statusbarHandles.ProgressBar, 'Background','white', 'Foreground',[0.4,0,0]);
+myhandles.statusbarHandles.TextPanel.setForeground(java.awt.Color(1,1,1));
+myhandles.statusbarHandles.TextPanel.setBackground(java.awt.Color(0,0,0));
+myhandles.statusbarHandles.TextPanel.setToolTipText('Loading...');
+myhandles.statusbarHandles.ProgressBar.setBackground(java.awt.Color(1,1,1));
+myhandles.statusbarHandles.ProgressBar.setForeground(java.awt.Color(0.4,0,0));
 setappdata(0,'myhandles',myhandles);
 save_last_path(pathname,'result');
 h=msgbox('Data Load Successfully','modal');
@@ -872,7 +892,11 @@ if(~Show_Visualization_Window)
   number_of_test_files=10;
   selected_files=cell(number_of_test_files,files_per_image);
   
-  set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximum',number_of_test_files, 'Value',0);
+  %set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximum',number_of_test_files, 'Value',0);
+  myhandles.statusbarHandles.ProgressBar.setVisible(true);
+  myhandles.statusbarHandles.ProgressBar.setValue(0);
+  myhandles.statusbarHandles.ProgressBar.setMinimum(0);
+  myhandles.statusbarHandles.ProgressBar.setMaximum(number_of_test_files);
   myhandles.statusbarHandles=statusbar(hObject,'Scanning through all images');
   drawnow;
   for test_num=1:number_of_test_files
@@ -887,13 +911,18 @@ if(~Show_Visualization_Window)
 %       
 %       imagenames{file_num,channel};
     end
-    set(myhandles.statusbarHandles.ProgressBar, 'Value',test_num);
+    %set(myhandles.statusbarHandles.ProgressBar, 'Value',test_num);
+    myhandles.statusbarHandles.ProgressBar.setValue(test_num);
     if(test_num==1)
       drawnow;
     end
   end 
     
-    set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximum',size(selected_files,1), 'Value',0);
+    %set(myhandles.statusbarHandles.ProgressBar, 'Visible','on', 'Minimum',0, 'Maximum',size(selected_files,1), 'Value',0);
+    myhandles.statusbarHandles.ProgressBar.setVisible(true);
+    myhandles.statusbarHandles.ProgressBar.setValue(0);
+    myhandles.statusbarHandles.ProgressBar.setMinimum(0);
+    myhandles.statusbarHandles.ProgressBar.setMaximum(size(selected_files,1));
     %myhandles.statusbarHandles(hObject, 'Calculating Image Parameters ...');
     myhandles.statusbarHandles=statusbar(hObject,'Calculating Image Parameters ...');
     test=imfinfo(selected_files{1,1});
@@ -931,7 +960,8 @@ if(~Show_Visualization_Window)
         amp=sum(double(img).^2,3);
         amplitudes(file_num)=quantile(amp(:),0.66);
         %thresholds(file_num)=min(channel_thresholds).^2;
-        set(myhandles.statusbarHandles.ProgressBar, 'Value',file_num);
+        %set(myhandles.statusbarHandles.ProgressBar, 'Value',file_num);
+    	myhandles.statusbarHandles.ProgressBar.setValue(file_num);
     end
    
     myhandles.marker_scales=zeros(number_of_channels,2);
@@ -949,7 +979,8 @@ if(~Show_Visualization_Window)
     myhandles.foreground_channels=ones(number_of_channels,1);
     myhandles.analyze_channels=ones(number_of_channels,1);
     myhandles.statusbarHandles=statusbar(hObject,'');
-    set(myhandles.statusbarHandles.ProgressBar, 'Visible','off'); 
+    %set(myhandles.statusbarHandles.ProgressBar, 'Visible','off'); 
+    myhandles.statusbarHandles.ProgressBar.setVisible(false);
     myhandles.amplitude_range=max(cutoff_intensity,30);
     myhandles.bit_depth=bit_depth(double(max_val),[8,12,14,16,32]);
     
@@ -1009,10 +1040,17 @@ myhandles=getappdata(0,'myhandles');
 warning off;
 myhandles.statusbarHandles=statusbar(mainFigure,...
   'Welcome to PhenoRipper...');
-set(myhandles.statusbarHandles.TextPanel, 'Foreground',[1,1,1],...
-  'Background','black', 'ToolTipText','Loading...');
-set(myhandles.statusbarHandles.ProgressBar, 'Background','white',...
-  'Foreground',[0.4,0,0]);
+% set(myhandles.statusbarHandles.TextPanel, 'Foreground',[1,1,1],...
+%   'Background','black', 'ToolTipText','Loading...');
+myhandles.statusbarHandles.TextPanel.setForeground(java.awt.Color(1,1,1));
+myhandles.statusbarHandles.TextPanel.setBackground(java.awt.Color(0,0,0));
+myhandles.statusbarHandles.TextPanel.setToolTipText('Loading...');
+
+% set(myhandles.statusbarHandles.ProgressBar, 'Background','white',...
+%   'Foreground',[0.4,0,0]);
+
+myhandles.statusbarHandles.ProgressBar.setBackground(java.awt.Color(1,1,1));
+myhandles.statusbarHandles.ProgressBar.setForeground(java.awt.Color(0.4,0,0));
 warning on;
 setappdata(0,'myhandles',myhandles);
 
